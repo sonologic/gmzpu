@@ -118,6 +118,7 @@ package zpupkg is
       port(
          clk_i        : in  std_logic; -- CPU Clock
          reset_i      : in  std_logic; -- Sync Reset
+         interrupt_i  : in  std_logic; -- Interrupt
          enable_i     : in  std_logic; -- Hold the CPU (after reset)
          break_o      : out std_logic; -- Break instruction executed
          dbg_o        : out zpu_dbgo_t; -- Debug outputs (i.e. trace log)

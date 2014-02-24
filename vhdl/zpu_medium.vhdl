@@ -14,6 +14,7 @@
 ----  Author:                                                             ----
 ----    - Øyvind Harboe, oyvind.harboe zylin.com                          ----
 ----    - Salvador E. Tropea, salvador inti.gob.ar                        ----
+----    - Koen Martens, gmc sonologic.nl                                  ----
 ----                                                                      ----
 ------------------------------------------------------------------------------
 ----                                                                      ----
@@ -81,6 +82,7 @@ entity ZPUMediumCore is
    port(
       clk_i        : in  std_logic; -- CPU Clock
       reset_i      : in  std_logic; -- Sync Reset
+      interrupt_i  : in  std_logic; -- Interrupt
       enable_i     : in  std_logic; -- Hold the CPU (after reset)
       break_o      : out std_logic; -- Break instruction executed
       dbg_o        : out zpu_dbgo_t; -- Debug outputs (i.e. trace log)
@@ -167,6 +169,8 @@ architecture Behave of ZPUMediumCore is
    signal read_en_r     : std_logic;
    signal addr_r        : unsigned(ADDR_W-1 downto BYTE_BITS):=(others => '0');
    signal fetched_w_r   : unsigned(WORD_SIZE-1 downto 0);
+   -- IRQ flag
+   signal in_irq_r      : std_logic:='0';
 
    type state_t is(st_load2, st_popped, st_load_sp2, st_load_sp3, st_add_sp2,
                    st_fetch, st_execute, st_decode, st_decode2, st_resync,

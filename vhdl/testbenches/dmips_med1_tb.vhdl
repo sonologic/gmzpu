@@ -77,6 +77,7 @@ architecture Behave of DMIPS_Med1_TB is
       port(
          clk_i      : in  std_logic;  -- CPU clock
          rst_i      : in  std_logic;  -- Reset
+         interrupt_i: in  std_logic;  -- Interrupt
          break_o    : out std_logic;  -- Break executed
          dbg_o      : out zpu_dbgo_t; -- Debug info
          rs232_tx_o : out std_logic;  -- UART Tx
@@ -89,6 +90,7 @@ architecture Behave of DMIPS_Med1_TB is
 
    signal clk          : std_logic;
    signal reset        : std_logic:='1';
+   signal interrupt    : std_logic;
 
    signal break        : std_logic;
    signal dbg          : zpu_dbgo_t; -- Debug info
@@ -101,7 +103,7 @@ begin
          CLK_FREQ => CLK_FREQ, BRATE => BRATE, ADDR_W => ADDR_W,
          BRAM_W => BRAM_W)
       port map(
-         clk_i => clk, rst_i => reset, rs232_tx_o => rs232_tx,
+         clk_i => clk, rst_i => reset, interrupt_i => interrupt, rs232_tx_o => rs232_tx,
          rs232_rx_i => rs232_rx, break_o => break, dbg_o => dbg,
          gpio_in => (others => '0'));
 
