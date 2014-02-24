@@ -8,15 +8,15 @@ vlib zpu
 
 
 vcom -work zpu ../vhdl/roms/hello_bram.vhdl
-vcom -work zpu ../vhdl/roms/hello_dbram.vhdl
+#vcom -work zpu ../vhdl/roms/hello_dbram.vhdl
 vcom -work zpu ../vhdl/roms/rom_pkg.vhdl
 
 vcom -work zpu ../vhdl/zpu_pkg.vhdl
-vcom -work zpu ../vhdl/zpu_small.vhdl
+#vcom -work zpu ../vhdl/zpu_small.vhdl
 vcom -work zpu ../vhdl/zpu_medium.vhdl
 
 vcom -work zpu ../vhdl/helpers/zpu_med1.vhdl
-vcom -work zpu ../vhdl/helpers/zpu_small1.vhdl
+#vcom -work zpu ../vhdl/helpers/zpu_small1.vhdl
 
 vcom -work zpu  ../vhdl/devices/txt_util.vhdl
 vcom -work zpu  ../vhdl/devices/phi_io.vhdl
