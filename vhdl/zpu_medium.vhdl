@@ -251,7 +251,7 @@ architecture Behave of ZPUMediumCore is
                    dec_less_than, dec_less_than_or_equal, dec_lshr,
                    dec_u_less_than_or_equal, dec_u_less_than, dec_push_sp_add,
                    dec_call, dec_call_pc_rel, dec_sub, dec_break, dec_storeb,
-                   dec_insn_fetch, dec_pop_down);
+                   dec_insn_fetch, dec_pop_down, dec_interrupt);
    signal insn : insn_t;
    type insn_array_t is array(0 to WORD_BYTES-1) of insn_t;
    signal insns : insn_array_t;
@@ -296,6 +296,7 @@ begin
             sp_r         <= SP_START;
             pc_r         <= (others => '0');
             idim_r       <= '0';
+            in_irq_r     <= '0';
             write_en_r   <= '0';
             read_en_r    <= '0';
             mult_a_r     <= (others => '0');
@@ -332,6 +333,10 @@ begin
             sp_offset(4):=not opcode_r(ipc_low)(4);
             sp_offset(3 downto 0):=opcode_r(ipc_low)(3 downto 0);
             next_pc:=pc_r+1;
+
+            if interrupt_i='0' then
+              in_irq_r <= '0'; -- nolonger in an interrupt
+            end if;
    
             -- Prepare trace snapshot
             dbg_o.opcode <= opcode_r(ipc_low);
@@ -377,112 +382,125 @@ begin
                          state       <= st_decode2;
                       end if;
                  when st_decode2 =>
+                      if interrupt_i='1' and in_irq_r='0' then
+                      -- if interrupt asserted, execute interrupt
+                              tinsns(0):=dec_interrupt;
+                              tinsns(1):=dec_interrupt;
+                              tinsns(2):=dec_interrupt;
+                              tinsns(3):=dec_interrupt;
+                              insn <= tinsns(ipc_low);
+                              -- once we wrap, we need to fetch
+                              -- tinsns(0):=dec_insn_fetch;
+                              insns <= tinsns;
+                              state <= st_execute;
+                              in_irq_r <= '1';
+                      else
                       -- decode 4 instructions in parallel
-                      for i in 0 to WORD_BYTES-1 loop
-                          topcode:=fetched_w_r((WORD_BYTES-1-i+1)*8-1 downto (WORD_BYTES-1-i)*8);
+                              for i in 0 to WORD_BYTES-1 loop
+                                  topcode:=fetched_w_r((WORD_BYTES-1-i+1)*8-1 downto (WORD_BYTES-1-i)*8);
 
-                          tsp_offset(4):=not topcode(4);
-                          tsp_offset(3 downto 0):=topcode(3 downto 0);
+                                  tsp_offset(4):=not topcode(4);
+                                  tsp_offset(3 downto 0):=topcode(3 downto 0);
 
-                          opcode_r(i) <= topcode;
-                          if topcode(7 downto 7)=OPCODE_IM then
-                             tdecoded:=dec_im;
-                          elsif topcode(7 downto 5)=OPCODE_STORESP then
-                             if tsp_offset=0 then
-                                -- Special case, we can avoid a write
-                                tdecoded:=dec_pop;
-                             elsif tsp_offset=1 then
-                                -- Special case, collision
-                                tdecoded:=dec_pop_down;
-                             else
-                                tdecoded:=dec_store_sp;
-                             end if;
-                          elsif topcode(7 downto 5)=OPCODE_LOADSP then
-                             if tsp_offset=0 then
-                                tdecoded:=dec_dup;
-                             elsif tsp_offset=1 then
-                                tdecoded:=dec_dup_stk_b;
-                             else
-                                tdecoded:=dec_load_sp;
-                             end if;
-                          elsif topcode(7 downto 5)=OPCODE_EMULATE then
-                             tdecoded:=dec_emulate;
-                             if ENA_LEVEL0 and topcode(5 downto 0)=OPCODE_NEQBRANCH then
-                                tdecoded:=dec_neq_branch;
-                             elsif ENA_LEVEL0 and topcode(5 downto 0)=OPCODE_EQ then
-                                tdecoded:=dec_eq;
-                             elsif ENA_LEVEL0 and topcode(5 downto 0)=OPCODE_LOADB then
-                                tdecoded:=dec_loadb;
-                             elsif ENA_LEVEL0 and topcode(5 downto 0)=OPCODE_PUSHSPADD then
-                                tdecoded:=dec_push_sp_add;
-                             elsif ENA_LEVEL1 and topcode(5 downto 0)=OPCODE_LESSTHAN then
-                                tdecoded:=dec_less_than;
-                             elsif ENA_LEVEL1 and topcode(5 downto 0)=OPCODE_ULESSTHAN then
-                                tdecoded:=dec_u_less_than;
-                             elsif ENA_LEVEL1 and topcode(5 downto 0)=OPCODE_MULT then
-                                tdecoded:=dec_mult;
-                             elsif ENA_LEVEL1 and topcode(5 downto 0)=OPCODE_STOREB then
-                                tdecoded:=dec_storeb;
-                             elsif ENA_LEVEL1 and topcode(5 downto 0)=OPCODE_CALLPCREL then
-                                tdecoded:=dec_call_pc_rel;
-                             elsif ENA_LEVEL1 and topcode(5 downto 0)=OPCODE_SUB then
-                                tdecoded:=dec_sub;
-                             elsif ENA_LEVEL2 and topcode(5 downto 0)=OPCODE_LESSTHANOREQUAL then
-                                tdecoded:=dec_less_than_or_equal;
-                             elsif ENA_LEVEL2 and topcode(5 downto 0)=OPCODE_ULESSTHANOREQUAL then
-                                tdecoded:=dec_u_less_than_or_equal;
-                             elsif ENA_LEVEL2 and topcode(5 downto 0)=OPCODE_CALL then
-                                tdecoded:=dec_call;
-                             elsif ENA_LEVEL2 and topcode(5 downto 0)=OPCODE_POPPCREL then
-                                tdecoded:=dec_pop_pc_rel;
-                             elsif ENA_LSHR and topcode(5 downto 0)=OPCODE_LSHIFTRIGHT then
-                                tdecoded:=dec_lshr;
-                             end if;
-                          elsif topcode(7 downto 4)=OPCODE_ADDSP then
-                             if tsp_offset=0 then
-                                tdecoded:=dec_shift;
-                             elsif tsp_offset=1 then
-                                tdecoded:=dec_add_top;
-                             else
-                                tdecoded:=dec_add_sp;
-                             end if;
-                          else -- OPCODE_SHORT
-                             case topcode(3 downto 0) is
-                                  when OPCODE_BREAK =>
-                                       tdecoded:=dec_break;
-                                  when OPCODE_PUSHSP =>
-                                       tdecoded:=dec_push_sp;
-                                  when OPCODE_POPPC =>
-                                       tdecoded:=dec_pop_pc;
-                                  when OPCODE_ADD =>
-                                       tdecoded:=dec_add;
-                                  when OPCODE_OR =>
-                                       tdecoded:=dec_or;
-                                  when OPCODE_AND =>
-                                       tdecoded:=dec_and;
-                                  when OPCODE_LOAD =>
-                                       tdecoded:=dec_load;
-                                  when OPCODE_NOT =>
-                                       tdecoded:=dec_not;
-                                  when OPCODE_FLIP =>
-                                       tdecoded:=dec_flip;
-                                  when OPCODE_STORE =>
-                                       tdecoded:=dec_store;
-                                  when OPCODE_POPSP =>
-                                       tdecoded:=dec_pop_sp;
-                                  when others => -- OPCODE_NOP and others
-                                       tdecoded:=dec_nop;
-                             end case;
-                          end if;
-                          tinsns(i):=tdecoded;
-                      end loop;
-                      
-                      insn <= tinsns(ipc_low);
-                      -- once we wrap, we need to fetch
-                      tinsns(0):=dec_insn_fetch;
-                      insns <= tinsns;
-                      state <= st_execute;
-
+                                  opcode_r(i) <= topcode;
+                                  if topcode(7 downto 7)=OPCODE_IM then
+                                     tdecoded:=dec_im;
+                                  elsif topcode(7 downto 5)=OPCODE_STORESP then
+                                     if tsp_offset=0 then
+                                        -- Special case, we can avoid a write
+                                        tdecoded:=dec_pop;
+                                     elsif tsp_offset=1 then
+                                        -- Special case, collision
+                                        tdecoded:=dec_pop_down;
+                                     else
+                                        tdecoded:=dec_store_sp;
+                                     end if;
+                                  elsif topcode(7 downto 5)=OPCODE_LOADSP then
+                                     if tsp_offset=0 then
+                                        tdecoded:=dec_dup;
+                                     elsif tsp_offset=1 then
+                                        tdecoded:=dec_dup_stk_b;
+                                     else
+                                        tdecoded:=dec_load_sp;
+                                     end if;
+                                  elsif topcode(7 downto 5)=OPCODE_EMULATE then
+                                     tdecoded:=dec_emulate;
+                                     if ENA_LEVEL0 and topcode(5 downto 0)=OPCODE_NEQBRANCH then
+                                        tdecoded:=dec_neq_branch;
+                                     elsif ENA_LEVEL0 and topcode(5 downto 0)=OPCODE_EQ then
+                                        tdecoded:=dec_eq;
+                                     elsif ENA_LEVEL0 and topcode(5 downto 0)=OPCODE_LOADB then
+                                        tdecoded:=dec_loadb;
+                                     elsif ENA_LEVEL0 and topcode(5 downto 0)=OPCODE_PUSHSPADD then
+                                        tdecoded:=dec_push_sp_add;
+                                     elsif ENA_LEVEL1 and topcode(5 downto 0)=OPCODE_LESSTHAN then
+                                        tdecoded:=dec_less_than;
+                                     elsif ENA_LEVEL1 and topcode(5 downto 0)=OPCODE_ULESSTHAN then
+                                        tdecoded:=dec_u_less_than;
+                                     elsif ENA_LEVEL1 and topcode(5 downto 0)=OPCODE_MULT then
+                                        tdecoded:=dec_mult;
+                                     elsif ENA_LEVEL1 and topcode(5 downto 0)=OPCODE_STOREB then
+                                        tdecoded:=dec_storeb;
+                                     elsif ENA_LEVEL1 and topcode(5 downto 0)=OPCODE_CALLPCREL then
+                                        tdecoded:=dec_call_pc_rel;
+                                     elsif ENA_LEVEL1 and topcode(5 downto 0)=OPCODE_SUB then
+                                        tdecoded:=dec_sub;
+                                     elsif ENA_LEVEL2 and topcode(5 downto 0)=OPCODE_LESSTHANOREQUAL then
+                                        tdecoded:=dec_less_than_or_equal;
+                                     elsif ENA_LEVEL2 and topcode(5 downto 0)=OPCODE_ULESSTHANOREQUAL then
+                                        tdecoded:=dec_u_less_than_or_equal;
+                                     elsif ENA_LEVEL2 and topcode(5 downto 0)=OPCODE_CALL then
+                                        tdecoded:=dec_call;
+                                     elsif ENA_LEVEL2 and topcode(5 downto 0)=OPCODE_POPPCREL then
+                                        tdecoded:=dec_pop_pc_rel;
+                                     elsif ENA_LSHR and topcode(5 downto 0)=OPCODE_LSHIFTRIGHT then
+                                        tdecoded:=dec_lshr;
+                                     end if;
+                                  elsif topcode(7 downto 4)=OPCODE_ADDSP then
+                                     if tsp_offset=0 then
+                                        tdecoded:=dec_shift;
+                                     elsif tsp_offset=1 then
+                                        tdecoded:=dec_add_top;
+                                     else
+                                        tdecoded:=dec_add_sp;
+                                     end if;
+                                  else -- OPCODE_SHORT
+                                     case topcode(3 downto 0) is
+                                          when OPCODE_BREAK =>
+                                               tdecoded:=dec_break;
+                                          when OPCODE_PUSHSP =>
+                                               tdecoded:=dec_push_sp;
+                                          when OPCODE_POPPC =>
+                                               tdecoded:=dec_pop_pc;
+                                          when OPCODE_ADD =>
+                                               tdecoded:=dec_add;
+                                          when OPCODE_OR =>
+                                               tdecoded:=dec_or;
+                                          when OPCODE_AND =>
+                                               tdecoded:=dec_and;
+                                          when OPCODE_LOAD =>
+                                               tdecoded:=dec_load;
+                                          when OPCODE_NOT =>
+                                               tdecoded:=dec_not;
+                                          when OPCODE_FLIP =>
+                                               tdecoded:=dec_flip;
+                                          when OPCODE_STORE =>
+                                               tdecoded:=dec_store;
+                                          when OPCODE_POPSP =>
+                                               tdecoded:=dec_pop_sp;
+                                          when others => -- OPCODE_NOP and others
+                                               tdecoded:=dec_nop;
+                                     end case;
+                                  end if;
+                                  tinsns(i):=tdecoded;
+                              end loop;
+                              
+                              insn <= tinsns(ipc_low);
+                              -- once we wrap, we need to fetch
+                              tinsns(0):=dec_insn_fetch;
+                              insns <= tinsns;
+                              state <= st_execute;
+                      end if;
                       -- Each instruction must:
                       --
                       -- 1. increase pc_r if applicable
@@ -499,6 +517,23 @@ begin
                          idim_r       <= '0';
                       end if;
                       case insn is
+                           when dec_interrupt =>
+                                -- Not a real instruction, interrupt
+                                -- Push(PC); PC=32
+
+                                -- sp_r         <= sp_r-1;
+                                -- a_addr_r     <= sp_r-1;
+                                -- a_we_r       <= '1';
+
+                                FlushB(write_en_r,addr_r,inc_sp,data_o,b_r);
+                                a_r          <= (others => D_CARE_VAL);
+                                a_r(ADDR_W-1 downto 0)          <= pc_r;
+                                Push(sp_r,a_r,b_r);
+
+                                pc_r     <= to_unsigned(32,ADDR_W); -- interrupt address
+                                report "ZPU jumped to interrupt!" severity note;
+                                -- TODO: force fetch
+                                insn <= dec_insn_fetch;
                            when dec_insn_fetch =>
                                 -- Not a real instruction, fetch new instructions
                                 DoFetch(FAST_FETCH,state,addr_r,pc_r,read_en_r,mem_busy_i);

@@ -151,7 +151,7 @@ begin
          WORD_SIZE => WORD_SIZE, ADDR_W => ADDR_W, MEM_W => BRAM_W,
          D_CARE_VAL => D_CARE_VAL)
       port map(
-         clk_i => clk_i, reset_i => rst_i, interrupt_i => '0', enable_i => '1',
+         clk_i => clk_i, reset_i => rst_i, interrupt_i => interrupt_i, enable_i => '1',
          break_o => break_o, dbg_o => dbg_o,
          -- Memory
          mem_busy_i => mem_busy, data_i => mem_read, data_o => mem_write,

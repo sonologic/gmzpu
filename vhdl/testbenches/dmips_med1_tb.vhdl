@@ -90,7 +90,7 @@ architecture Behave of DMIPS_Med1_TB is
 
    signal clk          : std_logic;
    signal reset        : std_logic:='1';
-   signal interrupt    : std_logic;
+   signal interrupt    : std_logic:='0';
 
    signal break        : std_logic;
    signal dbg          : zpu_dbgo_t; -- Debug info
@@ -126,6 +126,13 @@ begin
          wait;
       end if;
    end process do_clock;
+
+   do_intr:
+   process
+   begin
+     wait for 1000000 ns;
+     interrupt <= '1';
+   end process do_intr;
 
    do_reset:
    process
