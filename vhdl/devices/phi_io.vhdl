@@ -65,8 +65,7 @@ entity ZPUPhiIO is
    generic(
       BRDIVISOR : positive:=1;   -- Baud rate divisor i.e. br_clk/9600/4
       ENA_LOG   : boolean:=true; -- Enable log
-      LOG_FILE  : string:="log.txt"; -- Name for the log file
-      UART_LOG_FILE  : string:="uart.log"); -- Name for the log file
+      LOG_FILE  : string:="log.txt"); -- Name for the log file
    port(
       clk_i      : in  std_logic; -- System Clock
       reset_i    : in  std_logic; -- Synchronous Reset
@@ -124,8 +123,6 @@ architecture Behave of ZPUPhiIO is
    signal gpio_read  : unsigned(31 downto 0);
 
    file l_file       : text open write_mode is LOG_FILE;
-
-   file u_file       : text open write_mode is UART_LOG_FILE;
 
 begin
    -----------
@@ -208,7 +205,6 @@ begin
                   -- Write to UART
                   print("- Write to UART Tx: 0x" &hstr(data_i)&" ("&
                         character'val(to_integer(data_i) mod 256)&")");
-                  write(u_file, "" & character'val(to_integer(data_i) mod 256) & "");
                     char := character'val(to_integer(data_i));
                     if char = lf then
                         std.textio.writeline(l_file, line_out);
