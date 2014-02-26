@@ -3,3 +3,7 @@ work
 *.wlf
 transcript
 zpu
+roms/*/*.dis
+roms/*/*.vhdl
+sim/*.vstf
+*.bak
