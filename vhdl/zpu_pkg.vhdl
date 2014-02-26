@@ -291,3 +291,41 @@ package UART is
    end component BRGen;
 end package UART;
 
+library IEEE;
+use IEEE.std_logic_1164.all;
+use IEEE.numeric_std.all;
+
+package wishbone is
+
+    component zpu_wishbone_bridge is
+            generic (
+                DATA_WIDTH  : natural:=32;       -- width of data bus
+                ADR_MSB     : natural:=31;
+                ADR_LSB     : natural:=2
+            );
+            port (
+                --
+                clk_i       : in std_logic;
+                dat_i       : in std_logic_vector(DATA_WIDTH-1 downto 0);
+                dat_o       : out std_logic_vector(DATA_WIDTH-1 downto 0);
+                rst_i       : in std_logic;
+                -- data tagging
+                tgd_i       : in std_logic_vector(DATA_WIDTH-1 downto 0);
+                tgd_o       : out std_logic_vector(DATA_WIDTH-1 downto 0);
+                -- MASTER signals
+                ack_i       : in std_logic;
+                adr_o       : out std_logic_vector(ADR_MSB downto ADR_LSB);
+                cyc_o       : out std_logic;
+                stall_i     : in std_logic;
+                err_i       : in std_logic;
+                lock_o      : out std_logic;
+                rty_i       : in std_logic;
+                sel_o       : out std_logic_vector(DATA_WIDTH-1 downto 0);
+                stb_o       : out std_logic;
+                tga_o       : out std_logic_vector(ADR_MSB downto ADR_LSB);
+                tgc_o       : out std_logic_vector(DATA_WIDTH-1 downto 0); -- size correct?
+                we_o        : out std_logic
+            );
+    end component zpu_wishbone_bridge;
+end package wishbone;
+
