@@ -87,3 +87,46 @@ begin
 end architecture rtl;
 
 
+
+
+
+library IEEE;
+use IEEE.std_logic_1164.all;
+use IEEE.numeric_std.all;
+
+entity zpu_wishbone_intercon is
+    generic (
+        ADR_MSB     : natural:=31;
+        ADR_LSB     : natural:=0;
+        PAGE_BIT    : natural:=4;
+        NUNITS      : natural:=3
+
+    );
+    port (
+        rst_i       : in  std_logic;
+        stb_i       : in  std_logic;
+        cyc_i       : in  std_logic;
+        adr_i       : in  std_logic_vector(ADR_MSB downto ADR_LSB);
+        adr_o       : out std_logic_vector(PAGE_BIT-1 downto 0);
+        stb_o       : out std_logic_vector(NUNITS-1 downto 0)
+    );
+
+end entity zpu_wishbone_intercon;
+
+architecture rtl of zpu_wishbone_intercon is
+begin
+
+    process(adr_i,stb_i,cyc_i)
+        variable page_sel     : integer range 0 to NUNITS-1;
+    begin
+        page_sel := to_integer(unsigned(adr_i(ADR_MSB downto PAGE_BIT)));
+
+        stb_o <= (others => '0');
+        stb_o(page_sel) <= stb_i and cyc_i;
+
+        adr_o <= (others => '0');
+        adr_o(PAGE_BIT-1 downto 0) <= adr_i(PAGE_BIT-1 downto 0);
+    end process;
+
+end architecture rtl;
+

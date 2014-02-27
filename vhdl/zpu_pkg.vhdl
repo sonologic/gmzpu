@@ -327,5 +327,22 @@ package wishbone is
                 we_o        : out std_logic
             );
     end component zpu_wishbone_bridge;
+
+    component zpu_wishbone_intercon is
+            generic (
+                ADR_MSB     : natural:=31;
+                ADR_LSB     : natural:=0;
+                PAGE_BIT    : natural:=4;
+                NUNITS      : natural:=3
+            );
+            port (
+                rst_i       : in  std_logic;
+                stb_i       : in  std_logic;
+                cyc_i       : in  std_logic;
+                adr_i       : in  std_logic_vector(ADR_MSB downto ADR_LSB);
+                adr_o       : out std_logic_vector(PAGE_BIT-1 downto 0);
+                stb_o       : out std_logic_vector(NUNITS-1 downto 0)
+            );
+    end component zpu_wishbone_intercon;
 end package wishbone;
 
