@@ -141,6 +141,65 @@ library IEEE;
 use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all;
 
+entity zwishbone_c_regs is
+    generic(
+        ADR_WIDTH   : natural:=16;
+        DATA_WIDTH  : natural:=32
+    );
+    port (
+        clk_i       : in std_logic;
+        rst_i       : in std_logic;
+        -- c_decode
+        en_i        : in std_logic;
+        we_i        : in std_logic;
+        adr_i       : in std_logic_vector(ADR_WIDTH-1 downto 0);
+        dat_i       : in std_logic_vector(DATA_WIDTH-1 downto 0);
+        dat_o       : out std_logic_vector(DATA_WIDTH-1 downto 0);
+        -- config register value (0x0000, for c_control)
+        cfg_o       : out std_logic_vector(DATA_WIDTH-1 downto 0)
+    );
+end entity zwishbone_c_regs;
+
+architecture rtl of zwishbone_c_regs is
+    constant    R_CFG_PIPELINE_BIT  : integer:=0;
+    constant    R_CFG_BLOCK_BIT     : integer:=1;
+    constant    R_CFG_RMW_BIT       : integer:=0;
+    signal reg_config   : std_logic_vector(DATA_WIDTH-1 downto 0) := (others => '0');
+begin
+
+    process
+    begin
+        wait until rising_edge(clk_i);
+      
+        -- only act when enabled 
+        if en_i='1' then
+            -- adr 0x0 : CONFIG register
+            if adr_i=std_logic_vector(to_unsigned(0,ADR_WIDTH)) then
+                    -- write/read CONFIG register
+                    if we_i='1' then
+                        reg_config <= std_logic_vector(dat_i);
+                    else
+                        dat_o <= std_logic_vector(reg_config);
+                    end if;
+            end if;
+        end if;
+
+        -- reset 
+        if rst_i='1' then
+            reg_config <= (others => '0');
+        end if;
+
+    end process;
+
+    -- export CONFIG register value
+    cfg_o <= reg_config;
+
+end architecture rtl;
+
+library IEEE;
+use IEEE.std_logic_1164.all;
+use IEEE.numeric_std.all;
+
 entity zwishbone_c_decode is
             generic(
                 ADR_WIDTH   : natural:=15;
@@ -156,25 +215,23 @@ entity zwishbone_c_decode is
                 -- internal fabric
                 reg_en_o    : out std_logic;
                 bus_en_o    : out std_logic;
-                reg_o       : out std_logic;
-                bus_o       : out std_logic;
                 radr_o      : out std_logic_vector(ADR_WIDTH-1-CS_WIDTH downto 0);
                 badr_o      : out std_logic_vector(ADR_WIDTH-1-CS_WIDTH downto 0);
-                reg_i       : in std_logic(WORD_SIZE-1 downto 0);
-                reg_o       : out std_logic(WORD_SIZE-1 downto 0);
-                bus_i       : in std_logic(WORD_SIZE-1 downto 0);
-                bus_o       : out std_logic(WORD_SZIE-1 downto 0);
+                reg_i       : in std_logic_vector(WORD_SIZE-1 downto 0);
+                reg_o       : out std_logic_vector(WORD_SIZE-1 downto 0);
+                bus_i       : in std_logic_vector(WORD_SIZE-1 downto 0);
+                bus_o       : out std_logic_vector(WORD_SIZE-1 downto 0);
                 -- chip select
                 cs_o        : out std_logic_vector(CS_WIDTH-1 downto 0)
             );
 end entity zwishbone_c_decode;
 
 architecture zwc_decode of zwishbone_c_decode is
-begin
     signal reg_en   : std_logic;
     signal bus_en   : std_logic;
     signal cs       : std_logic_vector(ADR_WIDTH-2 downto ADR_WIDTH-CS_WIDTH-1);
-    signal adr      : std_logic_vector(ADR_WIDTH-CS_WIDTH-2);
+    signal adr      : std_logic_vector(ADR_WIDTH-CS_WIDTH-2 downto 0);
+begin
 
     -- bus or register ? check MSB of adr_i
     bus_en <= adr_i(ADR_WIDTH-1) and ena_i;
@@ -186,11 +243,11 @@ begin
     -- chip select
     cs <= adr_i(ADR_WIDTH-2 downto ADR_WIDTH-CS_WIDTH-1);
 
-    cs_o <= cs when (ena_i='1' and bus_en='1') else 'Z';
+    cs_o <= cs when (ena_i='1' and bus_en='1') else "ZZZZ";
 
     -- bus and register address
-    badr_o <= adr_i(ADR_WIDTH-CS_WIDTH-2 downto 0) when (ena_i='1' and bus_en='1') else 'Z';
-    radr_o <= adr_i(ADR_WIDTH-CS_WIDTH-2 downto 0) when (ena_i='1' and reg_en='1') else 'Z';
+    badr_o <= adr_i(ADR_WIDTH-CS_WIDTH-2 downto 0) when (ena_i='1' and bus_en='1') else "ZZZZ";
+    radr_o <= adr_i(ADR_WIDTH-CS_WIDTH-2 downto 0) when (ena_i='1' and reg_en='1') else "ZZZZ";
 
     -- 
     dat_o <= bus_i when bus_en='1';
