@@ -1,8 +1,9 @@
-work
 *.log
 *.wlf
 transcript
-zpu
+sim/gmzpu
+sim/zpu
+sim/work
 roms/*/*.dis
 roms/*/*.vhdl
 sim/*.vstf
