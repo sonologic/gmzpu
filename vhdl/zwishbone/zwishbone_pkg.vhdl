@@ -42,9 +42,9 @@ library IEEE;
 use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all;
 
-package wishbone is
+package zwishbone is
 
-    component zpu_wishbone_controller is
+    component zwishbone_controller is
             generic (
                 DATA_WIDTH  : natural:=32;       -- width of data bus
                 ADR_MSB     : natural:=31;
@@ -82,9 +82,9 @@ package wishbone is
         block_i     : in std_logic; -- select block mode
         rmw_i       : in std_logic -- select read-modify-write
             );
-    end component zpu_wishbone_controller;
+    end component zwishbone_controller;
 
-    component zpu_wishbone_c_control is
+    component zwishbone_c_control is
             generic(
                 ADR_WIDTH   : natural:=16;
                 DATA_WIDTH  : natural:=32
@@ -97,9 +97,9 @@ package wishbone is
                 busy_o  : out std_logic;
                 
             );
-    end component zpu_wishbone_c_control
+    end component zwishbone_c_control
 
-    component zpu_wishbone_c_regs is
+    component zwishbone_c_regs is
             generic(
                 ADR_WIDTH   : natural:=16;
                 DATA_WIDTH  : natural:=32
@@ -109,9 +109,9 @@ package wishbone is
                 cfg_o       : out std_logic_vector(DATA_WIDTH-1 downto 0);
                 
             );
-    end component zpu_wishbone_c_regs
+    end component zwishbone_c_regs
 
-    component zpu_wishbone_c_bus is
+    component zwishbone_c_bus is
             generic(
                 ADR_WIDTH   : natural:=16;
                 DATA_WIDTH  : natural:=32
@@ -138,9 +138,9 @@ package wishbone is
                 tgc_o       : out std_logic_vector(DATA_WIDTH-1 downto 0); -- size correct?
                 we_o        : out std_logic;
             );
-    end component zpu_wishbone_c_bus
+    end component zwishbone_c_bus
         
-    component zpu_wishbone_c_decode is
+    component zwishbone_c_decode is
             generic(
                 ADR_WIDTH   : natural:=16;
                 WORD_SIZE   : natural:=32;
@@ -163,9 +163,9 @@ package wishbone is
                 -- chip select
                 cs_o        : out std_logic_vector(CS_WIDTH-1 downto 0);
             );
-    end component zpu_wishbone_c_decode
+    end component zwishbone_c_decode
 
-    component zpu_wishbone_intercon is
+    component zwishbone_intercon is
             generic (
                 ADR_MSB     : natural:=31;
                 ADR_LSB     : natural:=0;
@@ -180,6 +180,6 @@ package wishbone is
                 adr_o       : out std_logic_vector(PAGE_BIT-1 downto 0);
                 stb_o       : out std_logic_vector(NUNITS-1 downto 0)
             );
-    end component zpu_wishbone_intercon;
-end package wishbone;
+    end component zwishbone_intercon;
+end package zwishbone;
 

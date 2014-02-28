@@ -12,22 +12,21 @@ use IEEE.numeric_std.all;
 
 -- 
 
-entity zpu_wishbone_bridge is
+entity zwishbone_controller is
     generic (
         DATA_WIDTH  : natural:=32;       -- width of data bus
         ADR_MSB     : natural:=31;
         ADR_LSB     : natural:=2
     );
     port (
-        --
+        -- SYSCON
         clk_i       : in std_logic;
+        rst_i       : in std_logic;
+        -- wishbone MASTER signals
         dat_i       : in std_logic_vector(DATA_WIDTH-1 downto 0);
         dat_o       : out std_logic_vector(DATA_WIDTH-1 downto 0);
-        rst_i       : in std_logic;
-        -- data tagging
         tgd_i       : in std_logic_vector(DATA_WIDTH-1 downto 0);
         tgd_o       : out std_logic_vector(DATA_WIDTH-1 downto 0);
-        -- MASTER signals
         ack_i       : in std_logic;
         adr_o       : out std_logic_vector(ADR_MSB downto ADR_LSB);
         cyc_o       : out std_logic;
@@ -39,28 +38,31 @@ entity zpu_wishbone_bridge is
         stb_o       : out std_logic;
         tga_o       : out std_logic_vector(ADR_MSB downto ADR_LSB);
         tgc_o       : out std_logic_vector(DATA_WIDTH-1 downto 0); -- size correct?
-        we_o        : out std_logic
+        we_o        : out std_logic;
+        -- zpu interface (non wishbone signal)
+        ena_i       : in std_logic; -- enable wb controller
+        busy_o      : out std_logic; -- controller busy
+        adr_i       : in std_logic_vector(ADR_MSB downto ADR_LSB);
+        we_i        : in std_logic;
+        data_i      : in std_logic_vector(DATA_WIDTH-1 downto 0);
+        data_o      : out std_logic_vector(DATA_WIDTH-1 downto 0);
+        pipeline_i  : in std_logic; -- select pipelined mode
+        block_i     : in std_logic; -- select block mode
+        rmw_i       : in std_logic -- select read-modify-write
     );
-end entity zpu_wishbone_bridge;
+end entity zwishbone_controller;
 
 --
 
-architecture rtl of zpu_wishbone_bridge is
+architecture rtl of zwishbone_controller is
 
     signal in_reset : std_logic:='0';
 
-begin
+    signal strobe : std_logic:='0';
+    signal cycle  : std_logic:='0';
+    signal busy  : std_logic:='0';
 
---    dat_o <= (others => '0');
---    tgd_o <= (others => '0');
---    adr_o <= (others => '0');
---    cyc_o <= '0';
---    lock_o <= '0';
---    sel_o <= (others => '0');
---    stb_o <= '0';
---    tga_o <= (others => '0');
---    tgc_o <= (others => '0');
---    we_o <= '0';
+begin
 
     do_wishbone:
     process(clk_i)
@@ -69,20 +71,22 @@ begin
     begin
         if rising_edge(clk_i) then
             if rst_i='1' then
-                stb_o <= '0';
-                cyc_o <= '0';
                 in_reset <= '1';
             else -- rst_i='1'
-                if in_reset='1' then
-                    -- stay in initialized state
-                    in_reset <= '0';
-                else -- in_reset='1'
-                    -- not in reset, operate bus..
-
-                end if; -- in_reset='1'
+                in_reset <= '0';
             end if; -- rst_i='1' 
         end if; -- rising_edge(clk_i)
     end process do_wishbone;
+
+    strobe <= '0';
+    cycle <= '0';
+
+    stb_o <= '0' when in_reset='1' else
+             strobe;
+    cyc_o <= '0' when in_reset='1' else
+             cycle;
+    busy_o <= '1' when in_reset='1' else
+             busy;
 
 end architecture rtl;
 
@@ -94,7 +98,7 @@ library IEEE;
 use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all;
 
-entity zpu_wishbone_intercon is
+entity zwishbone_intercon is
     generic (
         ADR_MSB     : natural:=31;
         ADR_LSB     : natural:=0;
@@ -111,9 +115,9 @@ entity zpu_wishbone_intercon is
         stb_o       : out std_logic_vector(NUNITS-1 downto 0)
     );
 
-end entity zpu_wishbone_intercon;
+end entity zwishbone_intercon;
 
-architecture rtl of zpu_wishbone_intercon is
+architecture rtl of zwishbone_intercon is
 begin
 
     process(adr_i,stb_i,cyc_i)
@@ -129,4 +133,71 @@ begin
     end process;
 
 end architecture rtl;
+
+
+
+
+library IEEE;
+use IEEE.std_logic_1164.all;
+use IEEE.numeric_std.all;
+
+entity zwishbone_c_decode is
+            generic(
+                ADR_WIDTH   : natural:=15;
+                WORD_SIZE   : natural:=32;
+                CS_WIDTH    : natural:=4
+            );
+            port (
+                -- zpu fabric
+                adr_i       : in std_logic_vector(ADR_WIDTH-1 downto 0);
+                dat_i       : in std_logic_vector(WORD_SIZE-1 downto 0);
+                dat_o       : out std_logic_vector(WORD_SIZE-1 downto 0);
+                ena_i       : in std_logic;
+                -- internal fabric
+                reg_en_o    : out std_logic;
+                bus_en_o    : out std_logic;
+                reg_o       : out std_logic;
+                bus_o       : out std_logic;
+                radr_o      : out std_logic_vector(ADR_WIDTH-1-CS_WIDTH downto 0);
+                badr_o      : out std_logic_vector(ADR_WIDTH-1-CS_WIDTH downto 0);
+                reg_i       : in std_logic(WORD_SIZE-1 downto 0);
+                reg_o       : out std_logic(WORD_SIZE-1 downto 0);
+                bus_i       : in std_logic(WORD_SIZE-1 downto 0);
+                bus_o       : out std_logic(WORD_SZIE-1 downto 0);
+                -- chip select
+                cs_o        : out std_logic_vector(CS_WIDTH-1 downto 0)
+            );
+end entity zwishbone_c_decode;
+
+architecture zwc_decode of zwishbone_c_decode is
+begin
+    signal reg_en   : std_logic;
+    signal bus_en   : std_logic;
+    signal cs       : std_logic_vector(ADR_WIDTH-2 downto ADR_WIDTH-CS_WIDTH-1);
+    signal adr      : std_logic_vector(ADR_WIDTH-CS_WIDTH-2);
+
+    -- bus or register ? check MSB of adr_i
+    bus_en <= adr_i(ADR_WIDTH-1) and ena_i;
+    reg_en <= (not adr_i(ADR_WIDTH-1)) and ena_i;
+
+    bus_en_o <= bus_en;
+    reg_en_o <= reg_en;
+
+    -- chip select
+    cs <= adr_i(ADR_WIDTH-2 downto ADR_WIDTH-CS_WIDTH-1);
+
+    cs_o <= cs when (ena_i='1' and bus_en='1') else 'Z';
+
+    -- bus and register address
+    badr_o <= adr_i(ADR_WIDTH-CS_WIDTH-2 downto 0) when (ena_i='1' and bus_en='1') else 'Z';
+    radr_o <= adr_i(ADR_WIDTH-CS_WIDTH-2 downto 0) when (ena_i='1' and reg_en='1') else 'Z';
+
+    -- 
+    dat_o <= bus_i when bus_en='1';
+    bus_o <= dat_i when bus_en='1';
+
+    dat_o <= reg_i when reg_en='1';
+    reg_o <= dat_i when reg_en='1';
+
+end architecture zwc_decode;
 
