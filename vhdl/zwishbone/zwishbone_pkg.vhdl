@@ -121,6 +121,8 @@ package zwishbone is
                 adr_i       : in std_logic_vector(ADR_WIDTH-1 downto 0);
                 dat_i       : in std_logic_vector(DATA_WIDTH-1 downto 0);
                 dat_o       : out std_logic_vector(DATA_WIDTH-1 downto 0);
+                --
+                ready_o     : out std_logic;
                 -- config register value (0x0000, for c_control)
                 cfg_o       : out std_logic_vector(DATA_WIDTH-1 downto 0)
             );
@@ -133,7 +135,10 @@ package zwishbone is
             );
             port (
                 -- zpu wishbone controller signals
+                clk_i       : in std_logic;
+                rst_i       : in std_logic;
                 en_i        : in std_logic;     -- enable wb bus (internal)
+                we_i        : in std_logic;
                 adr_i       : in std_logic_vector(ADR_WIDTH-1 downto 0);
                 dat_i       : in std_logic_vector(DATA_WIDTH-1 downto 0);
                 dat_o       : out std_logic_vector(DATA_WIDTH-1 downto 0);
@@ -169,11 +174,13 @@ package zwishbone is
                 dat_i       : in std_logic_vector(WORD_SIZE-1 downto 0);
                 dat_o       : out std_logic_vector(WORD_SIZE-1 downto 0);
                 ena_i       : in std_logic;
+                rst_i       : in std_logic;
+                we_i        : in std_logic;
                 -- internal fabric
                 reg_en_o    : out std_logic;
                 bus_en_o    : out std_logic;
-                radr_o      : out std_logic_vector(ADR_WIDTH-1-CS_WIDTH downto 0);
-                badr_o      : out std_logic_vector(ADR_WIDTH-1-CS_WIDTH downto 0);
+                radr_o      : out std_logic_vector(ADR_WIDTH-2-CS_WIDTH downto 0);
+                badr_o      : out std_logic_vector(ADR_WIDTH-2-CS_WIDTH downto 0);
                 reg_i       : in std_logic_vector(WORD_SIZE-1 downto 0);
                 reg_o       : out std_logic_vector(WORD_SIZE-1 downto 0);
                 bus_i       : in std_logic_vector(WORD_SIZE-1 downto 0);
