@@ -16,3 +16,19 @@ Goals:
 Long term goals:
 - experiment with security-by-design microprocessors
 - experiment with security-by-design operating system
+
+Getting started
+---------------
+
+First install Altera's ModelSim.
+
+Then:
+
+cd sim
+
+vsim -do test.do              # run hello world on medium zpu core
+
+vsim -do zwishbone__decode.do # run testbench for zwishbone controller
+                              # decode component
+
+
