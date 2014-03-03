@@ -51,9 +51,9 @@ begin
     -- export CONFIG register value
     cfg_o <= reg_config;
 
-    reg_status <= (others => '0');
     reg_status(0) <= err_i;
     reg_status(1) <= rty_i;
+    reg_status(DATA_WIDTH-1 downto 2) <= (others => '0');
 
     process
     begin
@@ -271,6 +271,9 @@ begin
             err_i => status_err_r,
             rty_i => status_rty_r
         );
+
+    status_err_r <= '1';
+    status_rty_r <= '1';
 
     dec : zwishbone_c_decode
         generic map (
