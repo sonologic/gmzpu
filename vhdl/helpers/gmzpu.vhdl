@@ -51,6 +51,9 @@ use IEEE.numeric_std.all;
 library zpu;
 use zpu.zpupkg.all;
 
+library gmzpu;
+use gmzpu.zwishbone.all;
+
 -- RAM declaration
 library work;
 use work.zpu_memory.all;
@@ -80,7 +83,12 @@ end entity gmZPU;
 architecture Structural of gmZPU is
    constant BYTE_BITS  : integer:=WORD_SIZE/16; -- # of bits in a word that addresses bytes
    constant IO_BIT     : integer:=ADDR_W-1; -- Address bit to determine this is an I/O
+                                            -- 0 = memory, 1= I/O
+   constant ZW_BIT     : integer:=ADDR_W-2; -- Address bit to determine zwishbone from phiIO
+                                            -- 0 = phiIO, 1 = zwishbone
    constant BRDIVISOR  : positive:=CLK_FREQ*1e6/BRATE/4;
+   -- zwishbone
+   constant CS_WIDTH   : natural:=4;
 
    -- I/O & memory (ZPU)
    signal mem_busy     : std_logic;
@@ -99,13 +107,41 @@ architecture Structural of gmZPU is
    signal ram_ready_r  : std_logic:='0';
 
    -- I/O (ZPU_IO)
-   signal io_busy      : std_logic;
-   signal io_re        : std_logic;
-   signal io_we        : std_logic;
-   signal io_read      : unsigned(WORD_SIZE-1 downto 0);
-   signal io_ready     : std_logic;
-   signal io_reading_r : std_logic:='0';
-   signal io_addr      : unsigned(2 downto 0);
+   signal phi_io_busy      : std_logic;
+   signal phi_io_re        : std_logic;
+   signal phi_io_we        : std_logic;
+   signal phi_io_read      : unsigned(WORD_SIZE-1 downto 0);
+   signal phi_io_ready     : std_logic;
+   signal phi_io_reading_r : std_logic:='0';
+   signal phi_io_addr      : unsigned(2 downto 0);
+
+    -- I/O (zwishbone)
+    signal zw_ena           : std_logic;
+    signal zw_busy          : std_logic;
+    signal zw_ready_r       : std_logic;
+    signal zw_addr          : std_logic_vector(ADDR_W-3 downto 0);
+    signal zw_re            : std_logic;
+    signal zw_we            : std_logic;
+    signal zw_dat_i         : std_logic_vector(WORD_SIZE-1 downto 0);
+    signal zw_dat_o         : std_logic_vector(WORD_SIZE-1 downto 0);
+    --
+    signal wb_dat_i         : std_logic_vector(WORD_SIZE-1 downto 0);
+    signal wb_dat_o         : std_logic_vector(WORD_SIZE-1 downto 0);
+    signal wb_tgd_i         : std_logic_vector(WORD_SIZE-1 downto 0);
+    signal wb_tgd_o         : std_logic_vector(WORD_SIZE-1 downto 0);
+    signal wb_ack_i         : std_logic;
+    signal wb_adr_o         : std_logic_vector(ADDR_W-4-CS_WIDTH downto 0);
+    signal wb_cyc_o      : std_logic;
+    signal wb_stall_i    : std_logic;
+    signal wb_err_i      : std_logic;
+    signal wb_lock_o     : std_logic;
+    signal wb_rty_i      : std_logic;
+    signal wb_sel_o      : std_logic_vector(WORD_SIZE-1 downto 0);
+    signal wb_stb_o      : std_logic;
+    signal wb_tga_o      : std_logic_vector(ADDR_W-4-CS_WIDTH downto 0);
+    signal wb_tgc_o      : std_logic_vector(WORD_SIZE-1 downto 0); -- size correct?
+    signal wb_we_o       : std_logic;
+    
 begin
    memory: SinglePortRAM
       generic map(
@@ -127,12 +163,12 @@ begin
       port map(
          clk_i      => clk_i, 
          reset_i    => rst_i, 
-         busy_o     => io_busy, 
-         we_i       => io_we,
-         re_i       => io_re, 
+         busy_o     => phi_io_busy, 
+         we_i       => phi_io_we,
+         re_i       => phi_io_re, 
          data_i     => mem_write, 
-         data_o     => io_read,
-         addr_i     => io_addr, 
+         data_o     => phi_io_read,
+         addr_i     => phi_io_addr, 
          rs232_rx_i => rs232_rx_i, 
          rs232_tx_o => rs232_tx_o,
          br_clk_i   => '1',
@@ -140,13 +176,39 @@ begin
          gpio_out   => gpio_out,
          gpio_dir   => gpio_dir
          );
-   io_addr  <= mem_addr(4 downto 2);
+   phi_io_addr  <= mem_addr(4 downto 2);
    -- Here we decode 0x8xxxx as I/O and not just 0x80A00xx
    -- Note: We define the address space as 256 kB, so writing to 0x80A00xx
    -- will be as wrting to 0x200xx and hence we decode it as I/O space.
-   io_we    <= mem_we and mem_addr(IO_BIT);
-   io_re    <= mem_re and mem_addr(IO_BIT);
-   io_ready <= (io_reading_r or io_re) and not io_busy;
+   phi_io_we    <= mem_we and mem_addr(IO_BIT) and not mem_addr(ZW_BIT);
+   phi_io_re    <= mem_re and mem_addr(IO_BIT) and not mem_addr(ZW_BIT);
+   phi_io_ready <= (phi_io_reading_r or phi_io_re) and not phi_io_busy;
+
+    -- I/O: zwishbone
+    zwc: zwishbone_controller
+        generic map(
+            DATA_WIDTH => WORD_SIZE, ADR_WIDTH => ADDR_W-2, CS_WIDTH => 4
+        )
+        port map(
+            clk_i => clk_i, rst_i => rst_i, ena_i => zw_ena, busy_o => zw_busy,
+            adr_i => zw_addr, we_i => zw_we, dat_i => zw_dat_i, dat_o => zw_dat_o,
+            wb_dat_i => wb_dat_i, wb_dat_o => wb_dat_o, 
+            wb_tgd_i => wb_tgd_i, wb_tgd_o => wb_tgd_o, 
+            wb_ack_i => wb_ack_i, wb_adr_o => wb_adr_o,
+            wb_cyc_o => wb_cyc_o, wb_stall_i => wb_stall_i, wb_err_i => wb_err_i, wb_lock_o => wb_lock_o, wb_rty_i => wb_rty_i,
+            wb_sel_o => wb_sel_o,
+            wb_tga_o => wb_tga_o,
+            wb_tgc_o => wb_tgc_o, 
+            wb_we_o => wb_we_o
+        );
+    -- ADDR_W = 18, IO_BIT = 17, ZW_BIT = 16
+    zw_we  <= mem_we and mem_addr(IO_BIT) and mem_addr(ZW_BIT);
+    zw_re  <= mem_re and mem_addr(IO_BIT) and mem_addr(ZW_BIT);
+    zw_ena <= zw_we or zw_re;
+    zw_addr <= std_logic_vector(mem_addr(ADDR_W-3 downto 0));
+    zw_we <= mem_we and mem_addr(IO_BIT) and mem_addr(ZW_BIT);
+    zw_ready_r <= zw_re and not zw_busy;
+    
 
    zpu : ZPUMediumCore
       generic map(
@@ -158,18 +220,21 @@ begin
          -- Memory
          mem_busy_i => mem_busy, data_i => mem_read, data_o => mem_write,
          addr_o => mem_addr, write_en_o => mem_we, read_en_o => mem_re);
-   mem_busy <= io_busy or ram_busy;
+   mem_busy <= (phi_io_busy or ram_busy) or zw_busy;
 
    -- Memory reads either come from IO or DRAM. We need to pick the right one.
    memory_control:
-   process (ram_read, ram_ready_r, io_ready, io_read)
+   process (ram_read, ram_ready_r, phi_io_ready, phi_io_read, zw_dat_o, zw_ready_r)
    begin
       mem_read <= (others => '0');
       if ram_ready_r='1' then
          mem_read <= ram_read;
       end if;
-      if io_ready='1' then
-         mem_read <= io_read;
+      if phi_io_ready='1' then
+         mem_read <= phi_io_read;
+      end if;
+      if zw_ready_r='1' then
+        mem_read <= unsigned(zw_dat_o);
       end if;
    end process memory_control;
 
@@ -178,10 +243,10 @@ begin
    begin
       if rising_edge(clk_i) then
          if rst_i='1' then
-            io_reading_r <= '0';
+            phi_io_reading_r <= '0';
             ram_ready_r  <= '0';
          else
-            io_reading_r <= io_busy or io_re;
+            phi_io_reading_r <= phi_io_busy or phi_io_re;
             ram_ready_r  <= ram_re;
          end if;
       end if;

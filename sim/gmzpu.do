@@ -4,6 +4,11 @@
 # do gmzpu.do
 
 set BreakOnAssertion 1
+
+vlib gmzpu
+vcom -work gmzpu ../vhdl/zwishbone/zwishbone_pkg.vhdl
+vcom -work gmzpu ../vhdl/zwishbone/zwishbone.vhdl
+
 vlib zpu
 #vcom -work zpu ../vhdl/roms/hello_bram.vhdl
 #vcom -work zpu ../vhdl/roms/my_hello.vhdl
@@ -37,6 +42,7 @@ vsim gmZPU_TB
 
 view wave
 
+
 onerror {resume}
 quietly WaveActivateNextPane {} 0
 add wave -noupdate -group TB /gmzpu_tb/clk
@@ -68,13 +74,13 @@ add wave -noupdate -group {ZPU port} /gmzpu_tb/zpu/ram_addr
 add wave -noupdate -group {ZPU port} /gmzpu_tb/zpu/ram_we
 add wave -noupdate -group {ZPU port} /gmzpu_tb/zpu/ram_re
 add wave -noupdate -group {ZPU port} /gmzpu_tb/zpu/ram_ready_r
-add wave -noupdate -group {ZPU port} /gmzpu_tb/zpu/io_busy
-add wave -noupdate -group {ZPU port} /gmzpu_tb/zpu/io_re
-add wave -noupdate -group {ZPU port} /gmzpu_tb/zpu/io_we
-add wave -noupdate -group {ZPU port} /gmzpu_tb/zpu/io_read
-add wave -noupdate -group {ZPU port} /gmzpu_tb/zpu/io_ready
-add wave -noupdate -group {ZPU port} /gmzpu_tb/zpu/io_reading_r
-add wave -noupdate -group {ZPU port} /gmzpu_tb/zpu/io_addr
+add wave -noupdate -group {ZPU port} /gmzpu_tb/zpu/phi_io_busy
+add wave -noupdate -group {ZPU port} /gmzpu_tb/zpu/phi_io_re
+add wave -noupdate -group {ZPU port} /gmzpu_tb/zpu/phi_io_we
+add wave -noupdate -group {ZPU port} /gmzpu_tb/zpu/phi_io_read
+add wave -noupdate -group {ZPU port} /gmzpu_tb/zpu/phi_io_ready
+add wave -noupdate -group {ZPU port} /gmzpu_tb/zpu/phi_io_reading_r
+add wave -noupdate -group {ZPU port} /gmzpu_tb/zpu/phi_io_addr
 add wave -noupdate -group Memory /gmzpu_tb/zpu/memory/clk_i
 add wave -noupdate -group Memory /gmzpu_tb/zpu/memory/we_i
 add wave -noupdate -group Memory /gmzpu_tb/zpu/memory/re_i
@@ -84,6 +90,110 @@ add wave -noupdate -group Memory /gmzpu_tb/zpu/memory/read_o
 add wave -noupdate -group Memory /gmzpu_tb/zpu/memory/busy_o
 add wave -noupdate -group Memory /gmzpu_tb/zpu/memory/addr_r
 add wave -noupdate -group Memory /gmzpu_tb/zpu/memory/ram
+add wave -noupdate -expand -group ZWC -expand -group ZWC -expand -group zpu /gmzpu_tb/zpu/zwc/clk_i
+add wave -noupdate -expand -group ZWC -expand -group ZWC -expand -group zpu /gmzpu_tb/zpu/zwc/rst_i
+add wave -noupdate -expand -group ZWC -expand -group ZWC -expand -group zpu /gmzpu_tb/zpu/zwc/ena_i
+add wave -noupdate -expand -group ZWC -expand -group ZWC -expand -group zpu /gmzpu_tb/zpu/zwc/busy_o
+add wave -noupdate -expand -group ZWC -expand -group ZWC -expand -group zpu -radix hexadecimal /gmzpu_tb/zpu/zwc/adr_i
+add wave -noupdate -expand -group ZWC -expand -group ZWC -expand -group zpu /gmzpu_tb/zpu/zwc/we_i
+add wave -noupdate -expand -group ZWC -expand -group ZWC -expand -group zpu -radix hexadecimal /gmzpu_tb/zpu/zwc/dat_i
+add wave -noupdate -expand -group ZWC -expand -group ZWC -expand -group zpu -radix hexadecimal /gmzpu_tb/zpu/zwc/dat_o
+add wave -noupdate -expand -group ZWC -group wb -radix hexadecimal -childformat {{/gmzpu_tb/zpu/zwc/wb_dat_i(31) -radix hexadecimal} {/gmzpu_tb/zpu/zwc/wb_dat_i(30) -radix hexadecimal} {/gmzpu_tb/zpu/zwc/wb_dat_i(29) -radix hexadecimal} {/gmzpu_tb/zpu/zwc/wb_dat_i(28) -radix hexadecimal} {/gmzpu_tb/zpu/zwc/wb_dat_i(27) -radix hexadecimal} {/gmzpu_tb/zpu/zwc/wb_dat_i(26) -radix hexadecimal} {/gmzpu_tb/zpu/zwc/wb_dat_i(25) -radix hexadecimal} {/gmzpu_tb/zpu/zwc/wb_dat_i(24) -radix hexadecimal} {/gmzpu_tb/zpu/zwc/wb_dat_i(23) -radix hexadecimal} {/gmzpu_tb/zpu/zwc/wb_dat_i(22) -radix hexadecimal} {/gmzpu_tb/zpu/zwc/wb_dat_i(21) -radix hexadecimal} {/gmzpu_tb/zpu/zwc/wb_dat_i(20) -radix hexadecimal} {/gmzpu_tb/zpu/zwc/wb_dat_i(19) -radix hexadecimal} {/gmzpu_tb/zpu/zwc/wb_dat_i(18) -radix hexadecimal} {/gmzpu_tb/zpu/zwc/wb_dat_i(17) -radix hexadecimal} {/gmzpu_tb/zpu/zwc/wb_dat_i(16) -radix hexadecimal} {/gmzpu_tb/zpu/zwc/wb_dat_i(15) -radix hexadecimal} {/gmzpu_tb/zpu/zwc/wb_dat_i(14) -radix hexadecimal} {/gmzpu_tb/zpu/zwc/wb_dat_i(13) -radix hexadecimal} {/gmzpu_tb/zpu/zwc/wb_dat_i(12) -radix hexadecimal} {/gmzpu_tb/zpu/zwc/wb_dat_i(11) -radix hexadecimal} {/gmzpu_tb/zpu/zwc/wb_dat_i(10) -radix hexadecimal} {/gmzpu_tb/zpu/zwc/wb_dat_i(9) -radix hexadecimal} {/gmzpu_tb/zpu/zwc/wb_dat_i(8) -radix hexadecimal} {/gmzpu_tb/zpu/zwc/wb_dat_i(7) -radix hexadecimal} {/gmzpu_tb/zpu/zwc/wb_dat_i(6) -radix hexadecimal} {/gmzpu_tb/zpu/zwc/wb_dat_i(5) -radix hexadecimal} {/gmzpu_tb/zpu/zwc/wb_dat_i(4) -radix hexadecimal} {/gmzpu_tb/zpu/zwc/wb_dat_i(3) -radix hexadecimal} {/gmzpu_tb/zpu/zwc/wb_dat_i(2) -radix hexadecimal} {/gmzpu_tb/zpu/zwc/wb_dat_i(1) -radix hexadecimal} {/gmzpu_tb/zpu/zwc/wb_dat_i(0) -radix hexadecimal}} -subitemconfig {/gmzpu_tb/zpu/zwc/wb_dat_i(31) {-radix hexadecimal} /gmzpu_tb/zpu/zwc/wb_dat_i(30) {-radix hexadecimal} /gmzpu_tb/zpu/zwc/wb_dat_i(29) {-radix hexadecimal} /gmzpu_tb/zpu/zwc/wb_dat_i(28) {-radix hexadecimal} /gmzpu_tb/zpu/zwc/wb_dat_i(27) {-radix hexadecimal} /gmzpu_tb/zpu/zwc/wb_dat_i(26) {-radix hexadecimal} /gmzpu_tb/zpu/zwc/wb_dat_i(25) {-radix hexadecimal} /gmzpu_tb/zpu/zwc/wb_dat_i(24) {-radix hexadecimal} /gmzpu_tb/zpu/zwc/wb_dat_i(23) {-radix hexadecimal} /gmzpu_tb/zpu/zwc/wb_dat_i(22) {-radix hexadecimal} /gmzpu_tb/zpu/zwc/wb_dat_i(21) {-radix hexadecimal} /gmzpu_tb/zpu/zwc/wb_dat_i(20) {-radix hexadecimal} /gmzpu_tb/zpu/zwc/wb_dat_i(19) {-radix hexadecimal} /gmzpu_tb/zpu/zwc/wb_dat_i(18) {-radix hexadecimal} /gmzpu_tb/zpu/zwc/wb_dat_i(17) {-radix hexadecimal} /gmzpu_tb/zpu/zwc/wb_dat_i(16) {-radix hexadecimal} /gmzpu_tb/zpu/zwc/wb_dat_i(15) {-radix hexadecimal} /gmzpu_tb/zpu/zwc/wb_dat_i(14) {-radix hexadecimal} /gmzpu_tb/zpu/zwc/wb_dat_i(13) {-radix hexadecimal} /gmzpu_tb/zpu/zwc/wb_dat_i(12) {-radix hexadecimal} /gmzpu_tb/zpu/zwc/wb_dat_i(11) {-radix hexadecimal} /gmzpu_tb/zpu/zwc/wb_dat_i(10) {-radix hexadecimal} /gmzpu_tb/zpu/zwc/wb_dat_i(9) {-radix hexadecimal} /gmzpu_tb/zpu/zwc/wb_dat_i(8) {-radix hexadecimal} /gmzpu_tb/zpu/zwc/wb_dat_i(7) {-radix hexadecimal} /gmzpu_tb/zpu/zwc/wb_dat_i(6) {-radix hexadecimal} /gmzpu_tb/zpu/zwc/wb_dat_i(5) {-radix hexadecimal} /gmzpu_tb/zpu/zwc/wb_dat_i(4) {-radix hexadecimal} /gmzpu_tb/zpu/zwc/wb_dat_i(3) {-radix hexadecimal} /gmzpu_tb/zpu/zwc/wb_dat_i(2) {-radix hexadecimal} /gmzpu_tb/zpu/zwc/wb_dat_i(1) {-radix hexadecimal} /gmzpu_tb/zpu/zwc/wb_dat_i(0) {-radix hexadecimal}} /gmzpu_tb/zpu/zwc/wb_dat_i
+add wave -noupdate -expand -group ZWC -group wb -radix hexadecimal /gmzpu_tb/zpu/zwc/wb_dat_o
+add wave -noupdate -expand -group ZWC -group wb -radix hexadecimal /gmzpu_tb/zpu/zwc/wb_tgd_i
+add wave -noupdate -expand -group ZWC -group wb -radix hexadecimal /gmzpu_tb/zpu/zwc/wb_tgd_o
+add wave -noupdate -expand -group ZWC -group wb /gmzpu_tb/zpu/zwc/wb_ack_i
+add wave -noupdate -expand -group ZWC -group wb -radix hexadecimal /gmzpu_tb/zpu/zwc/wb_adr_o
+add wave -noupdate -expand -group ZWC -group wb /gmzpu_tb/zpu/zwc/wb_cyc_o
+add wave -noupdate -expand -group ZWC -group wb /gmzpu_tb/zpu/zwc/wb_stall_i
+add wave -noupdate -expand -group ZWC -group wb /gmzpu_tb/zpu/zwc/wb_err_i
+add wave -noupdate -expand -group ZWC -group wb /gmzpu_tb/zpu/zwc/wb_lock_o
+add wave -noupdate -expand -group ZWC -group wb /gmzpu_tb/zpu/zwc/wb_rty_i
+add wave -noupdate -expand -group ZWC -group wb -radix hexadecimal /gmzpu_tb/zpu/zwc/wb_sel_o
+add wave -noupdate -expand -group ZWC -group wb -radix binary /gmzpu_tb/zpu/zwc/wb_stb_o
+add wave -noupdate -expand -group ZWC -group wb -radix hexadecimal /gmzpu_tb/zpu/zwc/wb_tga_o
+add wave -noupdate -expand -group ZWC -group wb -radix hexadecimal /gmzpu_tb/zpu/zwc/wb_tgc_o
+add wave -noupdate -expand -group ZWC -group wb /gmzpu_tb/zpu/zwc/wb_we_o
+add wave -noupdate -expand -group ZWC -expand -group fabric -radix hexadecimal /gmzpu_tb/zpu/zwc/config
+add wave -noupdate -expand -group ZWC -expand -group fabric /gmzpu_tb/zpu/zwc/status_err_r
+add wave -noupdate -expand -group ZWC -expand -group fabric /gmzpu_tb/zpu/zwc/status_rty_r
+add wave -noupdate -expand -group ZWC -expand -group fabric /gmzpu_tb/zpu/zwc/reg_en
+add wave -noupdate -expand -group ZWC -expand -group fabric /gmzpu_tb/zpu/zwc/bus_en
+add wave -noupdate -expand -group ZWC -expand -group fabric -radix hexadecimal /gmzpu_tb/zpu/zwc/radr
+add wave -noupdate -expand -group ZWC -expand -group fabric -radix hexadecimal /gmzpu_tb/zpu/zwc/badr
+add wave -noupdate -expand -group ZWC -expand -group fabric -radix hexadecimal /gmzpu_tb/zpu/zwc/bdat_i
+add wave -noupdate -expand -group ZWC -expand -group fabric -radix hexadecimal /gmzpu_tb/zpu/zwc/bdat_o
+add wave -noupdate -expand -group ZWC -expand -group fabric -radix hexadecimal /gmzpu_tb/zpu/zwc/rdat_i
+add wave -noupdate -expand -group ZWC -expand -group fabric -radix hexadecimal /gmzpu_tb/zpu/zwc/rdat_o
+add wave -noupdate -expand -group ZWC -expand -group fabric /gmzpu_tb/zpu/zwc/cs
+add wave -noupdate -expand -group ZWC -group regs /gmzpu_tb/zpu/zwc/regs/clk_i
+add wave -noupdate -expand -group ZWC -group regs /gmzpu_tb/zpu/zwc/regs/rst_i
+add wave -noupdate -expand -group ZWC -group regs /gmzpu_tb/zpu/zwc/regs/en_i
+add wave -noupdate -expand -group ZWC -group regs /gmzpu_tb/zpu/zwc/regs/we_i
+add wave -noupdate -expand -group ZWC -group regs /gmzpu_tb/zpu/zwc/regs/adr_i
+add wave -noupdate -expand -group ZWC -group regs /gmzpu_tb/zpu/zwc/regs/dat_i
+add wave -noupdate -expand -group ZWC -group regs /gmzpu_tb/zpu/zwc/regs/dat_o
+add wave -noupdate -expand -group ZWC -group regs /gmzpu_tb/zpu/zwc/regs/busy_o
+add wave -noupdate -expand -group ZWC -group regs /gmzpu_tb/zpu/zwc/regs/ready_o
+add wave -noupdate -expand -group ZWC -group regs /gmzpu_tb/zpu/zwc/regs/cfg_o
+add wave -noupdate -expand -group ZWC -group regs /gmzpu_tb/zpu/zwc/regs/err_i
+add wave -noupdate -expand -group ZWC -group regs /gmzpu_tb/zpu/zwc/regs/rty_i
+add wave -noupdate -expand -group ZWC -group regs /gmzpu_tb/zpu/zwc/regs/reg_config
+add wave -noupdate -expand -group ZWC -group regs /gmzpu_tb/zpu/zwc/regs/reg_status
+add wave -noupdate -expand -group ZWC -group regs /gmzpu_tb/zpu/zwc/regs/ready_r
+add wave -noupdate -expand -group ZWC -group decode /gmzpu_tb/zpu/zwc/dec/adr_i
+add wave -noupdate -expand -group ZWC -group decode /gmzpu_tb/zpu/zwc/dec/dat_i
+add wave -noupdate -expand -group ZWC -group decode /gmzpu_tb/zpu/zwc/dec/dat_o
+add wave -noupdate -expand -group ZWC -group decode /gmzpu_tb/zpu/zwc/dec/ena_i
+add wave -noupdate -expand -group ZWC -group decode /gmzpu_tb/zpu/zwc/dec/rst_i
+add wave -noupdate -expand -group ZWC -group decode /gmzpu_tb/zpu/zwc/dec/we_i
+add wave -noupdate -expand -group ZWC -group decode /gmzpu_tb/zpu/zwc/dec/reg_en_o
+add wave -noupdate -expand -group ZWC -group decode /gmzpu_tb/zpu/zwc/dec/bus_en_o
+add wave -noupdate -expand -group ZWC -group decode /gmzpu_tb/zpu/zwc/dec/radr_o
+add wave -noupdate -expand -group ZWC -group decode /gmzpu_tb/zpu/zwc/dec/badr_o
+add wave -noupdate -expand -group ZWC -group decode /gmzpu_tb/zpu/zwc/dec/reg_i
+add wave -noupdate -expand -group ZWC -group decode /gmzpu_tb/zpu/zwc/dec/reg_o
+add wave -noupdate -expand -group ZWC -group decode /gmzpu_tb/zpu/zwc/dec/bus_i
+add wave -noupdate -expand -group ZWC -group decode /gmzpu_tb/zpu/zwc/dec/bus_o
+add wave -noupdate -expand -group ZWC -group decode /gmzpu_tb/zpu/zwc/dec/cs_o
+add wave -noupdate -expand -group ZWC -group decode /gmzpu_tb/zpu/zwc/dec/reg_en_r
+add wave -noupdate -expand -group ZWC -group decode /gmzpu_tb/zpu/zwc/dec/bus_en_r
+add wave -noupdate -expand -group ZWC -group decode /gmzpu_tb/zpu/zwc/dec/en_r
+add wave -noupdate -expand -group ZWC -group decode /gmzpu_tb/zpu/zwc/dec/re_r
+add wave -noupdate -expand -group ZWC -group decode /gmzpu_tb/zpu/zwc/dec/we_r
+add wave -noupdate -expand -group ZWC -group decode /gmzpu_tb/zpu/zwc/dec/cs_r
+add wave -noupdate -expand -group ZWC -group decode /gmzpu_tb/zpu/zwc/dec/adr
+add wave -noupdate -expand -group ZWC -group decode /gmzpu_tb/zpu/zwc/dec/io_adr_r
+add wave -noupdate -expand -group ZWC -group decode /gmzpu_tb/zpu/zwc/dec/bus_re_r
+add wave -noupdate -expand -group ZWC -group decode /gmzpu_tb/zpu/zwc/dec/bus_we_r
+add wave -noupdate -expand -group ZWC -group decode /gmzpu_tb/zpu/zwc/dec/reg_re_r
+add wave -noupdate -expand -group ZWC -group decode /gmzpu_tb/zpu/zwc/dec/reg_we_r
+add wave -noupdate -expand -group ZWC -group bus /gmzpu_tb/zpu/zwc/zwbbus/clk_i
+add wave -noupdate -expand -group ZWC -group bus /gmzpu_tb/zpu/zwc/zwbbus/rst_i
+add wave -noupdate -expand -group ZWC -group bus /gmzpu_tb/zpu/zwc/zwbbus/en_i
+add wave -noupdate -expand -group ZWC -group bus /gmzpu_tb/zpu/zwc/zwbbus/we_i
+add wave -noupdate -expand -group ZWC -group bus /gmzpu_tb/zpu/zwc/zwbbus/adr_i
+add wave -noupdate -expand -group ZWC -group bus /gmzpu_tb/zpu/zwc/zwbbus/dat_i
+add wave -noupdate -expand -group ZWC -group bus /gmzpu_tb/zpu/zwc/zwbbus/dat_o
+add wave -noupdate -expand -group ZWC -group bus /gmzpu_tb/zpu/zwc/zwbbus/cs_i
+add wave -noupdate -expand -group ZWC -group bus /gmzpu_tb/zpu/zwc/zwbbus/b_dat_i
+add wave -noupdate -expand -group ZWC -group bus /gmzpu_tb/zpu/zwc/zwbbus/b_dat_o
+add wave -noupdate -expand -group ZWC -group bus /gmzpu_tb/zpu/zwc/zwbbus/b_tgd_i
+add wave -noupdate -expand -group ZWC -group bus /gmzpu_tb/zpu/zwc/zwbbus/b_tgd_o
+add wave -noupdate -expand -group ZWC -group bus /gmzpu_tb/zpu/zwc/zwbbus/b_ack_i
+add wave -noupdate -expand -group ZWC -group bus /gmzpu_tb/zpu/zwc/zwbbus/b_adr_o
+add wave -noupdate -expand -group ZWC -group bus /gmzpu_tb/zpu/zwc/zwbbus/b_cyc_o
+add wave -noupdate -expand -group ZWC -group bus /gmzpu_tb/zpu/zwc/zwbbus/b_stall_i
+add wave -noupdate -expand -group ZWC -group bus /gmzpu_tb/zpu/zwc/zwbbus/b_err_i
+add wave -noupdate -expand -group ZWC -group bus /gmzpu_tb/zpu/zwc/zwbbus/b_lock_o
+add wave -noupdate -expand -group ZWC -group bus /gmzpu_tb/zpu/zwc/zwbbus/b_rty_i
+add wave -noupdate -expand -group ZWC -group bus /gmzpu_tb/zpu/zwc/zwbbus/b_sel_o
+add wave -noupdate -expand -group ZWC -group bus /gmzpu_tb/zpu/zwc/zwbbus/b_stb_o
+add wave -noupdate -expand -group ZWC -group bus /gmzpu_tb/zpu/zwc/zwbbus/b_tga_o
+add wave -noupdate -expand -group ZWC -group bus /gmzpu_tb/zpu/zwc/zwbbus/b_tgc_o
+add wave -noupdate -expand -group ZWC -group bus /gmzpu_tb/zpu/zwc/zwbbus/b_we_o
+add wave -noupdate -expand -group ZWC -group bus /gmzpu_tb/zpu/zwc/zwbbus/cyc_r
+add wave -noupdate -expand -group ZWC -group bus /gmzpu_tb/zpu/zwc/zwbbus/stb_r
 add wave -noupdate -group IO -group Control /gmzpu_tb/zpu/io_map/clk_i
 add wave -noupdate -group IO -group Control /gmzpu_tb/zpu/io_map/reset_i
 add wave -noupdate -group IO -group Control /gmzpu_tb/zpu/io_map/busy_o
@@ -202,10 +312,10 @@ add wave -noupdate /gmzpu_tb/trace_mod/stop_i
 add wave -noupdate /gmzpu_tb/trace_mod/busy_i
 add wave -noupdate /gmzpu_tb/trace_mod/counter
 TreeUpdate [SetDefaultTree]
-WaveRestoreCursors {{Cursor 1} {1835128 ps} 0}
+WaveRestoreCursors {{Cursor 1} {14105693526 ps} 0}
 quietly wave cursor active 1
 configure wave -namecolwidth 340
-configure wave -valuecolwidth 100
+configure wave -valuecolwidth 136
 configure wave -justifyvalue left
 configure wave -signalnamewidth 0
 configure wave -snapdistance 10
@@ -218,8 +328,7 @@ configure wave -griddelta 40
 configure wave -timeline 0
 configure wave -timelineunits ps
 update
-WaveRestoreZoom {1701840 ps} {1957632 ps}
-
+WaveRestoreZoom {14105678140 ps} {14105922393 ps}
 #add wave -recursive *
 view structure
 #view signals
