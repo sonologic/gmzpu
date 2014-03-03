@@ -43,48 +43,44 @@ use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all;
 
 package zwishbone is
-
     component zwishbone_controller is
             generic (
                 DATA_WIDTH  : natural:=32;       -- width of data bus
-                ADR_WIDTH   : natural:=15;
-                CS_WIDTH    : natural:=4;
-                ADR_MSB     : natural:=15;
-                ADR_LSB     : natural:=2
+                ADR_WIDTH   : natural:=16;
+                BUSBIT_WIDTH: natural:=1;        -- bus/reg bit, adr MSB
+                CS_WIDTH    : natural:=4
             );
             port (
-        -- SYSCON
-        clk_i       : in std_logic;
-        rst_i       : in std_logic;
-        -- wishbone MASTER signals
-        dat_i       : in std_logic_vector(DATA_WIDTH-1 downto 0);
-        dat_o       : out std_logic_vector(DATA_WIDTH-1 downto 0);
-        tgd_i       : in std_logic_vector(DATA_WIDTH-1 downto 0);
-        tgd_o       : out std_logic_vector(DATA_WIDTH-1 downto 0);
-        ack_i       : in std_logic;
-        adr_o       : out std_logic_vector(ADR_MSB downto ADR_LSB);
-        cyc_o       : out std_logic;
-        stall_i     : in std_logic;
-        err_i       : in std_logic;
-        lock_o      : out std_logic;
-        rty_i       : in std_logic;
-        sel_o       : out std_logic_vector(DATA_WIDTH-1 downto 0);
-        stb_o       : out std_logic;
-        tga_o       : out std_logic_vector(ADR_MSB downto ADR_LSB);
-        tgc_o       : out std_logic_vector(DATA_WIDTH-1 downto 0); -- size correct?
-        we_o        : out std_logic;
-        -- zpu interface (non wishbone signal)
-        ena_i       : in std_logic; -- enable wb controller
-        busy_o      : out std_logic; -- controller busy
-        adr_i       : in std_logic_vector(ADR_MSB downto ADR_LSB);
-        we_i        : in std_logic;
-        data_i      : in std_logic_vector(DATA_WIDTH-1 downto 0);
-        data_o      : out std_logic_vector(DATA_WIDTH-1 downto 0);
-        --pipeline_i  : in std_logic; -- select pipelined mode
-        --block_i     : in std_logic; -- select block mode
-        --rmw_i       : in std_logic -- select read-modify-write
-        -- chip select output
-        cs_o        : out std_logic_vector((2**CS_WIDTH)-1 downto 0)
+                -- SYSCON
+                clk_i       : in std_logic;
+                rst_i       : in std_logic;
+                -- zpu interface (non wishbone signal)
+                ena_i       : in std_logic; -- enable wb controller
+                busy_o      : out std_logic; -- controller busy
+                adr_i       : in std_logic_vector(ADR_WIDTH-1 downto 0);
+                we_i        : in std_logic;
+                dat_i      : in std_logic_vector(DATA_WIDTH-1 downto 0);
+                dat_o      : out std_logic_vector(DATA_WIDTH-1 downto 0);
+                -- I/O decoder
+                --cs_o        : out std_logic_vector(CS_WIDTH-1 downto 0);
+                -- wishbone bus
+                wb_dat_i      : in std_logic_vector(DATA_WIDTH-1 downto 0);
+                wb_dat_o      : out std_logic_vector(DATA_WIDTH-1 downto 0);
+                wb_tgd_i      : in std_logic_vector(DATA_WIDTH-1 downto 0);
+                wb_tgd_o      : out std_logic_vector(DATA_WIDTH-1 downto 0);
+                wb_ack_i      : in std_logic;
+                wb_adr_o      : out std_logic_vector(ADR_WIDTH-BUSBIT_WIDTH-CS_WIDTH-1 downto 0);
+                wb_cyc_o      : out std_logic;
+                wb_stall_i    : in std_logic;
+                wb_err_i      : in std_logic;
+                wb_lock_o     : out std_logic;
+                wb_rty_i      : in std_logic;
+                wb_sel_o      : out std_logic_vector(DATA_WIDTH-1 downto 0);
+                wb_stb_o      : out std_logic_vector((2**CS_WIDTH)-1 downto 0);
+                wb_tga_o      : out std_logic_vector(ADR_WIDTH-BUSBIT_WIDTH-CS_WIDTH-1 downto 0);
+                wb_tgc_o      : out std_logic_vector(DATA_WIDTH-1 downto 0); -- size correct?
+                wb_we_o       : out std_logic
+
             );
     end component zwishbone_controller;
 
@@ -124,14 +120,18 @@ package zwishbone is
                 --
                 ready_o     : out std_logic;
                 -- config register value (0x0000, for c_control)
-                cfg_o       : out std_logic_vector(DATA_WIDTH-1 downto 0)
+                cfg_o       : out std_logic_vector(DATA_WIDTH-1 downto 0);
+                -- status register value (0x0004, from c_control / bus)
+                err_i       : in std_logic;
+                rty_i       : in std_logic
             );
     end component zwishbone_c_regs;
 
     component zwishbone_c_bus is
             generic(
-                ADR_WIDTH   : natural:=16;
-                DATA_WIDTH  : natural:=32
+                ADR_WIDTH   : natural:=10;
+                DATA_WIDTH  : natural:=32;
+                CS_WIDTH    : natural:=4
             );
             port (
                 -- zpu wishbone controller signals
@@ -142,6 +142,7 @@ package zwishbone is
                 adr_i       : in std_logic_vector(ADR_WIDTH-1 downto 0);
                 dat_i       : in std_logic_vector(DATA_WIDTH-1 downto 0);
                 dat_o       : out std_logic_vector(DATA_WIDTH-1 downto 0);
+                cs_i        : in std_logic_vector(CS_WIDTH-1 downto 0);
                 -- wishbone MASTER signals
                 b_dat_i      : in std_logic_vector(DATA_WIDTH-1 downto 0);
                 b_dat_o      : out std_logic_vector(DATA_WIDTH-1 downto 0);
@@ -155,7 +156,7 @@ package zwishbone is
                 b_lock_o     : out std_logic;
                 b_rty_i      : in std_logic;
                 b_sel_o      : out std_logic_vector(DATA_WIDTH-1 downto 0);
-                b_stb_o      : out std_logic;
+                b_stb_o      : out std_logic_vector((2**CS_WIDTH)-1 downto 0);
                 b_tga_o      : out std_logic_vector(ADR_WIDTH-1 downto 0);
                 b_tgc_o      : out std_logic_vector(DATA_WIDTH-1 downto 0); -- size correct?
                 b_we_o       : out std_logic
