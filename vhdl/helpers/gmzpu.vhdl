@@ -208,6 +208,8 @@ begin
     zw_addr <= std_logic_vector(mem_addr(ADDR_W-3 downto 0));
     zw_we <= mem_we and mem_addr(IO_BIT) and mem_addr(ZW_BIT);
     zw_ready_r <= zw_re and not zw_busy;
+
+    zw_dat_i <= std_logic_vector(mem_write);
     
 
    zpu : ZPUMediumCore
