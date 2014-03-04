@@ -172,8 +172,6 @@ package zwishbone is
             port (
                 -- zpu fabric
                 adr_i       : in std_logic_vector(ADR_WIDTH-1 downto 0);
-                dat_i       : in std_logic_vector(WORD_SIZE-1 downto 0);
-                dat_o       : out std_logic_vector(WORD_SIZE-1 downto 0);
                 ena_i       : in std_logic;
                 rst_i       : in std_logic;
                 we_i        : in std_logic;
@@ -182,10 +180,6 @@ package zwishbone is
                 bus_en_o    : out std_logic;
                 radr_o      : out std_logic_vector(ADR_WIDTH-2-CS_WIDTH downto 0);
                 badr_o      : out std_logic_vector(ADR_WIDTH-2-CS_WIDTH downto 0);
-                reg_i       : in std_logic_vector(WORD_SIZE-1 downto 0);
-                reg_o       : out std_logic_vector(WORD_SIZE-1 downto 0);
-                bus_i       : in std_logic_vector(WORD_SIZE-1 downto 0);
-                bus_o       : out std_logic_vector(WORD_SIZE-1 downto 0);
                 -- chip select
                 cs_o        : out std_logic_vector(CS_WIDTH-1 downto 0)
             );

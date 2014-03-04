@@ -62,6 +62,7 @@ begin
         if rst_i='1' then
             reg_config <= (others => '0');
             ready_r <= '0';
+            dat_o <= (others => 'Z');
         else 
                 -- only act when enabled 
                 if en_i='1' then
@@ -222,8 +223,6 @@ architecture rtl of zwishbone_controller is
             port (
                 -- zpu fabric
                 adr_i       : in std_logic_vector(ADR_WIDTH-1 downto 0);
-                dat_i       : in std_logic_vector(DATA_WIDTH-1 downto 0);
-                dat_o       : out std_logic_vector(DATA_WIDTH-1 downto 0);
                 ena_i       : in std_logic;
                 rst_i       : in std_logic;
                 we_i        : in std_logic;
@@ -232,10 +231,6 @@ architecture rtl of zwishbone_controller is
                 bus_en_o    : out std_logic;
                 radr_o      : out std_logic_vector(ADR_WIDTH-2-CS_WIDTH downto 0);
                 badr_o      : out std_logic_vector(ADR_WIDTH-2-CS_WIDTH downto 0);
-                reg_i       : in std_logic_vector(DATA_WIDTH-1 downto 0);
-                reg_o       : out std_logic_vector(DATA_WIDTH-1 downto 0);
-                bus_i       : in std_logic_vector(DATA_WIDTH-1 downto 0);
-                bus_o       : out std_logic_vector(DATA_WIDTH-1 downto 0);
                 -- chip select
                 cs_o        : out std_logic_vector(CS_WIDTH-1 downto 0)
             );
@@ -249,10 +244,6 @@ architecture rtl of zwishbone_controller is
     signal bus_en   : std_logic;
     signal radr     : std_logic_vector(ADR_WIDTH-CS_WIDTH-2 downto 0);
     signal badr     : std_logic_vector(ADR_WIDTH-CS_WIDTH-2 downto 0);
-    signal bdat_i   : std_logic_vector(DATA_WIDTH-1 downto 0);
-    signal bdat_o   : std_logic_vector(DATA_WIDTH-1 downto 0);
-    signal rdat_i   : std_logic_vector(DATA_WIDTH-1 downto 0);
-    signal rdat_o   : std_logic_vector(DATA_WIDTH-1 downto 0);
 
     -- 
     signal cs       : std_logic_vector(CS_WIDTH-1 downto 0);
@@ -267,7 +258,7 @@ begin
         )
         port map (
             clk_i => clk_i, rst_i => rst_i, en_i => reg_en, we_i => we_i,
-            adr_i => radr, dat_i => rdat_o, dat_o => rdat_i, cfg_o => config,
+            adr_i => radr, dat_i => dat_i, dat_o => dat_o, cfg_o => config,
             err_i => status_err_r,
             rty_i => status_rty_r
         );
@@ -280,9 +271,8 @@ begin
             ADR_WIDTH => ADR_WIDTH, DATA_WIDTH => DATA_WIDTH, CS_WIDTH => CS_WIDTH
         )
         port map (
-            adr_i => adr_i, dat_i => dat_i, dat_o => dat_o, ena_i => ena_i,
+            adr_i => adr_i, ena_i => ena_i,
             reg_en_o => reg_en, bus_en_o => bus_en, radr_o => radr, badr_o => badr,
-            reg_i => rdat_o, reg_o => rdat_i, bus_i => bdat_o, bus_o => bdat_i,
             cs_o => cs, rst_i => rst_i, we_i => we_i
         );
 
@@ -292,7 +282,7 @@ begin
         )
         port map (
             clk_i => clk_i, rst_i => rst_i, en_i => bus_en, we_i => we_i,
-            adr_i => badr, dat_i => bdat_o, dat_o => bdat_i,
+            adr_i => badr, dat_i => dat_i, dat_o => dat_o,
             b_dat_i => wb_dat_i, b_dat_o => wb_dat_o, b_tgd_i => wb_tgd_i,
             b_tgd_o => wb_tgd_o, b_ack_i => wb_ack_i, b_adr_o => wb_adr_o,
             b_cyc_o => wb_cyc_o, b_stall_i => wb_stall_i, b_err_i => wb_err_i,
@@ -386,8 +376,6 @@ entity zwishbone_c_decode is
             port (
                 -- zpu fabric
                 adr_i       : in std_logic_vector(ADR_WIDTH-1 downto 0);
-                dat_i       : in std_logic_vector(DATA_WIDTH-1 downto 0);
-                dat_o       : out std_logic_vector(DATA_WIDTH-1 downto 0);
                 ena_i       : in std_logic;
                 rst_i       : in std_logic;
                 we_i        : in std_logic;
@@ -396,10 +384,6 @@ entity zwishbone_c_decode is
                 bus_en_o    : out std_logic;
                 radr_o      : out std_logic_vector(ADR_WIDTH-2-CS_WIDTH downto 0);
                 badr_o      : out std_logic_vector(ADR_WIDTH-2-CS_WIDTH downto 0);
-                reg_i       : in std_logic_vector(DATA_WIDTH-1 downto 0);
-                reg_o       : out std_logic_vector(DATA_WIDTH-1 downto 0);
-                bus_i       : in std_logic_vector(DATA_WIDTH-1 downto 0);
-                bus_o       : out std_logic_vector(DATA_WIDTH-1 downto 0);
                 -- chip select
                 cs_o        : out std_logic_vector(CS_WIDTH-1 downto 0)
             );
@@ -414,10 +398,6 @@ architecture zwc_decode of zwishbone_c_decode is
     signal cs_r     : std_logic_vector(CS_WIDTH-1 downto 0);
     signal adr      : std_logic_vector(ADR_WIDTH-1 downto 0);
     signal io_adr_r : std_logic_vector(ADR_WIDTH-CS_WIDTH-2 downto 0);
-    signal bus_re_r : std_logic;
-    signal bus_we_r : std_logic;
-    signal reg_re_r : std_logic;
-    signal reg_we_r : std_logic;
 begin
     -- enable
     en_r <= ena_i and not rst_i;
@@ -437,25 +417,13 @@ begin
     -- chip select
     cs_r <= adr_i(ADR_WIDTH-2 downto ADR_WIDTH-CS_WIDTH-1);
 
-    cs_o <= cs_r when (bus_en_r='1') else (others => 'Z');
+    cs_o <= cs_r;
 
     -- bus and register address
     io_adr_r <= adr_i(ADR_WIDTH-CS_WIDTH-2 downto 0);
 
-    badr_o <= io_adr_r when (bus_en_r='1') else (others => 'Z');
-    radr_o <= io_adr_r when (reg_en_r='1') else (others => 'Z');
-
-    bus_re_r <= re_r and bus_en_r;
-    reg_re_r <= re_r and reg_en_r;
-    bus_we_r <= we_r and bus_en_r;
-    reg_we_r <= we_r and reg_en_r;
-    -- 
-    dat_o <= bus_i when (bus_re_r='1') else
-             reg_i when (reg_re_r='1') else
-             (others => 'Z');
-
-    bus_o <= dat_i when (bus_we_r='1') else (others => 'Z');
-    reg_o <= dat_i when (reg_we_r='1') else (others => 'Z');
+    badr_o <= io_adr_r;
+    radr_o <= io_adr_r;
 
 end architecture zwc_decode;
 
