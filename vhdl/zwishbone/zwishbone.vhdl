@@ -74,7 +74,7 @@ begin
                                 reg_config <= std_logic_vector(dat_i);
                                 dat_o <= (others => 'Z');
                             else
-                                dat_o <= std_logic_vector(reg_config);
+                                dat_o <= reg_config;
                             end if;
                     elsif adr_i=std_logic_vector(to_unsigned(4,ADR_WIDTH)) then
                             ready_r <= '1';
