@@ -99,6 +99,7 @@ begin
             direction    <= (others => '1');
             port_in_reg  <= (others => '0');
             port_in_sync <= (others => '0');
+            port_out     <= (others => '0');
         end if;
 
     end process;
