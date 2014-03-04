@@ -230,9 +230,9 @@ begin
                   end if;
                   data_o <= gpio_read;
                elsif addr_i=UART_TX then
-                  if ENA_LOG then
-                     print("- Read UART Tx");
-                  end if;
+                  --if ENA_LOG then
+                     --print("- Read UART Tx");
+                  --end if;
                   data_o(8) <= not(tx_busy); -- output fifo not full
                elsif addr_i=UART_RX then
                   if ENA_LOG then
