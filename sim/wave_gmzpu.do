@@ -143,6 +143,7 @@ add wave -noupdate -expand -group TB -expand -group zpuu -expand -group ZWC -exp
 add wave -noupdate -expand -group TB -expand -group zpuu -expand -group ZWC -expand -group regs -radix hexadecimal /gmzpu_tb/zpu/zwc/regs/reg_config
 add wave -noupdate -expand -group TB -expand -group zpuu -expand -group ZWC -expand -group regs -radix hexadecimal /gmzpu_tb/zpu/zwc/regs/reg_status
 add wave -noupdate -expand -group TB -expand -group zpuu -expand -group ZWC -expand -group regs /gmzpu_tb/zpu/zwc/regs/ready_r
+add wave -noupdate -expand -group TB -expand -group zpuu -expand -group ZWC -expand -group regs /gmzpu_tb/zpu/zwc/regs/reading_r
 add wave -noupdate -expand -group TB -expand -group zpuu -expand -group ZWC -expand -group decode -radix hexadecimal /gmzpu_tb/zpu/zwc/dec/adr_i
 add wave -noupdate -expand -group TB -expand -group zpuu -expand -group ZWC -expand -group decode /gmzpu_tb/zpu/zwc/dec/ena_i
 add wave -noupdate -expand -group TB -expand -group zpuu -expand -group ZWC -expand -group decode /gmzpu_tb/zpu/zwc/dec/rst_i
