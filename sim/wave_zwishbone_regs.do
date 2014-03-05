@@ -27,6 +27,7 @@ add wave -noupdate /zwishbone_regs_tb/c_regs/rty_i
 add wave -noupdate -radix hexadecimal /zwishbone_regs_tb/c_regs/reg_config
 add wave -noupdate -radix hexadecimal /zwishbone_regs_tb/c_regs/reg_status
 add wave -noupdate /zwishbone_regs_tb/c_regs/ready_r
+add wave -noupdate /zwishbone_regs_tb/c_regs/reading_r
 TreeUpdate [SetDefaultTree]
 WaveRestoreCursors {{Cursor 1} {0 ps} 0}
 quietly wave cursor active 1
