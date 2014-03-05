@@ -62,7 +62,7 @@ begin
         if rst_i='1' then
             reg_config <= (others => '0');
             ready_r <= '0';
-            dat_o <= (others => 'Z');
+            dat_o <= (others => '0');
         else 
                 -- only act when enabled 
                 if en_i='1' then
@@ -124,6 +124,7 @@ entity zwishbone_controller is
         -- zpu interface (non wishbone signal)
         ena_i       : in std_logic; -- enable wb controller
         busy_o      : out std_logic; -- controller busy
+	ready_o	    : out std_logic; -- read request ready
         adr_i       : in std_logic_vector(ADR_WIDTH-1 downto 0);
         we_i        : in std_logic;
         dat_i      : in std_logic_vector(DATA_WIDTH-1 downto 0);
@@ -169,6 +170,7 @@ architecture rtl of zwishbone_controller is
                 dat_i       : in std_logic_vector(DATA_WIDTH-1 downto 0);
                 dat_o       : out std_logic_vector(DATA_WIDTH-1 downto 0);
                 --
+                busy_o      : out std_logic;
                 ready_o     : out std_logic;
                 -- config register value (0x0000, for c_control)
                 cfg_o       : out std_logic_vector(DATA_WIDTH-1 downto 0);
@@ -245,6 +247,10 @@ architecture rtl of zwishbone_controller is
     signal radr     : std_logic_vector(ADR_WIDTH-CS_WIDTH-2 downto 0);
     signal badr     : std_logic_vector(ADR_WIDTH-CS_WIDTH-2 downto 0);
 
+    signal busy_r   : std_logic;
+    signal ready_r  : std_logic;
+    signal reg_busy_r : std_logic;
+    signal reg_ready_r : std_logic;
     -- 
     signal cs       : std_logic_vector(CS_WIDTH-1 downto 0);
 
@@ -260,7 +266,8 @@ begin
             clk_i => clk_i, rst_i => rst_i, en_i => reg_en, we_i => we_i,
             adr_i => radr, dat_i => dat_i, dat_o => dat_o, cfg_o => config,
             err_i => status_err_r,
-            rty_i => status_rty_r
+            rty_i => status_rty_r,
+	    busy_o => reg_busy_r, ready_o => reg_ready_r
         );
 
     status_err_r <= '1';
@@ -292,7 +299,11 @@ begin
             cs_i => cs
         );
 
-    busy_o <= '0';
+    busy_r <= reg_busy_r;
+    busy_o <= busy_r;
+
+    ready_r <= reg_ready_r;
+    ready_o <= ready_r;
 
 --    do_wishbone:
 --    process(clk_i)

@@ -118,6 +118,7 @@ package zwishbone is
                 dat_i       : in std_logic_vector(DATA_WIDTH-1 downto 0);
                 dat_o       : out std_logic_vector(DATA_WIDTH-1 downto 0);
                 --
+                busy_o      : out std_logic;
                 ready_o     : out std_logic;
                 -- config register value (0x0000, for c_control)
                 cfg_o       : out std_logic_vector(DATA_WIDTH-1 downto 0);
