@@ -64,7 +64,7 @@ int main(int argc, char **argv)
         print_hex(status);
         //printf("config = 0x%x, status=0x%s\n", config, status);
 
-        write_raw((__uint32_t *)ZWC_CONFIG, 0);
+        write_raw((__uint32_t *)ZWC_CONFIG, 0x87654321);
         write_raw((__uint32_t *)ZWC_STATUS, 0x12345678);
         config = read_raw((__uint32_t *)ZWC_CONFIG);
         status = read_raw((__uint32_t *)ZWC_STATUS);
