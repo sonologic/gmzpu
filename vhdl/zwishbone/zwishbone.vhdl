@@ -454,6 +454,8 @@ entity zwishbone_c_bus is
                 -- zpu wishbone controller signals
                 clk_i       : in std_logic;
                 rst_i       : in std_logic;
+                busy_o      : out std_logic;
+                ready_o     : out std_logic;
                 en_i        : in std_logic;     -- enable wb bus (internal)
                 we_i        : in std_logic;
                 adr_i       : in std_logic_vector(ADR_WIDTH-1 downto 0);
@@ -494,18 +496,33 @@ begin
 
         b_stb_o <= (others => '0');
         b_stb_o(page_sel) <= stb_r and cyc_r;
-
-        dat_o <= (others => 'Z');
-        b_dat_o <= (others => 'Z');
-        b_tgd_o <= (others => 'Z');
-        b_adr_o <= (others => 'Z');
-        b_sel_o <= (others => 'Z');
-        b_tgc_o <= (others => 'Z');
-        b_tga_o <= (others => 'Z');
-        b_cyc_o <= '0';
-        b_lock_o <= '0';
-        b_we_o <= '0';
-
         -- adr_o <= ..
     end process;
-end architecture rtl;
+
+    process(en_i)
+    begin
+        if rising_edge(clk_i) then
+        --    cyc_r <= '1';
+        end if;
+    end process;
+
+        b_tgd_o <= (others => 'Z');
+        b_sel_o <= (others => 'Z');
+        b_tga_o <= (others => 'Z');
+        b_lock_o <= '0';
+
+        b_cyc_o <= cyc_r;
+        ready_o <= b_ack_i;
+        busy_o <= en_i;
+
+        b_we_o <= we_i and en_i;
+        cyc_r <= en_i;
+        stb_r <= en_i;
+
+        b_adr_o <= adr_i when (cyc_r = '1') else (others => '0');
+        b_tgc_o <= (others => '0') when (cyc_r = '0') else (others => 'Z');
+
+        dat_o <= b_dat_i when ( we_i='0' and b_ack_i='1' ) else (others => 'Z');
+        b_dat_o <= dat_i when ( we_i='1' and cyc_r='1' ) else (others => 'Z');
+
+ end architecture rtl;
