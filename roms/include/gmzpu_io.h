@@ -14,12 +14,12 @@
 
 static inline __uint32_t read_raw(__uint32_t *ptr) 
 {
-    return *((volatile __uint32_t *)ptr);
+    return *(((volatile __uint32_t) *)ptr);
 }
 
 static inline void write_raw(__uint32_t *ptr, __uint32_t data)
 {
-    *((volatile __uint32_t *)ptr) = data;
+    *(((volatile __uint32_t) *)ptr) = data;
 }
 
 /*
