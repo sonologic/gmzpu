@@ -57,10 +57,11 @@ package zwishbone is
                 -- zpu interface (non wishbone signal)
                 ena_i       : in std_logic; -- enable wb controller
                 busy_o      : out std_logic; -- controller busy
+                ready_o     : out std_logic; -- controller busy
                 adr_i       : in std_logic_vector(ADR_WIDTH-1 downto 0);
                 we_i        : in std_logic;
-                dat_i      : in std_logic_vector(DATA_WIDTH-1 downto 0);
-                dat_o      : out std_logic_vector(DATA_WIDTH-1 downto 0);
+                dat_i       : in std_logic_vector(DATA_WIDTH-1 downto 0);
+                dat_o       : out std_logic_vector(DATA_WIDTH-1 downto 0);
                 -- I/O decoder
                 --cs_o        : out std_logic_vector(CS_WIDTH-1 downto 0);
                 -- wishbone bus

@@ -40,13 +40,14 @@ architecture rtl of zwishbone_c_regs is
     constant    R_CFG_PIPELINE_BIT  : integer:=0;
     constant    R_CFG_BLOCK_BIT     : integer:=1;
     constant    R_CFG_RMW_BIT       : integer:=2;
-    signal reg_config   : std_logic_vector(DATA_WIDTH-1 downto 0) := (others => '0');
-    signal reg_status   : std_logic_vector(DATA_WIDTH-1 downto 0) := (others => '0');
-    signal ready_r      : std_logic;
+    signal reg_config   : std_logic_vector(DATA_WIDTH-1 downto 0); -- := (others => '0');
+    signal reg_status   : std_logic_vector(DATA_WIDTH-1 downto 0); -- := (others => '0');
+    signal reading_r    : std_logic;
+    --signal ready_r      : std_logic;
 begin
     busy_o <= en_i;
 
-    ready_o <= ready_r;
+    ready_o <= (reading_r or (en_i and not we_i)) and not en_i;
 
     -- export CONFIG register value
     cfg_o <= reg_config;
@@ -55,52 +56,52 @@ begin
     reg_status(1) <= rty_i;
     reg_status(DATA_WIDTH-1 downto 2) <= (others => '0');
 
-    process
+    process(clk_i)
     begin
-        wait until rising_edge(clk_i);
-     
-        if rst_i='1' then
-            reg_config <= (others => '0');
-            ready_r <= '0';
-            dat_o <= (others => '0');
-        else 
+        if rising_edge(clk_i) then
+            if rst_i='1' then
+                reg_config <= (others => '0');
+                dat_o <= (others => '0');
+                reading_r <= '0';
+            else 
                 -- only act when enabled 
                 if en_i='1' then
                     -- adr 0x0 : CONFIG register
                     if adr_i=std_logic_vector(to_unsigned(0,ADR_WIDTH)) then
-                            ready_r <= '1';
                             -- write/read CONFIG register
-                            if we_i='1' then
+                            if we_i/='1' then
+                                reading_r <= '1';
+                                dat_o <= reg_config;
+                            else
                                 reg_config <= std_logic_vector(dat_i);
                                 dat_o <= (others => 'Z');
-                            else
-                                dat_o <= reg_config;
                             end if;
                     elsif adr_i=std_logic_vector(to_unsigned(4,ADR_WIDTH)) then
-                            ready_r <= '1';
                             -- status can only be read
                             if we_i/='1' then
+                                reading_r <= '1';
                                 dat_o <= std_logic_vector(reg_status);
                             else
                                 dat_o <= (others => 'Z');
                             end if;
                     else
-                            ready_r <= '1';
                             if we_i/='1' then
+                                reading_r <= '1';
                                 dat_o <= std_logic_vector(to_unsigned(0,DATA_WIDTH));
                             else
                                 dat_o <= (others => 'Z');
                             end if;
                     end if;
                 else
-                    if ready_r='1' then
-                        ready_r <= '0';
+                    if reading_r='1' then
+                        reading_r <= '0';
+                        dat_o <= (others => 'Z');
                     end if;
                 end if;
+            end if;
         end if;
 
     end process;
-
 
 end architecture rtl;
 
@@ -124,7 +125,7 @@ entity zwishbone_controller is
         -- zpu interface (non wishbone signal)
         ena_i       : in std_logic; -- enable wb controller
         busy_o      : out std_logic; -- controller busy
-	ready_o	    : out std_logic; -- read request ready
+	    ready_o	    : out std_logic; -- read request ready
         adr_i       : in std_logic_vector(ADR_WIDTH-1 downto 0);
         we_i        : in std_logic;
         dat_i      : in std_logic_vector(DATA_WIDTH-1 downto 0);
@@ -247,10 +248,10 @@ architecture rtl of zwishbone_controller is
     signal radr     : std_logic_vector(ADR_WIDTH-CS_WIDTH-2 downto 0);
     signal badr     : std_logic_vector(ADR_WIDTH-CS_WIDTH-2 downto 0);
 
-    signal busy_r   : std_logic;
-    signal ready_r  : std_logic;
-    signal reg_busy_r : std_logic;
-    signal reg_ready_r : std_logic;
+    --signal busy_r   : std_logic;
+    --signal ready_r  : std_logic;
+    --signal reg_busy_r : std_logic;
+    --signal reg_ready_r : std_logic;
     -- 
     signal cs       : std_logic_vector(CS_WIDTH-1 downto 0);
 
@@ -267,7 +268,7 @@ begin
             adr_i => radr, dat_i => dat_i, dat_o => dat_o, cfg_o => config,
             err_i => status_err_r,
             rty_i => status_rty_r,
-	    busy_o => reg_busy_r, ready_o => reg_ready_r
+	        busy_o => busy_o, ready_o => ready_o
         );
 
     status_err_r <= '1';
@@ -299,11 +300,11 @@ begin
             cs_i => cs
         );
 
-    busy_r <= reg_busy_r;
-    busy_o <= busy_r;
+    --busy_r <= reg_busy_r;
+    --busy_o <= busy_r;
 
-    ready_r <= reg_ready_r;
-    ready_o <= ready_r;
+    --ready_r <= reg_ready_r;
+    --ready_o <= ready_r;
 
 --    do_wishbone:
 --    process(clk_i)

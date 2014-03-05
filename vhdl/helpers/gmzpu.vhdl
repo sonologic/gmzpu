@@ -118,7 +118,7 @@ architecture Structural of gmZPU is
     -- I/O (zwishbone)
     signal zw_ena           : std_logic;
     signal zw_busy          : std_logic;
-    signal zw_ready_r       : std_logic;
+    signal zw_ready         : std_logic;
     signal zw_addr          : std_logic_vector(ADDR_W-3 downto 0);
     signal zw_re            : std_logic;
     signal zw_we            : std_logic;
@@ -190,7 +190,7 @@ begin
             DATA_WIDTH => WORD_SIZE, ADR_WIDTH => ADDR_W-2, CS_WIDTH => 4
         )
         port map(
-            clk_i => clk_i, rst_i => rst_i, ena_i => zw_ena, busy_o => zw_busy,
+            clk_i => clk_i, rst_i => rst_i, ena_i => zw_ena, busy_o => zw_busy, ready_o => zw_ready,
             adr_i => zw_addr, we_i => zw_we, dat_i => zw_dat_i, dat_o => zw_dat_o,
             wb_dat_i => wb_dat_i, wb_dat_o => wb_dat_o, 
             wb_tgd_i => wb_tgd_i, wb_tgd_o => wb_tgd_o, 
@@ -206,8 +206,6 @@ begin
     zw_re  <= mem_re and mem_addr(IO_BIT) and mem_addr(ZW_BIT);
     zw_ena <= zw_we or zw_re;
     zw_addr <= std_logic_vector(mem_addr(ADDR_W-3 downto 0));
-    zw_we <= mem_we and mem_addr(IO_BIT) and mem_addr(ZW_BIT);
-    zw_ready_r <= zw_re and not zw_busy;
 
     zw_dat_i <= std_logic_vector(mem_write);
     
@@ -226,7 +224,7 @@ begin
 
    -- Memory reads either come from IO or DRAM. We need to pick the right one.
    memory_control:
-   process (ram_read, ram_ready_r, phi_io_ready, phi_io_read, zw_dat_o, zw_ready_r)
+   process (ram_read, ram_ready_r, phi_io_ready, phi_io_read, zw_dat_o, zw_ready)
    begin
       mem_read <= (others => '0');
       if ram_ready_r='1' then
@@ -235,7 +233,7 @@ begin
       if phi_io_ready='1' then
          mem_read <= phi_io_read;
       end if;
-      if zw_ready_r='1' then
+      if zw_ready='1' then
         mem_read <= unsigned(zw_dat_o);
       end if;
    end process memory_control;
