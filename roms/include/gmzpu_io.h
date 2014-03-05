@@ -31,6 +31,7 @@ static inline void write_raw(__uint32_t *ptr, __uint32_t data)
  */
 #define		IO_MASK			(1<<(ADDR_W-1))
 #define		ZWC_MASK		(1<<(ADDR_W-2))
+#define     ZWC_BUS_MASK    (1<<(ADDR_W-3))
 
 /*
  * 0x30000          : ZWC_CONFIG
