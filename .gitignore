@@ -6,6 +6,5 @@ sim/zpu
 sim/work
 sim/wave.do
 roms/*/*.dis
-roms/*/*.vhdl
 sim/*.vstf
 *.bak
