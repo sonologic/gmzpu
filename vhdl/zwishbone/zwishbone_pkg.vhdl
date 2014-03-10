@@ -106,26 +106,32 @@ package zwishbone is
 
     component zwishbone_c_regs is
             generic(
-                ADR_WIDTH   : natural:=16;
+                ADR_WIDTH   : natural:=15;
                 DATA_WIDTH  : natural:=32
             );
             port (
+                -- syscon
                 clk_i       : in std_logic;
                 rst_i       : in std_logic;
-                -- c_decode
+                -- memory control
+                busy_o      : out std_logic;
+                ready_o     : out std_logic;
                 en_i        : in std_logic;
                 we_i        : in std_logic;
                 adr_i       : in std_logic_vector(ADR_WIDTH-1 downto 0);
                 dat_i       : in std_logic_vector(DATA_WIDTH-1 downto 0);
                 dat_o       : out std_logic_vector(DATA_WIDTH-1 downto 0);
-                --
-                busy_o      : out std_logic;
-                ready_o     : out std_logic;
+                -- bus
+                to_inc_i    : in std_logic;
+                to_rst_i    : in std_logic;
+                to_o        : out std_logic;
                 -- config register value (0x0000, for c_control)
                 cfg_o       : out std_logic_vector(DATA_WIDTH-1 downto 0);
                 -- status register value (0x0004, from c_control / bus)
                 err_i       : in std_logic;
-                rty_i       : in std_logic
+                rty_i       : in std_logic;
+                -- wishbone timeout compare register value
+                to_cmp_o    : out std_logic_vector(DATA_WIDTH-1 downto 0)
             );
     end component zwishbone_c_regs;
 

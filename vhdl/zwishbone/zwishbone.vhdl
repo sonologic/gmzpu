@@ -17,31 +17,50 @@ entity zwishbone_c_regs is
         DATA_WIDTH  : natural:=32
     );
     port (
+        -- syscon
         clk_i       : in std_logic;
         rst_i       : in std_logic;
-        -- c_decode
+        -- memory control
+        busy_o      : out std_logic;
+        ready_o     : out std_logic;
         en_i        : in std_logic;
         we_i        : in std_logic;
         adr_i       : in std_logic_vector(ADR_WIDTH-1 downto 0);
         dat_i       : in std_logic_vector(DATA_WIDTH-1 downto 0);
         dat_o       : out std_logic_vector(DATA_WIDTH-1 downto 0);
-        --
-        busy_o      : out std_logic;
-        ready_o     : out std_logic;
+        -- bus
+        to_inc_i    : in std_logic;
+        to_rst_i    : in std_logic;
+        to_o        : out std_logic;
         -- config register value (0x0000, for c_control)
         cfg_o       : out std_logic_vector(DATA_WIDTH-1 downto 0);
         -- status register value (0x0004, from c_control / bus)
         err_i       : in std_logic;
-        rty_i       : in std_logic
+        rty_i       : in std_logic;
+        -- wishbone timeout compare register value
+        to_cmp_o    : out std_logic_vector(DATA_WIDTH-1 downto 0)
+        
+        
     );
 end entity zwishbone_c_regs;
 
 architecture rtl of zwishbone_c_regs is
+    -- registers
+    signal reg_config   : std_logic_vector(DATA_WIDTH-1 downto 0); -- := (others => '0');
+    signal reg_status   : std_logic_vector(DATA_WIDTH-1 downto 0); -- := (others => '0');
+    signal reg_to_cmp   : unsigned(DATA_WIDTH-1 downto 0); -- := (others => '0');
+    signal reg_to_val   : unsigned(DATA_WIDTH-1 downto 0); -- := (others => '0');
+    -- reg_status signals
+    signal to_r         : std_logic;
+    -- reg_config bits
     constant    R_CFG_PIPELINE_BIT  : integer:=0;
     constant    R_CFG_BLOCK_BIT     : integer:=1;
     constant    R_CFG_RMW_BIT       : integer:=2;
-    signal reg_config   : std_logic_vector(DATA_WIDTH-1 downto 0); -- := (others => '0');
-    signal reg_status   : std_logic_vector(DATA_WIDTH-1 downto 0); -- := (others => '0');
+    -- reg_status bits
+    constant    R_STATUS_ERR        : integer:=0;
+    constant    R_STATUS_RTY        : integer:=1;
+    constant    R_STATUS_TO         : integer:=2;
+    -- memory control
     signal reading_r    : std_logic;
     --signal ready_r      : std_logic;
 begin
@@ -54,13 +73,38 @@ begin
 
     reg_status(0) <= err_i;
     reg_status(1) <= rty_i;
+    reg_status(2) <= to_r;
     reg_status(DATA_WIDTH-1 downto 2) <= (others => '0');
 
     process(clk_i)
     begin
         if rising_edge(clk_i) then
+            if rst_i='0' then
+                if to_rst_i='0' then
+                    if reg_to_val = reg_to_cmp then
+                        to_r <= '1';
+                    end if;
+                    if to_inc_i='1' then
+                        reg_to_val <= reg_to_val + 1;
+                    end if;
+                else
+                    reg_to_val <= (others => '0');
+                    to_r <= '0';
+                end if;
+            end if;
+        end if;
+    end process;
+
+    to_o <= to_r;   
+ 
+    process(clk_i)
+    begin
+        if rising_edge(clk_i) then
             if rst_i='1' then
                 reg_config <= (others => '0');
+                reg_to_cmp <= x"0000000f";
+                reg_to_val <= x"00000000";
+                to_r <= '0';
                 dat_o <= (others => '0');
                 reading_r <= '0';
             else 
@@ -76,23 +120,47 @@ begin
                                 reg_config <= std_logic_vector(dat_i);
                                 dat_o <= (others => 'Z');
                             end if;
+                    -- adr 0x4 : STATUS register
                     elsif adr_i=std_logic_vector(to_unsigned(4,ADR_WIDTH)) then
                             -- status can only be read
                             if we_i/='1' then
                                 reading_r <= '1';
                                 dat_o <= std_logic_vector(reg_status);
                             else
+                                -- ignore writes
                                 dat_o <= (others => 'Z');
                             end if;
+                    -- adr 0x8 : TO_CMP register
+                    elsif adr_i=std_logic_vector(to_unsigned(8,ADR_WIDTH)) then
+                            if we_i/='1' then
+                                reading_r <= '1';
+                                dat_o <= std_logic_vector(reg_to_cmp);
+                            else
+                                reg_to_cmp <= unsigned(dat_i);
+                                dat_o <= (others => 'Z');
+                            end if;
+                    -- adr 0xc : TO_VAL register
+                    elsif adr_i=std_logic_vector(to_unsigned(12,ADR_WIDTH)) then
+                            if we_i/='1' then
+                                reading_r <= '1';
+                                dat_o <= std_logic_vector(reg_to_val);
+                            else
+                                -- ignore writes
+                                dat_o <= (others => 'Z');
+                            end if;
+                    -- undefined registers
                     else
                             if we_i/='1' then
+                                -- always read zeroes
                                 reading_r <= '1';
                                 dat_o <= std_logic_vector(to_unsigned(0,DATA_WIDTH));
                             else
+                                -- ignore writes
                                 dat_o <= (others => 'Z');
                             end if;
                     end if;
                 else
+                    -- deassert reading_r on the rising clock after assertion
                     if reading_r='1' then
                         reading_r <= '0';
                         dat_o <= (others => 'Z');
@@ -162,22 +230,30 @@ architecture rtl of zwishbone_controller is
                 DATA_WIDTH  : natural:=32
             );
             port (
+                -- syscon
                 clk_i       : in std_logic;
                 rst_i       : in std_logic;
-                -- c_decode
+                -- memory control
+                busy_o      : out std_logic;
+                ready_o     : out std_logic;
                 en_i        : in std_logic;
                 we_i        : in std_logic;
                 adr_i       : in std_logic_vector(ADR_WIDTH-1 downto 0);
                 dat_i       : in std_logic_vector(DATA_WIDTH-1 downto 0);
                 dat_o       : out std_logic_vector(DATA_WIDTH-1 downto 0);
-                --
-                busy_o      : out std_logic;
-                ready_o     : out std_logic;
+                -- bus
+                to_inc_i    : in std_logic;
+                to_rst_i    : in std_logic;
+                to_o        : out std_logic;
                 -- config register value (0x0000, for c_control)
                 cfg_o       : out std_logic_vector(DATA_WIDTH-1 downto 0);
-                -- status register bits
+                -- status register value (0x0004, from c_control / bus)
                 err_i       : in std_logic;
-                rty_i       : in std_logic
+                rty_i       : in std_logic;
+                -- wishbone timeout compare register value
+                to_cmp_o    : out std_logic_vector(DATA_WIDTH-1 downto 0)
+                
+                
             );
     end component zwishbone_c_regs;
 
