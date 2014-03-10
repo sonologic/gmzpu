@@ -45,7 +45,7 @@ architecture rtl of zwishbone_c_regs is
     signal reading_r    : std_logic;
     --signal ready_r      : std_logic;
 begin
-    busy_o <= en_i;
+    busy_o <= en_i or reading_r;
 
     ready_o <= (reading_r or (en_i and not we_i)) and not en_i;
 
@@ -191,6 +191,8 @@ architecture rtl of zwishbone_controller is
                 -- zpu wishbone controller signals
                 clk_i       : in std_logic;
                 rst_i       : in std_logic;
+                busy_o      : out std_logic;
+                ready_o     : out std_logic;
                 en_i        : in std_logic;     -- enable wb bus (internal)
                 we_i        : in std_logic;
                 adr_i       : in std_logic_vector(ADR_WIDTH-1 downto 0);
@@ -250,8 +252,10 @@ architecture rtl of zwishbone_controller is
 
     --signal busy_r   : std_logic;
     --signal ready_r  : std_logic;
-    --signal reg_busy_r : std_logic;
-    --signal reg_ready_r : std_logic;
+    signal reg_busy_r : std_logic;
+    signal reg_ready_r : std_logic;
+    signal zwc_busy_r : std_logic;
+    signal zwc_ready_r : std_logic;
     -- 
     signal cs       : std_logic_vector(CS_WIDTH-1 downto 0);
 
@@ -268,7 +272,7 @@ begin
             adr_i => radr, dat_i => dat_i, dat_o => dat_o, cfg_o => config,
             err_i => status_err_r,
             rty_i => status_rty_r,
-	        busy_o => busy_o, ready_o => ready_o
+	        busy_o => reg_busy_r, ready_o => reg_ready_r
         );
 
     status_err_r <= '1';
@@ -297,8 +301,12 @@ begin
             b_lock_o => wb_lock_o, b_rty_i => wb_rty_i, b_sel_o => wb_sel_o,
             b_stb_o => wb_stb_o, b_tga_o => wb_tga_o, b_tgc_o => wb_tgc_o,
             b_we_o => wb_we_o,
-            cs_i => cs
+            cs_i => cs,
+            busy_o => zwc_busy_r, ready_o => zwc_ready_r
         );
+
+        busy_o <= reg_busy_r or zwc_busy_r;
+        ready_o <= reg_ready_r or zwc_ready_r;
 
     --busy_r <= reg_busy_r;
     --busy_o <= busy_r;
@@ -499,10 +507,26 @@ begin
         -- adr_o <= ..
     end process;
 
-    process(en_i)
+    process(clk_i)
     begin
         if rising_edge(clk_i) then
-        --    cyc_r <= '1';
+            if rst_i='1' then
+                cyc_r <= '0';
+            else
+                    if en_i='1' then
+                        cyc_r <= '1';
+                    else
+                        if b_ack_i='1' then
+                            cyc_r <= '0';
+                        else
+                            if cyc_r='1' then
+                                cyc_r <= '1';
+                            else
+                                cyc_r <= '0';
+                            end if;
+                        end if;
+                    end if;
+            end if;
         end if;
     end process;
 
@@ -513,10 +537,9 @@ begin
 
         b_cyc_o <= cyc_r;
         ready_o <= b_ack_i;
-        busy_o <= en_i;
+        busy_o <= en_i or cyc_r;
 
         b_we_o <= we_i and en_i;
-        cyc_r <= en_i;
         stb_r <= en_i;
 
         b_adr_o <= adr_i when (cyc_r = '1') else (others => '0');
