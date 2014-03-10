@@ -8,3 +8,5 @@ sim/wave.do
 roms/*/*.dis
 sim/*.vstf
 *.bak
+roms/hello/hello.vhdl
+roms/hello/int_test.vhdl
