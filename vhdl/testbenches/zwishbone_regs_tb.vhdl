@@ -24,7 +24,7 @@
 ----                                                                      ----
 ------------------------------------------------------------------------------
 ----                                                                      ----
----- Design unit:      zwishbone_TB                                           ----
+---- Design unit:      zwishbone_TB                                       ----
 ---- File name:        gmzpu_tb.vhdl                                      ----
 ---- Note:             None                                               ----
 ---- Limitations:      None known                                         ----
@@ -59,21 +59,25 @@ architecture Behave of zwishbone_regs_TB is
 
     component zwishbone_c_regs is
             generic(
-                ADR_WIDTH   : natural:=16;
+                ADR_WIDTH   : natural:=15;
                 DATA_WIDTH  : natural:=32
             );
             port (
+                -- syscon
                 clk_i       : in std_logic;
                 rst_i       : in std_logic;
-                -- c_decode
+                -- memory control
+                busy_o      : out std_logic;
+                ready_o     : out std_logic;
                 en_i        : in std_logic;
                 we_i        : in std_logic;
                 adr_i       : in std_logic_vector(ADR_WIDTH-1 downto 0);
                 dat_i       : in std_logic_vector(DATA_WIDTH-1 downto 0);
                 dat_o       : out std_logic_vector(DATA_WIDTH-1 downto 0);
-                --
-                busy_o      : out std_logic;
-                ready_o     : out std_logic;
+                -- bus
+                to_inc_i    : in std_logic;
+                to_rst_i    : in std_logic;
+                to_o        : out std_logic;
                 -- config register value (0x0000, for c_control)
                 cfg_o       : out std_logic_vector(DATA_WIDTH-1 downto 0);
                 -- status register value (0x0004, from c_control / bus)
@@ -90,6 +94,8 @@ architecture Behave of zwishbone_regs_TB is
         we_i        : std_logic;
         adr_i       : std_logic_vector(ADR_WIDTH-1 downto 0);
         dat_i       : std_logic_vector(DATA_WIDTH-1 downto 0);
+        to_inc_i    : std_logic;
+        to_rst_i    : std_logic;
         err_i       : std_logic;
         rty_i       : std_logic;
         -- outputs
@@ -103,24 +109,29 @@ architecture Behave of zwishbone_regs_TB is
     type sample_array is array(natural range <>) of sample;
     constant test_data : sample_array :=
         (
-        --   rst en  we  adr           dat_i       err rty
-            ('1','0','0',"00000000000",X"00000000",'1','1'),
-            ('1','0','0',"00000000000",X"00000000",'1','1'),
-            ('0','0','0',"00000000000",X"00000000",'1','1'),
-            ('0','0','0',"00000000000",X"00000000",'1','1'),
-            ('0','1','0',"00000000000",X"00000000",'1','1'),
-            ('0','0','0',"00000000000",X"00000000",'1','1'),
-            ('0','0','0',"00000000000",X"00000000",'1','1'),
-            ('0','1','0',"00000000100",X"00000000",'1','1'),
-            ('0','0','0',"00000000000",X"00000000",'1','1'),
-            ('0','0','0',"00000000000",X"00000000",'1','1'),
-            ('0','0','0',"00000000000",X"00000000",'1','1'),
-            ('0','0','0',"00000000000",X"00000000",'1','1'),
-            ('0','0','0',"00000000000",X"00000000",'1','1'),
-            ('0','0','0',"00000000000",X"00000000",'1','1'),
-            ('0','0','0',"00000000000",X"00000000",'1','1'),
-            ('0','0','0',"00000000000",X"00000000",'1','1')
-            --('1','0','0',"000000000000000",X"00000000",X"00000000",X"00000000",  X"00000000", '0', '0', X"00000000", X"00000000", "000000000", "000000000", "0000")
+        --   rst en  we  adr           dat_i       to_inc, to_rst, err rty
+            ('1','0','0',"00000000000",X"00000000",'0',    '0',    '1','1'),
+            ('1','0','0',"00000000000",X"00000000",'0',    '0',    '1','1'),
+            ('0','0','0',"00000000000",X"00000000",'0',    '0',    '1','1'),
+            ('0','0','0',"00000000000",X"00000000",'0',    '0',    '1','1'),
+            ('0','1','0',"00000000000",X"00000000",'0',    '0',    '1','1'),
+            ('0','0','0',"00000000000",X"00000000",'0',    '0',    '1','1'),
+            ('0','0','0',"00000000000",X"00000000",'0',    '0',    '1','1'),
+            ('0','1','0',"00000000100",X"00000000",'0',    '0',    '1','1'),
+            ('0','0','0',"00000000000",X"00000000",'0',    '0',    '1','1'),
+            ('0','0','0',"00000000000",X"00000000",'0',    '0',    '1','1'),
+            ('0','0','0',"00000000000",X"00000000",'1',    '0',    '1','1'),
+            ('0','0','0',"00000000000",X"00000000",'1',    '0',    '1','1'),
+            ('0','0','0',"00000000000",X"00000000",'1',    '0',    '1','1'),
+            ('0','0','0',"00000000000",X"00000000",'1',    '0',    '1','1'),
+            ('0','0','0',"00000000000",X"00000000",'1',    '0',    '1','1'),
+            ('0','0','0',"00000000000",X"00000000",'0',    '1',    '1','1'),
+            ('0','0','0',"00000000000",X"00000000",'1',    '0',    '1','1'),
+            ('0','0','0',"00000000000",X"00000000",'1',    '0',    '1','1'),
+            ('0','0','0',"00000000000",X"00000000",'0',    '0',    '1','1'),
+            ('0','0','0',"00000000000",X"00000000",'0',    '0',    '1','1'),
+            ('0','0','0',"00000000000",X"00000000",'0',    '0',    '1','1'),
+            ('0','0','0',"00000000000",X"00000000",'0',    '0',    '1','1')
         );
         
 
@@ -132,17 +143,22 @@ architecture Behave of zwishbone_regs_TB is
     signal adr_i    : std_logic_vector(ADR_WIDTH-1 downto 0);
     signal dat_o    : std_logic_vector(DATA_WIDTH-1 downto 0);
     signal dat_i    : std_logic_vector(DATA_WIDTH-1 downto 0);
+    signal to_rst_i : std_logic;
+    signal to_inc_i : std_logic;
     signal busy_o   : std_logic;
     signal ready_o  : std_logic;
 
     signal rty_i : std_logic;
     signal err_i : std_logic;
 
+    signal to_o : std_logic;
+
 begin
     c_regs : zwishbone_c_regs
         generic map( ADR_WIDTH => ADR_WIDTH, DATA_WIDTH => DATA_WIDTH )
         port map (adr_i => adr_i, dat_i => dat_i, dat_o => dat_o, en_i => en_i, rst_i => reset, we_i => we_i,
-                    err_i => err_i, rty_i => rty_i, busy_o => busy_o, ready_o => ready_o, clk_i => clk);
+                    err_i => err_i, rty_i => rty_i, busy_o => busy_o, ready_o => ready_o, clk_i => clk,
+                    to_rst_i => to_rst_i, to_inc_i => to_inc_i, to_o => to_o );
    
     process
         variable cycle_count    : integer:=0;
@@ -153,6 +169,8 @@ begin
             we_i <= test_data(i).we_i;
             adr_i <= test_data(i).adr_i;
             dat_i <= test_data(i).dat_i;
+            to_inc_i <= test_data(i).to_inc_i;
+            to_rst_i <= test_data(i).to_rst_i;
             rty_i <= test_data(i).rty_i;
             err_i <= test_data(i).err_i;
             clk <= '1';
