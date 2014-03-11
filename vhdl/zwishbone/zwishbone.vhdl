@@ -36,11 +36,7 @@ entity zwishbone_c_regs is
         cfg_o       : out std_logic_vector(DATA_WIDTH-1 downto 0);
         -- status register value (0x0004, from c_control / bus)
         err_i       : in std_logic;
-        rty_i       : in std_logic;
-        -- wishbone timeout compare register value
-        to_cmp_o    : out std_logic_vector(DATA_WIDTH-1 downto 0)
-        
-        
+        rty_i       : in std_logic
     );
 end entity zwishbone_c_regs;
 
@@ -79,7 +75,13 @@ begin
     process(clk_i)
     begin
         if rising_edge(clk_i) then
-            if rst_i='0' then
+            if rst_i='1' or to_rst_i='1' then
+                reg_to_val <= x"00000000";
+                to_r <= '0';
+                if rst_i='1' then
+                    --reg_to_cmp <= x"0000000f";
+                end if;
+            else
                 if to_rst_i='0' then
                     if reg_to_val = reg_to_cmp then
                         to_r <= '1';
@@ -102,11 +104,9 @@ begin
         if rising_edge(clk_i) then
             if rst_i='1' then
                 reg_config <= (others => '0');
-                reg_to_cmp <= x"0000000f";
-                reg_to_val <= x"00000000";
-                to_r <= '0';
                 dat_o <= (others => '0');
                 reading_r <= '0';
+                reg_to_cmp <= x"0000000f";
             else 
                 -- only act when enabled 
                 if en_i='1' then
@@ -249,11 +249,7 @@ architecture rtl of zwishbone_controller is
                 cfg_o       : out std_logic_vector(DATA_WIDTH-1 downto 0);
                 -- status register value (0x0004, from c_control / bus)
                 err_i       : in std_logic;
-                rty_i       : in std_logic;
-                -- wishbone timeout compare register value
-                to_cmp_o    : out std_logic_vector(DATA_WIDTH-1 downto 0)
-                
-                
+                rty_i       : in std_logic
             );
     end component zwishbone_c_regs;
 
@@ -335,6 +331,10 @@ architecture rtl of zwishbone_controller is
     -- 
     signal cs       : std_logic_vector(CS_WIDTH-1 downto 0);
 
+    signal to_rst   : std_logic;
+    signal to_inc   : std_logic;
+    signal timeout  : std_logic;
+
 
 
 begin
@@ -348,11 +348,15 @@ begin
             adr_i => radr, dat_i => dat_i, dat_o => dat_o, cfg_o => config,
             err_i => status_err_r,
             rty_i => status_rty_r,
-	        busy_o => reg_busy_r, ready_o => reg_ready_r
+	        busy_o => reg_busy_r, ready_o => reg_ready_r,
+            to_rst_i => to_rst, to_inc_i => to_inc, to_o => timeout
         );
 
     status_err_r <= '1';
     status_rty_r <= '1';
+    to_rst<='0';
+    to_inc<='0';
+    
 
     dec : zwishbone_c_decode
         generic map (
