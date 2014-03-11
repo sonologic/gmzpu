@@ -7,6 +7,9 @@ add wave -noupdate /zwishbone_regs_tb/we_i
 add wave -noupdate -radix hexadecimal /zwishbone_regs_tb/adr_i
 add wave -noupdate -radix hexadecimal /zwishbone_regs_tb/dat_o
 add wave -noupdate -radix hexadecimal /zwishbone_regs_tb/dat_i
+add wave -noupdate /zwishbone_regs_tb/to_rst_i
+add wave -noupdate /zwishbone_regs_tb/to_inc_i
+add wave -noupdate /zwishbone_regs_tb/to_o
 add wave -noupdate /zwishbone_regs_tb/err_i
 add wave -noupdate /zwishbone_regs_tb/rty_i
 add wave -noupdate /zwishbone_regs_tb/busy_o
@@ -26,6 +29,8 @@ add wave -noupdate /zwishbone_regs_tb/c_regs/err_i
 add wave -noupdate /zwishbone_regs_tb/c_regs/rty_i
 add wave -noupdate -radix hexadecimal /zwishbone_regs_tb/c_regs/reg_config
 add wave -noupdate -radix hexadecimal /zwishbone_regs_tb/c_regs/reg_status
+add wave -noupdate -radix hexadecimal /zwishbone_regs_tb/c_regs/reg_to_cmp
+add wave -noupdate -radix hexadecimal /zwishbone_regs_tb/c_regs/reg_to_val
 add wave -noupdate /zwishbone_regs_tb/c_regs/ready_r
 add wave -noupdate /zwishbone_regs_tb/c_regs/reading_r
 TreeUpdate [SetDefaultTree]
