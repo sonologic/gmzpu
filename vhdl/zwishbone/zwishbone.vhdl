@@ -70,7 +70,7 @@ begin
     reg_status(0) <= err_i;
     reg_status(1) <= rty_i;
     reg_status(2) <= to_r;
-    reg_status(DATA_WIDTH-1 downto 2) <= (others => '0');
+    reg_status(DATA_WIDTH-1 downto 3) <= (others => '0');
 
     process(clk_i)
     begin
