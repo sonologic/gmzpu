@@ -129,9 +129,7 @@ package zwishbone is
                 cfg_o       : out std_logic_vector(DATA_WIDTH-1 downto 0);
                 -- status register value (0x0004, from c_control / bus)
                 err_i       : in std_logic;
-                rty_i       : in std_logic;
-                -- wishbone timeout compare register value
-                to_cmp_o    : out std_logic_vector(DATA_WIDTH-1 downto 0)
+                rty_i       : in std_logic
             );
     end component zwishbone_c_regs;
 
