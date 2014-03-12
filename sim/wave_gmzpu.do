@@ -126,6 +126,9 @@ add wave -noupdate -expand -group TB -expand -group zpuu -expand -group ZWC -gro
 add wave -noupdate -expand -group TB -expand -group zpuu -expand -group ZWC -group fabric -radix hexadecimal /gmzpu_tb/zpu/zwc/radr
 add wave -noupdate -expand -group TB -expand -group zpuu -expand -group ZWC -group fabric -radix hexadecimal /gmzpu_tb/zpu/zwc/badr
 add wave -noupdate -expand -group TB -expand -group zpuu -expand -group ZWC -group fabric /gmzpu_tb/zpu/zwc/cs
+add wave -noupdate -expand -group TB -expand -group zpuu -expand -group ZWC -group fabric /gmzpu_tb/zpu/zwc/to_rst
+add wave -noupdate -expand -group TB -expand -group zpuu -expand -group ZWC -group fabric /gmzpu_tb/zpu/zwc/to_inc
+add wave -noupdate -expand -group TB -expand -group zpuu -expand -group ZWC -group fabric /gmzpu_tb/zpu/zwc/timeout
 add wave -noupdate -expand -group TB -expand -group zpuu -expand -group ZWC -expand -group regs /gmzpu_tb/zpu/zwc/regs/clk_i
 add wave -noupdate -expand -group TB -expand -group zpuu -expand -group ZWC -expand -group regs /gmzpu_tb/zpu/zwc/regs/rst_i
 add wave -noupdate -expand -group TB -expand -group zpuu -expand -group ZWC -expand -group regs /gmzpu_tb/zpu/zwc/regs/en_i
@@ -140,6 +143,9 @@ add wave -noupdate -expand -group TB -expand -group zpuu -expand -group ZWC -exp
 add wave -noupdate -expand -group TB -expand -group zpuu -expand -group ZWC -expand -group regs -radix hexadecimal /gmzpu_tb/zpu/zwc/regs/cfg_o
 add wave -noupdate -expand -group TB -expand -group zpuu -expand -group ZWC -expand -group regs /gmzpu_tb/zpu/zwc/regs/err_i
 add wave -noupdate -expand -group TB -expand -group zpuu -expand -group ZWC -expand -group regs /gmzpu_tb/zpu/zwc/regs/rty_i
+add wave -noupdate -expand -group TB -expand -group zpuu -expand -group ZWC -expand -group regs /gmzpu_tb/zpu/zwc/regs/to_rst_i
+add wave -noupdate -expand -group TB -expand -group zpuu -expand -group ZWC -expand -group regs /gmzpu_tb/zpu/zwc/regs/to_inc_i
+add wave -noupdate -expand -group TB -expand -group zpuu -expand -group ZWC -expand -group regs /gmzpu_tb/zpu/zwc/regs/to_o
 add wave -noupdate -expand -group TB -expand -group zpuu -expand -group ZWC -expand -group regs -radix hexadecimal /gmzpu_tb/zpu/zwc/regs/reg_config
 add wave -noupdate -expand -group TB -expand -group zpuu -expand -group ZWC -expand -group regs -radix hexadecimal /gmzpu_tb/zpu/zwc/regs/reg_status
 add wave -noupdate -expand -group TB -expand -group zpuu -expand -group ZWC -expand -group regs /gmzpu_tb/zpu/zwc/regs/reading_r
@@ -166,6 +172,9 @@ add wave -noupdate -expand -group TB -expand -group zpuu -expand -group ZWC -exp
 add wave -noupdate -expand -group TB -expand -group zpuu -expand -group ZWC -expand -group bus /gmzpu_tb/zpu/zwc/zwbbus/we_i
 add wave -noupdate -expand -group TB -expand -group zpuu -expand -group ZWC -expand -group bus /gmzpu_tb/zpu/zwc/zwbbus/busy_o
 add wave -noupdate -expand -group TB -expand -group zpuu -expand -group ZWC -expand -group bus /gmzpu_tb/zpu/zwc/zwbbus/ready_o
+add wave -noupdate -expand -group TB -expand -group zpuu -expand -group ZWC -expand -group bus /gmzpu_tb/zpu/zwc/zwbbus/to_rst_o
+add wave -noupdate -expand -group TB -expand -group zpuu -expand -group ZWC -expand -group bus /gmzpu_tb/zpu/zwc/zwbbus/to_inc_o
+add wave -noupdate -expand -group TB -expand -group zpuu -expand -group ZWC -expand -group bus /gmzpu_tb/zpu/zwc/zwbbus/to_i
 add wave -noupdate -expand -group TB -expand -group zpuu -expand -group ZWC -expand -group bus /gmzpu_tb/zpu/zwc/zwbbus/we_i
 add wave -noupdate -expand -group TB -expand -group zpuu -expand -group ZWC -expand -group bus /gmzpu_tb/zpu/zwc/zwbbus/adr_i
 add wave -noupdate -expand -group TB -expand -group zpuu -expand -group ZWC -expand -group bus -radix hexadecimal /gmzpu_tb/zpu/zwc/zwbbus/dat_i
