@@ -271,6 +271,9 @@ architecture rtl of zwishbone_controller is
                 dat_i       : in std_logic_vector(DATA_WIDTH-1 downto 0);
                 dat_o       : out std_logic_vector(DATA_WIDTH-1 downto 0);
                 cs_i        : in std_logic_vector(CS_WIDTH-1 downto 0);
+                to_i        : in std_logic;
+                to_inc_o    : out std_logic;
+                to_rst_o    : out std_logic;
                 -- wishbone MASTER signals
                 b_dat_i      : in std_logic_vector(DATA_WIDTH-1 downto 0);
                 b_dat_o      : out std_logic_vector(DATA_WIDTH-1 downto 0);
@@ -322,8 +325,6 @@ architecture rtl of zwishbone_controller is
     signal radr     : std_logic_vector(ADR_WIDTH-CS_WIDTH-2 downto 0);
     signal badr     : std_logic_vector(ADR_WIDTH-CS_WIDTH-2 downto 0);
 
-    --signal busy_r   : std_logic;
-    --signal ready_r  : std_logic;
     signal reg_busy_r : std_logic;
     signal reg_ready_r : std_logic;
     signal zwc_busy_r : std_logic;
@@ -354,9 +355,6 @@ begin
 
     status_err_r <= '1';
     status_rty_r <= '1';
-    to_rst<='0';
-    to_inc<='0';
-    
 
     dec : zwishbone_c_decode
         generic map (
@@ -382,7 +380,8 @@ begin
             b_stb_o => wb_stb_o, b_tga_o => wb_tga_o, b_tgc_o => wb_tgc_o,
             b_we_o => wb_we_o,
             cs_i => cs,
-            busy_o => zwc_busy_r, ready_o => zwc_ready_r
+            busy_o => zwc_busy_r, ready_o => zwc_ready_r,
+            to_i => timeout, to_inc_o => to_inc, to_rst_o => to_rst
         );
 
         busy_o <= reg_busy_r or zwc_busy_r;
@@ -550,6 +549,9 @@ entity zwishbone_c_bus is
                 dat_i       : in std_logic_vector(DATA_WIDTH-1 downto 0);
                 dat_o       : out std_logic_vector(DATA_WIDTH-1 downto 0);
                 cs_i        : in std_logic_vector(CS_WIDTH-1 downto 0);
+                to_i        : in std_logic;
+                to_inc_o    : out std_logic;
+                to_rst_o    : out std_logic;
                 -- wishbone MASTER signals
                 b_dat_i      : in std_logic_vector(DATA_WIDTH-1 downto 0);
                 b_dat_o      : out std_logic_vector(DATA_WIDTH-1 downto 0);
@@ -587,14 +589,20 @@ begin
         -- adr_o <= ..
     end process;
 
+    to_inc_o <= cyc_r;
+    to_rst_o <= en_i;
+
     process(clk_i)
     begin
         if rising_edge(clk_i) then
             if rst_i='1' then
                 cyc_r <= '0';
             else
-                    if en_i='1' then
-                        cyc_r <= '1';
+                if en_i='1' then
+                    cyc_r <= '1';
+                else
+                    if to_i='1' then
+                        cyc_r <= '0';
                     else
                         if b_ack_i='1' then
                             cyc_r <= '0';
@@ -606,6 +614,7 @@ begin
                             end if;
                         end if;
                     end if;
+                end if;
             end if;
         end if;
     end process;

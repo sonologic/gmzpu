@@ -149,6 +149,9 @@ package zwishbone is
                 dat_i       : in std_logic_vector(DATA_WIDTH-1 downto 0);
                 dat_o       : out std_logic_vector(DATA_WIDTH-1 downto 0);
                 cs_i        : in std_logic_vector(CS_WIDTH-1 downto 0);
+                to_i        : in std_logic;
+                to_inc_o    : out std_logic;
+                to_rst_o    : out std_logic;
                 -- wishbone MASTER signals
                 b_dat_i      : in std_logic_vector(DATA_WIDTH-1 downto 0);
                 b_dat_o      : out std_logic_vector(DATA_WIDTH-1 downto 0);
