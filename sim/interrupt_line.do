@@ -17,8 +17,7 @@ vsim interrupt_line_TB
 
 view wave
 
-#do wave_zwishbone_regs.do
-add wave -recursive *
+do wave_interrupt_line.do
 
 view structure
 #view signals
