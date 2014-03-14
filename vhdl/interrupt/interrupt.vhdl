@@ -96,6 +96,7 @@ entity interrupt_regs is
         dat_o       : out std_logic_vector(DATA_WIDTH-1 downto 0);
         we_i        : in std_logic;
         en_i        : in std_logic;
+        ready_o     : out std_logic;
         irq_o       : out std_logic
     );
 end entity interrupt_regs;
@@ -122,8 +123,10 @@ architecture rtl of interrupt_regs is
     signal IER  : std_logic_vector(DATA_WIDTH-1 downto 0);
     signal irq  : std_logic_vector(DATA_WIDTH-1 downto 0);
     signal icr_we   : std_logic;
+    signal reading_r    : std_logic;
 begin
-  
+ 
+ 
     -- we to interrupt lines when upstream we or reset 
     icr_we <= (en_i and we_i) or (rst_i);
  
@@ -147,39 +150,65 @@ begin
 
     process(clk_i)
     begin
-        dat_o <= (others => 'Z');
-
         if rising_edge(clk_i) then
             if rst_i='1' then
                 IMR <= (others => '0');
                 ITR <= (others => '0');
                 IER <= (others => '0');
+                reading_r <= '0';
             elsif en_i='1' then
                 if adr_i="00" then      -- 0x0 ICR
                     if we_i='0' then
                         dat_o <= ICR;
+                        reading_r <= '1';
+                    else
+                        dat_o <= (others => 'Z');
+                        reading_r <= '0';
                     end if;
                 elsif adr_i="01" then   -- 0x1 IMR
                     if we_i='0' then
                         dat_o <= IMR;
+                        reading_r <= '1';
                     else
                         IMR <= dat_i;
+                        dat_o <= (others => 'Z');
+                        reading_r <= '0';
                     end if;
                 elsif adr_i="10" then   -- 0x2 ITR
                     if we_i='0' then
                         dat_o <= ITR;
+                        reading_r <= '1';
                     else
                         ITR <= dat_i;
+                        dat_o <= (others => 'Z');
+                        reading_r <= '0';
                     end if;
                 else                    -- 0x3 IER
                     if we_i='0' then
                         dat_o <= IER;
+                        reading_r <= '1';
                     else
                         IER <= dat_i;
+                        dat_o <= (others => 'Z');
+                        reading_r <= '0';
                     end if;
                 end if;
+            else
+                if reading_r='1' then
+                    reading_r <= '0';
+                elsif en_i='0' then
+                    dat_o <= (others => 'Z');
+                end if;
+                
             end if; -- en_i='1'
         end if; -- rising_edge(clk_i)
+    end process;
+    
+    process(clk_i)
+    begin
+        if rising_edge(clk_i) then
+            ready_o <= en_i or reading_r;
+        end if;
     end process;
                 
 end architecture rtl;

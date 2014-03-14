@@ -31,7 +31,8 @@ package pic is
             dat_o       : out std_logic_vector(DATA_WIDTH-1 downto 0);
             we_i        : in std_logic;
             en_i        : in std_logic;
-            irq_o       : out std_logic
+            irq_o       : out std_logic;
+            ready_o     : out std_logic
         );
     end component interrupt_regs;
 

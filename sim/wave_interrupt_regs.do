@@ -17,11 +17,13 @@ add wave -noupdate -expand -group regs -radix hexadecimal /interrupt_regs_tb/reg
 add wave -noupdate -expand -group regs -radix hexadecimal /interrupt_regs_tb/regs/dat_o
 add wave -noupdate -expand -group regs /interrupt_regs_tb/regs/we_i
 add wave -noupdate -expand -group regs /interrupt_regs_tb/regs/en_i
+add wave -noupdate -expand -group regs /interrupt_regs_tb/regs/ready_o
 add wave -noupdate -expand -group regs /interrupt_regs_tb/regs/irq_o
 add wave -noupdate -expand -group regs -radix hexadecimal /interrupt_regs_tb/regs/ICR
 add wave -noupdate -expand -group regs -radix hexadecimal /interrupt_regs_tb/regs/IMR
 add wave -noupdate -expand -group regs -radix hexadecimal /interrupt_regs_tb/regs/ITR
 add wave -noupdate -expand -group regs -radix hexadecimal /interrupt_regs_tb/regs/IER
+add wave -noupdate -expand -group regs -radix hexadecimal /interrupt_regs_tb/regs/reading_r
 add wave -noupdate -expand -group regs -radix hexadecimal /interrupt_regs_tb/regs/irq
 add wave -noupdate -expand -group regs /interrupt_regs_tb/regs/icr_we
 add wave -noupdate -group lines /interrupt_regs_tb/regs/icr_generator(31)/ICRX/clk_i

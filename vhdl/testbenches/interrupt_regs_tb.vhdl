@@ -70,6 +70,7 @@ architecture Behave of interrupt_regs_TB is
             dat_o       : out std_logic_vector(DATA_WIDTH-1 downto 0);
             we_i        : in std_logic;
             en_i        : in std_logic;
+            ready_o     : out std_logic;
             irq_o       : out std_logic
         );
     end component interrupt_regs;
@@ -90,6 +91,25 @@ architecture Behave of interrupt_regs_TB is
         --   rst  int          adr   dat_i        we   en
             ('1', X"00000000", "00", X"00000000", '0', '0'),
             ('1', X"00000000", "00", X"00000000", '0', '0'),
+            ('0', X"00000000", "00", X"00000000", '0', '0'),
+            ('0', X"00000000", "00", X"00000000", '0', '0'),
+            ('0', X"00000000", "01", X"ffffffff", '1', '1'),
+            ('0', X"00000000", "00", X"00000000", '0', '0'),
+            ('0', X"00000000", "00", X"00000000", '0', '0'),
+            ('0', X"00000000", "01", X"00000000", '0', '1'),
+            ('0', X"00000000", "00", X"00000000", '0', '0'),
+            ('0', X"00000000", "00", X"00000000", '0', '0'),
+            ('0', X"00000010", "00", X"00000000", '0', '0'),
+            ('0', X"00000000", "00", X"00000000", '0', '0'),
+            ('0', X"00000000", "00", X"00000000", '0', '1'),
+            ('0', X"00000000", "00", X"00000000", '0', '0'),
+            ('0', X"00000000", "00", X"00000000", '0', '0'),
+            ('0', X"00000000", "00", X"00000000", '0', '0'),
+            ('0', X"00000000", "00", X"00000000", '0', '0'),
+            ('0', X"00000000", "00", X"00000000", '0', '0'),
+            ('0', X"00000000", "00", X"00000000", '0', '0'),
+            ('0', X"00000000", "00", X"00000000", '0', '0'),
+            ('0', X"00000000", "00", X"00000000", '0', '0'),
             ('0', X"00000000", "00", X"00000000", '0', '0')
         );
         
@@ -104,6 +124,7 @@ architecture Behave of interrupt_regs_TB is
     signal we_i        : std_logic;
     signal en_i        : std_logic;
     signal irq_o       : std_logic;
+    signal ready_o     : std_logic;
 
 begin
     regs : interrupt_regs
@@ -112,7 +133,7 @@ begin
         )
         port map(rst_i => rst_i, clk_i => clk, int_i => int_i, adr_i => adr_i,
                  dat_i => dat_i, dat_o => dat_o,
-                 en_i => en_i, we_i => we_i, irq_o => irq_o);
+                 en_i => en_i, we_i => we_i, irq_o => irq_o, ready_o => ready_o);
 
     process
         variable cycle_count    : integer:=0;
