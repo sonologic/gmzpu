@@ -57,6 +57,7 @@ architecture Behave of interrupt_line_TB is
 
     component interrupt_line is
         port (
+            clk_i       : in std_logic;
             int_i       : in std_logic;
             irq_o       : out std_logic;
             icr_o       : out std_logic;
@@ -86,13 +87,13 @@ architecture Behave of interrupt_line_TB is
         (
         --   int icr imr ier itr we    irq icr
             -- reset
-            ('0','0','0','0','0','1',  '0','0'),
+            ('0','0','0','0','0','1',  '0','U'),
             ('0','0','0','0','0','0',  '0','0'),
             ('0','0','0','0','0','0',  '0','0'),
-            ('1','0','1','0','0','0',  '1','1'),
+            ('1','0','1','0','0','0',  '0','0'),
             ('0','0','1','0','0','0',  '1','1'),
             ('0','0','1','0','0','0',  '1','1'),
-            ('0','0','0','0','0','1',  '0','0'),
+            ('0','0','0','0','0','1',  '0','1'),
             ('0','0','0','0','0','0',  '0','0'),
             ('0','0','0','0','0','0',  '0','0')
         );
@@ -112,7 +113,8 @@ architecture Behave of interrupt_line_TB is
 begin
     line : interrupt_line
         port map(int_i => int_i, icr_i => icr_i, imr_i => imr_i, ier_i => ier_i, itr_i => itr_i, we_i => we_i,
-                 irq_o => irq_o, icr_o => icr_o);
+                 irq_o => irq_o, icr_o => icr_o,
+                 clk_i => clk);   
 
     process
         variable cycle_count    : integer:=0;
