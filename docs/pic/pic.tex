@@ -14,7 +14,16 @@
 
 The Sonologic Programmable Interrupt Controller is a WISHBONE B4 \cite{wishbone} compliant interrupt controller. The interrupt controller is a WISHBONE slave device. It offers a variable amount of interrupt banks. Each bank has three configuration registers and one status register. An interrupt bank contains a variable amount of interrupt lines. Interrupt lines can trigger on the rising edge, falling edge and level. Interrupt lines can be individually masked.
 
-Figure \ref{fig:block_diagram} contains the block diagram of the programmable interrupt controller. 
+
+\section{Notation}
+
+\begin{description}
+    \item[BUS(1:0)] Bit 1 downto 0 of bus BUS.
+\end{description}
+
+\section{Design units}
+
+The top design unit is \emph{interrupt\_controller}. Figure \ref{fig:block_diagram} contains the block diagram of the \emph{interrupt\_controller} design unit.
 
 \begin{figure}[h]
     \centering
@@ -23,13 +32,23 @@ Figure \ref{fig:block_diagram} contains the block diagram of the programmable in
     \label{fig:block_diagram}
 \end{figure}
 
-\section{Notation}
+The \emph{interrupt\_controller} can have a variable amount of register banks. The register bank is described in design unit \emph{interrupt\_regs}. A register bank implements four registers:
 
 \begin{description}
-    \item[BUS(1:0)] Bit 1 downto 0 of bus BUS.
-\end{description}
+    \item[ICR] Interrupt Cause Register
+    \item[IMR] Interrupt Mask Register
+    \item[ITR] Interrupt Type Register
+    \item[IER] Interrupt Edge Register
+\end{description}    
 
-\section{Design unit}
+The width of registers is variable. Each of the bits in the four registers are connected to an instantiation of the \emph{interrupt\_line} design unit. Figure \ref{fig:interrupt_line} shows the functional diagram of the \emph{interrupt\_line} design unit.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=7cm]{pic_interrupt_line}
+    \caption{Functional diagram interrupt line}
+    \label{fig:interrupt_line}
+\end{figure}
 
 \subsection{Design constraints}
 
