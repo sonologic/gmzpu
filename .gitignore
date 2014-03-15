@@ -12,4 +12,3 @@ roms/hello/hello.vhdl
 roms/hello/int_test.vhdl
 *-eps-converted-to.pdf
 *.aux
-docs/*/*.pdf
