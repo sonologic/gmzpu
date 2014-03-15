@@ -130,8 +130,11 @@ begin
    do_intr:
    process
    begin
-     wait for 1000000 ns;
+     wait for 2 ms;
      interrupt <= '1';
+     wait for 4 us;
+     interrupt <= '0';
+     wait for 20 ms;
    end process do_intr;
 
    do_reset:
