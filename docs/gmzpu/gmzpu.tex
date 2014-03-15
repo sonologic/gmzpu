@@ -12,7 +12,7 @@
 
 \section{Introduction}
 
-The gmZPU System-on-Chip (SoC) combines the zpu medium core \cite{zpu} with two WISHBONE B4 \cite{wishbone} buses. One of the WISHBONE buses connects internal devices to the zpu. The other WISHBONE bus is exported for external devices. Figure \ref{fig:block_diagram} shows the top-level block diagram of the gmZPU SoC.
+The gmZPU System-on-Chip (SoC) combines the zpu zealot medium core \cite{zpu} with two WISHBONE B4 \cite{wishbone} buses. One of the WISHBONE buses connects internal devices to the zpu. The other WISHBONE bus is exported for external devices. Figure \ref{fig:block_diagram} shows the top-level block diagram of the gmZPU SoC.
 
 \begin{figure*}
     \centering
@@ -21,12 +21,13 @@ The gmZPU System-on-Chip (SoC) combines the zpu medium core \cite{zpu} with two 
     \label{fig:block_diagram}
 \end{figure*}
 
-The gmZPU SoC internal devices are:
+The zpu data bus is 32 bits wide. The address bus is 18 bits wide. The Memory Management Unit (MMU) decodes the 18-bit address into chip-select and reduced address bus for the main components of the SoC interconnect fabric:
 
 \begin{itemize}
-    \item Programmable Interrupt Controller (PIC)
-    \item Memory Management Unit (MMU)
-    \item ...
+    \item RAM
+    \item phiIO basic zpu I/O
+    \item WISHBONE controller 0 (WB0)
+    \item WISHBONE controller 1 (WB1)
 \end{itemize}
 
 \section{Notation}
@@ -34,6 +35,42 @@ The gmZPU SoC internal devices are:
 \begin{description}
     \item[BUS(1:0)] Bit 1 downto 0 of bus BUS.
 \end{description}
+
+\section{Memory map}
+
+The 8 most significant bits of the zpu address bus select one of the core components linked directly to the zpu. Table \ref{tab:address_bits} shows how these bits are decoded.
+
+\begin{table}[h]
+\caption{Address decoding}
+\label{tab:address_bits}
+\begin{tabular}{| c | c | c | c | c | c | c | c | l |
+}
+    \hline
+    17 & 16 & 15 & 14 & 13 & 12 & 11 & 10 & chip select \\ \hline
+    0  & X  & X  & X  & X  & X  & X  & X  & RAM \\ \hline
+    1  & 0  & X  & X  & X  & X  & X  & X  & phiIO \\ \hline
+    1  & 1  & 0  & X  & X  & X  & X  & X  & WB0 control \\ \hline
+    1  & 1  & 1  & 0  & 0  & 0  & 0  & X  & WB0 slave 0 \\ \hline
+    1  & 1  & 1  & 0  & 0  & 0  & 1  & X  & WB0 slave 1 \\ \hline
+\end{tabular}
+\end{table}
+
+Each core component has a specific address bus width. Table \ref{tab:address_map_hex} shows the base address of each of the core components shown in \ref{tab:address_bits}. Along with the base address is the size of the address bus to that device.
+
+\begin{table}[h]
+\caption{Address map and sizes}
+\label{tab:address_map_hex}
+\begin{tabular}{| c | c | c | c |
+}
+    \hline
+    Device      & Base    & Size    & Bytes \\ \hline
+    RAM         & 0x00000 & 0x20000 & 128k  \\ \hline
+    phIO        & 0x20000 & 0x10000 & 64k   \\ \hline
+    WB0 control & 0x30000 & 0x08000 & 32K   \\ \hline
+    WB0 slave 0 & 0x38000 & 0x00800 & 2K    \\ \hline
+    WB0 slave 1 & 0x38800 & 0x00800 & 2k    \\ \hline
+\end{tabular}
+\end{table}
 
 \section{Internal devices}
 
