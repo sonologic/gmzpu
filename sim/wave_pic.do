@@ -1,69 +1,70 @@
 onerror {resume}
 quietly WaveActivateNextPane {} 0
-add wave -noupdate -group testbench /pic_tb/clk
-add wave -noupdate -group testbench /pic_tb/irq_o
-add wave -noupdate -group testbench /pic_tb/int_i
-add wave -noupdate -group testbench /pic_tb/rst_i
-add wave -noupdate -group testbench /pic_tb/clk_i
-add wave -noupdate -group testbench /pic_tb/wb_dat_o
-add wave -noupdate -group testbench /pic_tb/wb_dat_i
-add wave -noupdate -group testbench /pic_tb/wb_tgd_o
-add wave -noupdate -group testbench /pic_tb/wb_tgd_i
-add wave -noupdate -group testbench /pic_tb/wb_ack_o
-add wave -noupdate -group testbench /pic_tb/wb_adr_i
-add wave -noupdate -group testbench /pic_tb/wb_cyc_i
-add wave -noupdate -group testbench /pic_tb/wb_stall_o
-add wave -noupdate -group testbench /pic_tb/wb_err_o
-add wave -noupdate -group testbench /pic_tb/wb_lock_i
-add wave -noupdate -group testbench /pic_tb/wb_rty_o
-add wave -noupdate -group testbench /pic_tb/wb_sel_i
-add wave -noupdate -group testbench /pic_tb/wb_stb_i
-add wave -noupdate -group testbench /pic_tb/wb_tga_i
-add wave -noupdate -group testbench /pic_tb/wb_tgc_i
-add wave -noupdate -group testbench /pic_tb/wb_we_i
-add wave -noupdate -group pic /pic_tb/pic/irq_o
-add wave -noupdate -group pic /pic_tb/pic/int_i
-add wave -noupdate -group pic /pic_tb/pic/rst_i
-add wave -noupdate -group pic /pic_tb/pic/clk_i
-add wave -noupdate -group pic /pic_tb/pic/wb_dat_o
-add wave -noupdate -group pic /pic_tb/pic/wb_dat_i
-add wave -noupdate -group pic /pic_tb/pic/wb_tgd_o
-add wave -noupdate -group pic /pic_tb/pic/wb_tgd_i
-add wave -noupdate -group pic /pic_tb/pic/wb_ack_o
-add wave -noupdate -group pic /pic_tb/pic/wb_adr_i
-add wave -noupdate -group pic /pic_tb/pic/wb_cyc_i
-add wave -noupdate -group pic /pic_tb/pic/wb_stall_o
-add wave -noupdate -group pic /pic_tb/pic/wb_err_o
-add wave -noupdate -group pic /pic_tb/pic/wb_lock_i
-add wave -noupdate -group pic /pic_tb/pic/wb_rty_o
-add wave -noupdate -group pic /pic_tb/pic/wb_sel_i
-add wave -noupdate -group pic /pic_tb/pic/wb_stb_i
-add wave -noupdate -group pic /pic_tb/pic/wb_tga_i
-add wave -noupdate -group pic /pic_tb/pic/wb_tgc_i
-add wave -noupdate -group pic /pic_tb/pic/wb_we_i
-add wave -noupdate -group pic /pic_tb/pic/en_r
-add wave -noupdate -group pic /pic_tb/pic/regen_r
-add wave -noupdate -group pic /pic_tb/pic/ready_r
-add wave -noupdate -group pic /pic_tb/pic/irq_r
-add wave -noupdate -group pic /pic_tb/pic/cs_r
-add wave -noupdate -group pic /pic_tb/pic/adr_r
-add wave -noupdate -group pic /pic_tb/pic/ack_r
+add wave -noupdate -expand -group testbench /pic_tb/clk
+add wave -noupdate -expand -group testbench /pic_tb/irq_o
+add wave -noupdate -expand -group testbench -radix hexadecimal /pic_tb/int_i
+add wave -noupdate -expand -group testbench /pic_tb/rst_i
+add wave -noupdate -expand -group testbench /pic_tb/clk_i
+add wave -noupdate -expand -group testbench -radix hexadecimal /pic_tb/wb_dat_o
+add wave -noupdate -expand -group testbench -radix hexadecimal /pic_tb/wb_dat_i
+add wave -noupdate -expand -group testbench /pic_tb/wb_cyc_i
+add wave -noupdate -expand -group testbench /pic_tb/wb_stb_i
+add wave -noupdate -expand -group testbench /pic_tb/wb_ack_o
+add wave -noupdate -expand -group testbench /pic_tb/wb_we_i
+add wave -noupdate -expand -group testbench -radix hexadecimal /pic_tb/wb_adr_i
+add wave -noupdate -expand -group testbench /pic_tb/wb_stall_o
+add wave -noupdate -expand -group testbench /pic_tb/wb_err_o
+add wave -noupdate -expand -group testbench /pic_tb/wb_lock_i
+add wave -noupdate -expand -group testbench /pic_tb/wb_rty_o
+add wave -noupdate -expand -group testbench -radix hexadecimal /pic_tb/wb_sel_i
+add wave -noupdate -expand -group testbench -radix hexadecimal /pic_tb/wb_tga_i
+add wave -noupdate -expand -group testbench -radix hexadecimal /pic_tb/wb_tgc_i
+add wave -noupdate -expand -group testbench -radix hexadecimal /pic_tb/wb_tgd_o
+add wave -noupdate -expand -group testbench -radix hexadecimal /pic_tb/wb_tgd_i
+add wave -noupdate -expand -group pic /pic_tb/pic/irq_o
+add wave -noupdate -expand -group pic -radix hexadecimal /pic_tb/pic/int_i
+add wave -noupdate -expand -group pic /pic_tb/pic/rst_i
+add wave -noupdate -expand -group pic /pic_tb/pic/clk_i
+add wave -noupdate -expand -group pic -radix hexadecimal /pic_tb/pic/wb_dat_o
+add wave -noupdate -expand -group pic -radix hexadecimal /pic_tb/pic/wb_dat_i
+add wave -noupdate -expand -group pic -radix hexadecimal /pic_tb/pic/wb_tgd_o
+add wave -noupdate -expand -group pic -radix hexadecimal /pic_tb/pic/wb_tgd_i
+add wave -noupdate -expand -group pic /pic_tb/pic/wb_ack_o
+add wave -noupdate -expand -group pic -radix hexadecimal /pic_tb/pic/wb_adr_i
+add wave -noupdate -expand -group pic /pic_tb/pic/wb_cyc_i
+add wave -noupdate -expand -group pic /pic_tb/pic/wb_stall_o
+add wave -noupdate -expand -group pic /pic_tb/pic/wb_err_o
+add wave -noupdate -expand -group pic /pic_tb/pic/wb_lock_i
+add wave -noupdate -expand -group pic /pic_tb/pic/wb_rty_o
+add wave -noupdate -expand -group pic -radix hexadecimal /pic_tb/pic/wb_sel_i
+add wave -noupdate -expand -group pic /pic_tb/pic/wb_stb_i
+add wave -noupdate -expand -group pic -radix hexadecimal /pic_tb/pic/wb_tga_i
+add wave -noupdate -expand -group pic -radix hexadecimal /pic_tb/pic/wb_tgc_i
+add wave -noupdate -expand -group pic /pic_tb/pic/wb_we_i
+add wave -noupdate -expand -group pic /pic_tb/pic/en_r
+add wave -noupdate -expand -group pic /pic_tb/pic/regen_r
+add wave -noupdate -expand -group pic /pic_tb/pic/ready_r
+add wave -noupdate -expand -group pic /pic_tb/pic/irq_r
+add wave -noupdate -expand -group pic -radix hexadecimal /pic_tb/pic/cs_r
+add wave -noupdate -expand -group pic /pic_tb/pic/adr_r
+add wave -noupdate -expand -group pic /pic_tb/pic/ack_r
 add wave -noupdate -expand -group regs -expand -group bank1 -expand -group reg1 /pic_tb/pic/reg_generator(1)/regsX/rst_i
 add wave -noupdate -expand -group regs -expand -group bank1 -expand -group reg1 /pic_tb/pic/reg_generator(1)/regsX/clk_i
-add wave -noupdate -expand -group regs -expand -group bank1 -expand -group reg1 /pic_tb/pic/reg_generator(1)/regsX/int_i
+add wave -noupdate -expand -group regs -expand -group bank1 -expand -group reg1 -radix hexadecimal /pic_tb/pic/reg_generator(1)/regsX/int_i
 add wave -noupdate -expand -group regs -expand -group bank1 -expand -group reg1 /pic_tb/pic/reg_generator(1)/regsX/adr_i
-add wave -noupdate -expand -group regs -expand -group bank1 -expand -group reg1 /pic_tb/pic/reg_generator(1)/regsX/dat_i
-add wave -noupdate -expand -group regs -expand -group bank1 -expand -group reg1 /pic_tb/pic/reg_generator(1)/regsX/dat_o
+add wave -noupdate -expand -group regs -expand -group bank1 -expand -group reg1 -radix hexadecimal /pic_tb/pic/reg_generator(1)/regsX/dat_i
+add wave -noupdate -expand -group regs -expand -group bank1 -expand -group reg1 -radix hexadecimal /pic_tb/pic/reg_generator(1)/regsX/dat_o
 add wave -noupdate -expand -group regs -expand -group bank1 -expand -group reg1 /pic_tb/pic/reg_generator(1)/regsX/we_i
 add wave -noupdate -expand -group regs -expand -group bank1 -expand -group reg1 /pic_tb/pic/reg_generator(1)/regsX/en_i
 add wave -noupdate -expand -group regs -expand -group bank1 -expand -group reg1 /pic_tb/pic/reg_generator(1)/regsX/ready_o
 add wave -noupdate -expand -group regs -expand -group bank1 -expand -group reg1 /pic_tb/pic/reg_generator(1)/regsX/irq_o
-add wave -noupdate -expand -group regs -expand -group bank1 -expand -group reg1 /pic_tb/pic/reg_generator(1)/regsX/ICR
-add wave -noupdate -expand -group regs -expand -group bank1 -expand -group reg1 /pic_tb/pic/reg_generator(1)/regsX/IMR
-add wave -noupdate -expand -group regs -expand -group bank1 -expand -group reg1 /pic_tb/pic/reg_generator(1)/regsX/ITR
-add wave -noupdate -expand -group regs -expand -group bank1 -expand -group reg1 /pic_tb/pic/reg_generator(1)/regsX/IER
-add wave -noupdate -expand -group regs -expand -group bank1 -expand -group reg1 /pic_tb/pic/reg_generator(1)/regsX/irq
+add wave -noupdate -expand -group regs -expand -group bank1 -expand -group reg1 -radix hexadecimal /pic_tb/pic/reg_generator(1)/regsX/ICR
+add wave -noupdate -expand -group regs -expand -group bank1 -expand -group reg1 -radix hexadecimal /pic_tb/pic/reg_generator(1)/regsX/IMR
+add wave -noupdate -expand -group regs -expand -group bank1 -expand -group reg1 -radix hexadecimal /pic_tb/pic/reg_generator(1)/regsX/ITR
+add wave -noupdate -expand -group regs -expand -group bank1 -expand -group reg1 -radix hexadecimal /pic_tb/pic/reg_generator(1)/regsX/IER
+add wave -noupdate -expand -group regs -expand -group bank1 -expand -group reg1 -radix hexadecimal /pic_tb/pic/reg_generator(1)/regsX/irq
 add wave -noupdate -expand -group regs -expand -group bank1 -expand -group reg1 /pic_tb/pic/reg_generator(1)/regsX/icr_we
+add wave -noupdate -expand -group regs -expand -group bank1 -expand -group reg1 /pic_tb/pic/reg_generator(1)/regsX/ready_r
 add wave -noupdate -expand -group regs -expand -group bank1 -expand -group reg1 /pic_tb/pic/reg_generator(1)/regsX/reading_r
 add wave -noupdate -expand -group regs -expand -group bank1 -group icr1 /pic_tb/pic/reg_generator(1)/regsX/icr_generator(15)/ICRX/clk_i
 add wave -noupdate -expand -group regs -expand -group bank1 -group icr1 /pic_tb/pic/reg_generator(1)/regsX/icr_generator(15)/ICRX/int_i
@@ -323,20 +324,21 @@ add wave -noupdate -expand -group regs -expand -group bank1 -group icr1 /pic_tb/
 add wave -noupdate -expand -group regs -expand -group bank1 -group icr1 /pic_tb/pic/reg_generator(1)/regsX/icr_generator(0)/ICRX/prev_q
 add wave -noupdate -expand -group regs -expand -group bank0 -expand -group reg0 /pic_tb/pic/reg_generator(0)/regsX/rst_i
 add wave -noupdate -expand -group regs -expand -group bank0 -expand -group reg0 /pic_tb/pic/reg_generator(0)/regsX/clk_i
-add wave -noupdate -expand -group regs -expand -group bank0 -expand -group reg0 /pic_tb/pic/reg_generator(0)/regsX/int_i
+add wave -noupdate -expand -group regs -expand -group bank0 -expand -group reg0 -radix hexadecimal /pic_tb/pic/reg_generator(0)/regsX/int_i
 add wave -noupdate -expand -group regs -expand -group bank0 -expand -group reg0 /pic_tb/pic/reg_generator(0)/regsX/adr_i
-add wave -noupdate -expand -group regs -expand -group bank0 -expand -group reg0 /pic_tb/pic/reg_generator(0)/regsX/dat_i
-add wave -noupdate -expand -group regs -expand -group bank0 -expand -group reg0 /pic_tb/pic/reg_generator(0)/regsX/dat_o
+add wave -noupdate -expand -group regs -expand -group bank0 -expand -group reg0 -radix hexadecimal /pic_tb/pic/reg_generator(0)/regsX/dat_i
+add wave -noupdate -expand -group regs -expand -group bank0 -expand -group reg0 -radix hexadecimal /pic_tb/pic/reg_generator(0)/regsX/dat_o
 add wave -noupdate -expand -group regs -expand -group bank0 -expand -group reg0 /pic_tb/pic/reg_generator(0)/regsX/we_i
 add wave -noupdate -expand -group regs -expand -group bank0 -expand -group reg0 /pic_tb/pic/reg_generator(0)/regsX/en_i
 add wave -noupdate -expand -group regs -expand -group bank0 -expand -group reg0 /pic_tb/pic/reg_generator(0)/regsX/ready_o
 add wave -noupdate -expand -group regs -expand -group bank0 -expand -group reg0 /pic_tb/pic/reg_generator(0)/regsX/irq_o
-add wave -noupdate -expand -group regs -expand -group bank0 -expand -group reg0 /pic_tb/pic/reg_generator(0)/regsX/ICR
-add wave -noupdate -expand -group regs -expand -group bank0 -expand -group reg0 /pic_tb/pic/reg_generator(0)/regsX/IMR
-add wave -noupdate -expand -group regs -expand -group bank0 -expand -group reg0 /pic_tb/pic/reg_generator(0)/regsX/ITR
-add wave -noupdate -expand -group regs -expand -group bank0 -expand -group reg0 /pic_tb/pic/reg_generator(0)/regsX/IER
-add wave -noupdate -expand -group regs -expand -group bank0 -expand -group reg0 /pic_tb/pic/reg_generator(0)/regsX/irq
+add wave -noupdate -expand -group regs -expand -group bank0 -expand -group reg0 -radix hexadecimal /pic_tb/pic/reg_generator(0)/regsX/ICR
+add wave -noupdate -expand -group regs -expand -group bank0 -expand -group reg0 -radix hexadecimal /pic_tb/pic/reg_generator(0)/regsX/IMR
+add wave -noupdate -expand -group regs -expand -group bank0 -expand -group reg0 -radix hexadecimal /pic_tb/pic/reg_generator(0)/regsX/ITR
+add wave -noupdate -expand -group regs -expand -group bank0 -expand -group reg0 -radix hexadecimal /pic_tb/pic/reg_generator(0)/regsX/IER
+add wave -noupdate -expand -group regs -expand -group bank0 -expand -group reg0 -radix hexadecimal /pic_tb/pic/reg_generator(0)/regsX/irq
 add wave -noupdate -expand -group regs -expand -group bank0 -expand -group reg0 /pic_tb/pic/reg_generator(0)/regsX/icr_we
+add wave -noupdate -expand -group regs -expand -group bank0 -expand -group reg0 /pic_tb/pic/reg_generator(0)/regsX/ready_r
 add wave -noupdate -expand -group regs -expand -group bank0 -expand -group reg0 /pic_tb/pic/reg_generator(0)/regsX/reading_r
 add wave -noupdate -expand -group regs -expand -group bank0 -group icr0 /pic_tb/pic/reg_generator(0)/regsX/icr_generator(15)/ICRX/clk_i
 add wave -noupdate -expand -group regs -expand -group bank0 -group icr0 /pic_tb/pic/reg_generator(0)/regsX/icr_generator(15)/ICRX/int_i
@@ -595,7 +597,7 @@ add wave -noupdate -expand -group regs -expand -group bank0 -group icr0 /pic_tb/
 add wave -noupdate -expand -group regs -expand -group bank0 -group icr0 /pic_tb/pic/reg_generator(0)/regsX/icr_generator(0)/ICRX/q
 add wave -noupdate -expand -group regs -expand -group bank0 -group icr0 /pic_tb/pic/reg_generator(0)/regsX/icr_generator(0)/ICRX/prev_q
 TreeUpdate [SetDefaultTree]
-WaveRestoreCursors {{Cursor 1} {55968 ps} 0}
+WaveRestoreCursors {{Cursor 1} {119967 ps} 0}
 quietly wave cursor active 1
 configure wave -namecolwidth 339
 configure wave -valuecolwidth 100
