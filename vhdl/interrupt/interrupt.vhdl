@@ -127,7 +127,8 @@ architecture rtl of interrupt_regs is
     signal IER  : std_logic_vector(DATA_WIDTH-1 downto 0);
     signal irq  : std_logic_vector(DATA_WIDTH-1 downto 0);
     signal icr_we   : std_logic;
-    signal reading_r    : std_logic;
+    --signal reading_r    : std_logic;
+    signal ready_r      : std_logic;
 begin
  
  
@@ -152,67 +153,62 @@ begin
 
     irq_o <= '0' when irq=(irq'range => '0') else '1';
 
+    data_out:
     process(clk_i)
     begin
         if rising_edge(clk_i) then
             if rst_i='1' then
+                dat_o <= (others => 'Z');
                 IMR <= (others => '0');
                 ITR <= (others => '0');
                 IER <= (others => '0');
-                reading_r <= '0';
-                dat_o <= (others => 'Z');
             elsif en_i='1' then
-                if reading_r='0' then
-                    if adr_i="00" then      -- 0x0 ICR
-                        if we_i='0' then
-                            dat_o <= ICR;
-                            reading_r <= '1';
-                        else
-                            dat_o <= (others => 'Z');
-                            reading_r <= '0';
-                        end if;
-                    elsif adr_i="01" then   -- 0x1 IMR
-                        if we_i='0' then
-                            dat_o <= IMR;
-                            reading_r <= '1';
-                        else
-                            IMR <= dat_i;
-                            dat_o <= (others => 'Z');
-                            reading_r <= '0';
-                        end if;
-                    elsif adr_i="10" then   -- 0x2 ITR
-                        if we_i='0' then
-                            dat_o <= ITR;
-                            reading_r <= '1';
-                        else
-                            ITR <= dat_i;
-                            dat_o <= (others => 'Z');
-                            reading_r <= '0';
-                        end if;
-                    else                    -- 0x3 IER
-                        if we_i='0' then
-                            dat_o <= IER;
-                            reading_r <= '1';
-                        else
-                            IER <= dat_i;
-                            dat_o <= (others => 'Z');
-                            reading_r <= '0';
-                        end if;
+                dat_o <= (others => 'Z');
+                if ready_r='0' then
+                    if we_i='1' then
+                        case adr_i is
+                            when "00" => null;
+                            when "01" => IMR <= dat_i;
+                            when "10" => ITR <= dat_i;
+                            when others => IER <= dat_i;
+                        end case;
+                    else
+                        case adr_i is
+                            when "00" => dat_o <= ICR;
+                            when "01" => dat_o <= IMR;
+                            when "10" => dat_o <= ITR;
+                            when others => dat_o <= IER;
+                        end case;
                     end if;
-                --else 
-                    -- en_i='1' and reading_r='1'
-                    
-                end if;        
-                    
+                end if;
+            else
+                dat_o <= (others => 'Z');
+            end if;
+        end if;
+    end process;
+
+    memory_timing:
+    process(clk_i)
+    begin
+        if rising_edge(clk_i) then
+            if rst_i='1' then
+                ready_r <= '0';
+            elsif en_i='1' then
+                if ready_r='1' then
+                    ready_r <= '0';
+                else
+                    ready_r <= '1';
+                end if;
             else
                 -- en_i='0'
-                reading_r <= '0';
+                ready_r <= '0';
                 dat_o <= (others => 'Z');
             end if; -- en_i='1'
         end if; -- rising_edge(clk_i)
     end process;
-    
-    ready_o <= en_i and reading_r;
+   
+    ready_o <= en_i and ready_r; 
+    --ready_o <= en_i and reading_r;
     --process(clk_i)
     --begin
     --    if rising_edge(clk_i) then
@@ -296,13 +292,13 @@ begin
     wb_err_o <= '0' when en_r='1' else 'Z';
     wb_rty_o <= '0' when en_r='1' else 'Z';
 
-    -- split address buss in cs (msb) and adr (lsb)
+    -- split address bus in cs (msb) and adr (lsb)
     cs_r  <= wb_adr_i(ADR_WIDTH-1 downto 2);
     adr_r <= wb_adr_i(1 downto 0);
 
     -- 
     ack_r    <= '0' when ready_r=(ready_r'range=>'0') else '1';
-    wb_ack_o <= wb_cyc_i and ack_r;
+    wb_ack_o <= en_r and ack_r;
 
     -- aggregate bank irq's into irq_o
     irq_o <= '0' when irq_r=(irq_r'range => '0') else '1';
@@ -322,15 +318,14 @@ begin
             );
     end generate reg_generator;
 
-    process(clk_i)
+    process(en_r,cs_r,rst_i)
     begin
-        if rising_edge(clk_i) then
             if rst_i='1' then
                 regen_r <= (others => '0');
             else
-                if wb_stb_i='1' then
+                regen_r <= (others => '0');
+                if en_r='1' then
                     -- decode address
-                    regen_r <= (others => '0');
                     for i in N_BANKS-1 downto 0 loop
                         if cs_r = std_logic_vector(to_unsigned(i, cs_r'length)) then
                             regen_r(i) <= '1';
@@ -338,7 +333,6 @@ begin
                     end loop;
                 end if;
             end if;
-        end if;
     end process;
     
 end architecture rtl;
