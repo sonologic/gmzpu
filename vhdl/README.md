@@ -8,7 +8,7 @@ gmZPU vhdl
 - devices/         - PhiIO reference design (simulation only)
 - zwishbone/       - gmZPU wishbone controller
 - interrupt/       - gmZPU Programmable Intterupt Controller (PIC)
-testbenches/     - testbenches for component and integration testing
+- testbenches/     - testbenches for component and integration testing
 - wb_slaves/       - reference design WISHBONE slaves
 - roms/            - pre-compiled roms (possible outdated, check ../roms)
 
