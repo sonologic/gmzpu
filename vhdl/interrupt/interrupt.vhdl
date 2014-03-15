@@ -162,59 +162,62 @@ begin
                 reading_r <= '0';
                 dat_o <= (others => 'Z');
             elsif en_i='1' then
-                if adr_i="00" then      -- 0x0 ICR
-                    if we_i='0' then
-                        dat_o <= ICR;
-                        reading_r <= '1';
-                    else
-                        dat_o <= (others => 'Z');
-                        reading_r <= '0';
+                if reading_r='0' then
+                    if adr_i="00" then      -- 0x0 ICR
+                        if we_i='0' then
+                            dat_o <= ICR;
+                            reading_r <= '1';
+                        else
+                            dat_o <= (others => 'Z');
+                            reading_r <= '0';
+                        end if;
+                    elsif adr_i="01" then   -- 0x1 IMR
+                        if we_i='0' then
+                            dat_o <= IMR;
+                            reading_r <= '1';
+                        else
+                            IMR <= dat_i;
+                            dat_o <= (others => 'Z');
+                            reading_r <= '0';
+                        end if;
+                    elsif adr_i="10" then   -- 0x2 ITR
+                        if we_i='0' then
+                            dat_o <= ITR;
+                            reading_r <= '1';
+                        else
+                            ITR <= dat_i;
+                            dat_o <= (others => 'Z');
+                            reading_r <= '0';
+                        end if;
+                    else                    -- 0x3 IER
+                        if we_i='0' then
+                            dat_o <= IER;
+                            reading_r <= '1';
+                        else
+                            IER <= dat_i;
+                            dat_o <= (others => 'Z');
+                            reading_r <= '0';
+                        end if;
                     end if;
-                elsif adr_i="01" then   -- 0x1 IMR
-                    if we_i='0' then
-                        dat_o <= IMR;
-                        reading_r <= '1';
-                    else
-                        IMR <= dat_i;
-                        dat_o <= (others => 'Z');
-                        reading_r <= '0';
-                    end if;
-                elsif adr_i="10" then   -- 0x2 ITR
-                    if we_i='0' then
-                        dat_o <= ITR;
-                        reading_r <= '1';
-                    else
-                        ITR <= dat_i;
-                        dat_o <= (others => 'Z');
-                        reading_r <= '0';
-                    end if;
-                else                    -- 0x3 IER
-                    if we_i='0' then
-                        dat_o <= IER;
-                        reading_r <= '1';
-                    else
-                        IER <= dat_i;
-                        dat_o <= (others => 'Z');
-                        reading_r <= '0';
-                    end if;
-                end if;
+                --else 
+                    -- en_i='1' and reading_r='1'
+                    
+                end if;        
+                    
             else
-                if reading_r='1' then
-                    reading_r <= '0';
-                elsif en_i='0' then
-                    dat_o <= (others => 'Z');
-                end if;
-                
+                -- en_i='0'
+                reading_r <= '0';
+                dat_o <= (others => 'Z');
             end if; -- en_i='1'
         end if; -- rising_edge(clk_i)
     end process;
     
-    process(clk_i)
-    begin
-        if rising_edge(clk_i) then
-            ready_o <= en_i or reading_r;
-        end if;
-    end process;
+    ready_o <= en_i and reading_r;
+    --process(clk_i)
+    --begin
+    --    if rising_edge(clk_i) then
+    --    end if;
+    --end process;
                 
 end architecture rtl;
 
@@ -225,16 +228,16 @@ use IEEE.numeric_std.all;
 entity interrupt_controller is
     generic(
         -- address width (truncated to DATA_WIDTH)
-        ADR_WIDTH   : natural:=4;
+        ADR_WIDTH   : natural:=16;
         -- data bus width
-        DATA_WIDTH  : natural:=32;
+        DATA_WIDTH  : natural:=16;
         -- number of interrupt banks (each bank is DATA_WIDTH interrupt lines)
         N_BANKS     : natural:=2
     );
     port (
         irq_o   : out std_logic;
         -- interrupt lines
-        int_i   : in std_logic_vector(N_BANKS-1 downto 0);
+        int_i   : in std_logic_vector((N_BANKS*DATA_WIDTH)-1 downto 0);
         -- wishbone bus
         rst_i         : in std_logic;
         clk_i         : in std_logic;
@@ -284,18 +287,33 @@ architecture rtl of interrupt_controller is
     signal adr_r    : std_logic_vector(1 downto 0);
     signal ack_r    : std_logic;
 begin
-
+    -- enable on cycle and strobe
     en_r  <= wb_cyc_i and wb_stb_i;
 
+    -- unsupported signals
+    wb_tgd_o <= (others => '0') when en_r='1' else (others => 'Z');
+    wb_stall_o <= '0' when en_r='1' else 'Z';
+    wb_err_o <= '0' when en_r='1' else 'Z';
+    wb_rty_o <= '0' when en_r='1' else 'Z';
+
+    -- split address buss in cs (msb) and adr (lsb)
     cs_r  <= wb_adr_i(ADR_WIDTH-1 downto 2);
     adr_r <= wb_adr_i(1 downto 0);
 
+    -- 
     ack_r    <= '0' when ready_r=(ready_r'range=>'0') else '1';
     wb_ack_o <= wb_cyc_i and ack_r;
 
+    -- aggregate bank irq's into irq_o
+    irq_o <= '0' when irq_r=(irq_r'range => '0') else '1';
+
+    -- register generator, create N_BANKS regs
     reg_generator: 
     for i in N_BANKS-1 downto 0 generate
         regsX : interrupt_regs
+            generic map (
+                DATA_WIDTH => DATA_WIDTH
+            )
             port map (
                 rst_i => rst_i, clk_i => clk_i,
                 adr_i => adr_r, dat_i => wb_dat_i, dat_o => wb_dat_o,
@@ -306,17 +324,19 @@ begin
 
     process(clk_i)
     begin
-        if rst_i='1' then
-            regen_r <= (others => '0');
-        else
-            if wb_stb_i='1' then
-                -- decode address
+        if rising_edge(clk_i) then
+            if rst_i='1' then
                 regen_r <= (others => '0');
-                for i in N_BANKS-1 downto 0 loop
-                    if cs_r = std_logic_vector(to_unsigned(i, cs_r'length)) then
-                        regen_r(i) <= '1';
-                    end if;
-                end loop;
+            else
+                if wb_stb_i='1' then
+                    -- decode address
+                    regen_r <= (others => '0');
+                    for i in N_BANKS-1 downto 0 loop
+                        if cs_r = std_logic_vector(to_unsigned(i, cs_r'length)) then
+                            regen_r(i) <= '1';
+                        end if;
+                    end loop;
+                end if;
             end if;
         end if;
     end process;
