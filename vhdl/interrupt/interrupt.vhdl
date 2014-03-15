@@ -49,7 +49,7 @@ begin
     level <= itr_i and int_i;
 
     -- flipflop inputs
-    set <= level or rising or falling;
+    set <= level or (not itr_i and ((rising and not ier_i) or (falling and ier_i)));
 
     rst <= we_i and not icr_i;
 
@@ -117,9 +117,13 @@ architecture rtl of interrupt_regs is
         );
     end component interrupt_line;
 
+    -- cause, 0=deasserted, 1=asserted, write only resets, 1's are ignored
     signal ICR  : std_logic_vector(DATA_WIDTH-1 downto 0);
+    -- mask, 0=do not assert irq, 1=do assert irq
     signal IMR  : std_logic_vector(DATA_WIDTH-1 downto 0);
+    -- type, 0=edge, 1=level
     signal ITR  : std_logic_vector(DATA_WIDTH-1 downto 0);
+    -- edge, 0=rising, 1=falling
     signal IER  : std_logic_vector(DATA_WIDTH-1 downto 0);
     signal irq  : std_logic_vector(DATA_WIDTH-1 downto 0);
     signal icr_we   : std_logic;
@@ -156,6 +160,7 @@ begin
                 ITR <= (others => '0');
                 IER <= (others => '0');
                 reading_r <= '0';
+                dat_o <= (others => 'Z');
             elsif en_i='1' then
                 if adr_i="00" then      -- 0x0 ICR
                     if we_i='0' then
@@ -219,17 +224,20 @@ use IEEE.numeric_std.all;
 
 entity interrupt_controller is
     generic(
+        -- address width (truncated to DATA_WIDTH)
         ADR_WIDTH   : natural:=4;
+        -- data bus width
         DATA_WIDTH  : natural:=32;
-        N_INT       : natural:=32
+        -- number of interrupt banks (each bank is DATA_WIDTH interrupt lines)
+        N_BANKS     : natural:=2
     );
     port (
-        rst_i   : in std_logic;
-        clk_i   : in std_logic;
         irq_o   : out std_logic;
         -- interrupt lines
-        int_i   : in std_logic_vector(N_INT-1 downto 0);
+        int_i   : in std_logic_vector(N_BANKS-1 downto 0);
         -- wishbone bus
+        rst_i         : in std_logic;
+        clk_i         : in std_logic;
         wb_dat_o      : out std_logic_vector(DATA_WIDTH-1 downto 0);
         wb_dat_i      : in std_logic_vector(DATA_WIDTH-1 downto 0);
         wb_tgd_o      : out std_logic_vector(DATA_WIDTH-1 downto 0);
@@ -246,28 +254,70 @@ entity interrupt_controller is
         wb_tga_i      : in std_logic_vector(ADR_WIDTH-1 downto 0);
         wb_tgc_i      : in std_logic_vector(DATA_WIDTH-1 downto 0); -- size correct?
         wb_we_i       : in std_logic
-
     );
 end entity interrupt_controller;
 
 architecture rtl of interrupt_controller is
-    signal ICR  : std_logic_vector(N_INT-1 downto 0);   -- cause, 0=deasserted, 1=asserted, write only resets, 1's are ignored
-    signal IMR  : std_logic_vector(N_INT-1 downto 0);   -- mask, 0=do not assert irq, 1=do assert irq
-    signal ITR  : std_logic_vector(N_INT-1 downto 0);   -- type, 0=edge, 1=level
-    signal IER  : std_logic_vector(N_INT-1 downto 0);   -- edge, 0=rising, 1=falling
+    component interrupt_regs is
+        generic (
+            DATA_WIDTH  : natural:=32
+        );
+        port (
+            rst_i       : in  std_logic;
+            clk_i       : in  std_logic;
+            int_i       : in  std_logic_vector(DATA_WIDTH-1 downto 0);
+            adr_i       : in  std_logic_vector(1 downto 0);
+            dat_i       : in  std_logic_vector(DATA_WIDTH-1 downto 0);
+            dat_o       : out std_logic_vector(DATA_WIDTH-1 downto 0);
+            we_i        : in std_logic;
+            en_i        : in std_logic;
+            irq_o       : out std_logic;
+            ready_o     : out std_logic
+        );
+    end component interrupt_regs;
+
+    signal en_r     : std_logic;
+    signal regen_r  : std_logic_vector(N_BANKS-1 downto 0);
+    signal ready_r  : std_logic_vector(N_BANKS-1 downto 0);
+    signal irq_r    : std_logic_vector(N_BANKS-1 downto 0);
+    signal cs_r     : std_logic_vector(ADR_WIDTH-3 downto 0);
+    signal adr_r    : std_logic_vector(1 downto 0);
+    signal ack_r    : std_logic;
 begin
 
-    -- 
+    en_r  <= wb_cyc_i and wb_stb_i;
+
+    cs_r  <= wb_adr_i(ADR_WIDTH-1 downto 2);
+    adr_r <= wb_adr_i(1 downto 0);
+
+    ack_r    <= '0' when ready_r=(ready_r'range=>'0') else '1';
+    wb_ack_o <= wb_cyc_i and ack_r;
+
+    reg_generator: 
+    for i in N_BANKS-1 downto 0 generate
+        regsX : interrupt_regs
+            port map (
+                rst_i => rst_i, clk_i => clk_i,
+                adr_i => adr_r, dat_i => wb_dat_i, dat_o => wb_dat_o,
+                we_i => wb_we_i, en_i => regen_r(i), ready_o => ready_r(i), irq_o => irq_r(i),
+                int_i => int_i(((i+1)*DATA_WIDTH)-1 downto i*DATA_WIDTH)
+            );
+    end generate reg_generator;
+
     process(clk_i)
     begin
         if rst_i='1' then
-            ICR <= (others => '0');
-            IMR <= (others => '0');
-            ITR <= (others => '0');
-            irq_o <= '0';
+            regen_r <= (others => '0');
         else
-            ICR <= ICR or int_i;
-            --irq_o <= '1' when ((ICR and IMR)/=(ICR'range => '0')) else '0';
+            if wb_stb_i='1' then
+                -- decode address
+                regen_r <= (others => '0');
+                for i in N_BANKS-1 downto 0 loop
+                    if cs_r = std_logic_vector(to_unsigned(i, cs_r'length)) then
+                        regen_r(i) <= '1';
+                    end if;
+                end loop;
+            end if;
         end if;
     end process;
     
