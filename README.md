@@ -3,11 +3,16 @@ gmZPU
 
 gmZPU is a System-on-Chip (SoC) core based on the zpu medium core.
 
-Todo:
+In progress:
 - implement wishbone controller
 - add interrupt controller
-- add memory management
+
+Todo:
+- implement synthesizable PhiIO
 - increase address width
+- add memory management
+- add process contexts
+- virtual memory
 - add dma
 
 Goals:
