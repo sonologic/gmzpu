@@ -131,9 +131,9 @@ entity interrupt_regs is
         rst_i       : in  std_logic;
         clk_i       : in  std_logic;
         int_i       : in  std_logic_vector(DATA_WIDTH-1 downto 0);
-        adr_i       : in  std_logic_vector(1 downto 0);
-        dat_i       : in  std_logic_vector(DATA_WIDTH-1 downto 0);
-        dat_o       : out std_logic_vector(DATA_WIDTH-1 downto 0);
+        adr_i       : in  unsigned(1 downto 0);
+        dat_i       : in  unsigned(DATA_WIDTH-1 downto 0);
+        dat_o       : out unsigned(DATA_WIDTH-1 downto 0);
         we_i        : in std_logic;
         en_i        : in std_logic;
         ready_o     : out std_logic;
@@ -208,16 +208,16 @@ begin
                     if we_i='1' then
                         case adr_i is
                             when "00" => null;
-                            when "01" => IMR <= dat_i;
-                            when "10" => ITR <= dat_i;
-                            when others => IER <= dat_i;
+                            when "01" => IMR <= std_logic_vector(dat_i);
+                            when "10" => ITR <= std_logic_vector(dat_i);
+                            when others => IER <= std_logic_vector(dat_i);
                         end case;
                     else
                         case adr_i is
-                            when "00" => dat_o <= ICR;
-                            when "01" => dat_o <= IMR;
-                            when "10" => dat_o <= ITR;
-                            when others => dat_o <= IER;
+                            when "00" => dat_o <= unsigned(ICR);
+                            when "01" => dat_o <= unsigned(IMR);
+                            when "10" => dat_o <= unsigned(ITR);
+                            when others => dat_o <= unsigned(IER);
                         end case;
                     end if;
                 end if;
@@ -270,12 +270,12 @@ entity interrupt_controller is
         -- wishbone bus
         rst_i         : in std_logic;
         clk_i         : in std_logic;
-        wb_dat_o      : out std_logic_vector(DATA_WIDTH-1 downto 0);
-        wb_dat_i      : in std_logic_vector(DATA_WIDTH-1 downto 0);
-        wb_tgd_o      : out std_logic_vector(DATA_WIDTH-1 downto 0);
-        wb_tgd_i      : in std_logic_vector(DATA_WIDTH-1 downto 0);
+        wb_dat_o      : out unsigned(DATA_WIDTH-1 downto 0);
+        wb_dat_i      : in unsigned(DATA_WIDTH-1 downto 0);
+        wb_tgd_o      : out unsigned(DATA_WIDTH-1 downto 0);
+        wb_tgd_i      : in unsigned(DATA_WIDTH-1 downto 0);
         wb_ack_o      : out std_logic;
-        wb_adr_i      : in std_logic_vector(ADR_WIDTH-1 downto 0);
+        wb_adr_i      : in unsigned(ADR_WIDTH-1 downto 0);
         wb_cyc_i      : in std_logic;
         wb_stall_o    : out std_logic;
         wb_err_o      : out std_logic;
@@ -283,8 +283,8 @@ entity interrupt_controller is
         wb_rty_o      : out std_logic;
         wb_sel_i      : in std_logic_vector(DATA_WIDTH-1 downto 0);
         wb_stb_i      : in std_logic;
-        wb_tga_i      : in std_logic_vector(ADR_WIDTH-1 downto 0);
-        wb_tgc_i      : in std_logic_vector(DATA_WIDTH-1 downto 0); -- size correct?
+        wb_tga_i      : in unsigned(ADR_WIDTH-1 downto 0);
+        wb_tgc_i      : in unsigned(DATA_WIDTH-1 downto 0); -- size correct?
         wb_we_i       : in std_logic
     );
 end entity interrupt_controller;
@@ -298,9 +298,9 @@ architecture rtl of interrupt_controller is
             rst_i       : in  std_logic;
             clk_i       : in  std_logic;
             int_i       : in  std_logic_vector(DATA_WIDTH-1 downto 0);
-            adr_i       : in  std_logic_vector(1 downto 0);
-            dat_i       : in  std_logic_vector(DATA_WIDTH-1 downto 0);
-            dat_o       : out std_logic_vector(DATA_WIDTH-1 downto 0);
+            adr_i       : in  unsigned(1 downto 0);
+            dat_i       : in  unsigned(DATA_WIDTH-1 downto 0);
+            dat_o       : out unsigned(DATA_WIDTH-1 downto 0);
             we_i        : in std_logic;
             en_i        : in std_logic;
             irq_o       : out std_logic;
@@ -312,8 +312,8 @@ architecture rtl of interrupt_controller is
     signal regen_r  : std_logic_vector(N_BANKS-1 downto 0);
     signal ready_r  : std_logic_vector(N_BANKS-1 downto 0);
     signal irq_r    : std_logic_vector(N_BANKS-1 downto 0);
-    signal cs_r     : std_logic_vector(ADR_WIDTH-3 downto 0);
-    signal adr_r    : std_logic_vector(1 downto 0);
+    signal cs_r     : unsigned(ADR_WIDTH-3 downto 0);
+    signal adr_r    : unsigned(1 downto 0);
     signal ack_r    : std_logic;
 begin
     -- enable on cycle and strobe
@@ -361,7 +361,7 @@ begin
                 if en_r='1' then
                     -- decode address
                     for i in N_BANKS-1 downto 0 loop
-                        if cs_r = std_logic_vector(to_unsigned(i, cs_r'length)) then
+                        if cs_r = to_unsigned(i, cs_r'length) then
                             regen_r(i) <= '1';
                         end if;
                     end loop;

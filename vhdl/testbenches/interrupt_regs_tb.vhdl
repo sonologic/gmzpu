@@ -65,9 +65,9 @@ architecture Behave of interrupt_regs_TB is
             rst_i       : in  std_logic;
             clk_i       : in  std_logic;
             int_i       : in  std_logic_vector(DATA_WIDTH-1 downto 0);
-            adr_i       : in  std_logic_vector(1 downto 0);
-            dat_i       : in  std_logic_vector(DATA_WIDTH-1 downto 0);
-            dat_o       : out std_logic_vector(DATA_WIDTH-1 downto 0);
+            adr_i       : in  unsigned(1 downto 0);
+            dat_i       : in  unsigned(DATA_WIDTH-1 downto 0);
+            dat_o       : out unsigned(DATA_WIDTH-1 downto 0);
             we_i        : in std_logic;
             en_i        : in std_logic;
             ready_o     : out std_logic;
@@ -79,8 +79,8 @@ architecture Behave of interrupt_regs_TB is
         -- inputs
         rst_i       : std_logic;
         int_i       : std_logic_vector(DATA_WIDTH-1 downto 0);
-        adr_i       : std_logic_vector(ADR_WIDTH-1 downto 0);
-        dat_i       : std_logic_vector(DATA_WIDTH-1 downto 0);
+        adr_i       : unsigned(ADR_WIDTH-1 downto 0);
+        dat_i       : unsigned(DATA_WIDTH-1 downto 0);
         we_i        : std_logic;
         en_i        : std_logic;
         -- outputs
@@ -121,9 +121,9 @@ architecture Behave of interrupt_regs_TB is
 
     signal rst_i       : std_logic;
     signal int_i       : std_logic_vector(DATA_WIDTH-1 downto 0);
-    signal adr_i       : std_logic_vector(1 downto 0);
-    signal dat_i       : std_logic_vector(DATA_WIDTH-1 downto 0);
-    signal dat_o       : std_logic_vector(DATA_WIDTH-1 downto 0);
+    signal adr_i       : unsigned(1 downto 0);
+    signal dat_i       : unsigned(DATA_WIDTH-1 downto 0);
+    signal dat_o       : unsigned(DATA_WIDTH-1 downto 0);
     signal we_i        : std_logic;
     signal en_i        : std_logic;
     signal irq_o       : std_logic;

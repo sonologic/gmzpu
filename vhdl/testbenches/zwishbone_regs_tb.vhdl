@@ -71,15 +71,15 @@ architecture Behave of zwishbone_regs_TB is
                 ready_o     : out std_logic;
                 en_i        : in std_logic;
                 we_i        : in std_logic;
-                adr_i       : in std_logic_vector(ADR_WIDTH-1 downto 0);
-                dat_i       : in std_logic_vector(DATA_WIDTH-1 downto 0);
-                dat_o       : out std_logic_vector(DATA_WIDTH-1 downto 0);
+                adr_i       : in unsigned(ADR_WIDTH-1 downto 0);
+                dat_i       : in unsigned(DATA_WIDTH-1 downto 0);
+                dat_o       : out unsigned(DATA_WIDTH-1 downto 0);
                 -- bus
                 to_inc_i    : in std_logic;
                 to_rst_i    : in std_logic;
                 to_o        : out std_logic;
                 -- config register value (0x0000, for c_control)
-                cfg_o       : out std_logic_vector(DATA_WIDTH-1 downto 0);
+                cfg_o       : out unsigned(DATA_WIDTH-1 downto 0);
                 -- status register value (0x0004, from c_control / bus)
                 err_i       : in std_logic;
                 rty_i       : in std_logic
@@ -92,8 +92,8 @@ architecture Behave of zwishbone_regs_TB is
         reset       : std_logic;
         en_i        : std_logic;
         we_i        : std_logic;
-        adr_i       : std_logic_vector(ADR_WIDTH-1 downto 0);
-        dat_i       : std_logic_vector(DATA_WIDTH-1 downto 0);
+        adr_i       : unsigned(ADR_WIDTH-1 downto 0);
+        dat_i       : unsigned(DATA_WIDTH-1 downto 0);
         to_inc_i    : std_logic;
         to_rst_i    : std_logic;
         err_i       : std_logic;
@@ -165,9 +165,9 @@ architecture Behave of zwishbone_regs_TB is
     signal reset    : std_logic:='1';
     signal en_i     : std_logic;
     signal we_i     : std_logic;
-    signal adr_i    : std_logic_vector(ADR_WIDTH-1 downto 0);
-    signal dat_o    : std_logic_vector(DATA_WIDTH-1 downto 0);
-    signal dat_i    : std_logic_vector(DATA_WIDTH-1 downto 0);
+    signal adr_i    : unsigned(ADR_WIDTH-1 downto 0);
+    signal dat_o    : unsigned(DATA_WIDTH-1 downto 0);
+    signal dat_i    : unsigned(DATA_WIDTH-1 downto 0);
     signal to_rst_i : std_logic;
     signal to_inc_i : std_logic;
     signal busy_o   : std_logic;

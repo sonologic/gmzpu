@@ -66,9 +66,9 @@ package pic is
             rst_i       : in  std_logic;
             clk_i       : in  std_logic;
             int_i       : in  std_logic_vector(DATA_WIDTH-1 downto 0);
-            adr_i       : in  std_logic_vector(1 downto 0);
-            dat_i       : in  std_logic_vector(DATA_WIDTH-1 downto 0);
-            dat_o       : out std_logic_vector(DATA_WIDTH-1 downto 0);
+            adr_i       : in  unsigned(1 downto 0);
+            dat_i       : in  unsigned(DATA_WIDTH-1 downto 0);
+            dat_o       : out unsigned(DATA_WIDTH-1 downto 0);
             we_i        : in std_logic;
             en_i        : in std_logic;
             irq_o       : out std_logic;
@@ -92,12 +92,12 @@ package pic is
             -- wishbone bus
             rst_i         : in std_logic;
             clk_i         : in std_logic;
-            wb_dat_o      : out std_logic_vector(DATA_WIDTH-1 downto 0);
-            wb_dat_i      : in std_logic_vector(DATA_WIDTH-1 downto 0);
-            wb_tgd_o      : out std_logic_vector(DATA_WIDTH-1 downto 0);
-            wb_tgd_i      : in std_logic_vector(DATA_WIDTH-1 downto 0);
+            wb_dat_o      : out unsigned(DATA_WIDTH-1 downto 0);
+            wb_dat_i      : in unsigned(DATA_WIDTH-1 downto 0);
+            wb_tgd_o      : out unsigned(DATA_WIDTH-1 downto 0);
+            wb_tgd_i      : in unsigned(DATA_WIDTH-1 downto 0);
             wb_ack_o      : out std_logic;
-            wb_adr_i      : in std_logic_vector(ADR_WIDTH-1 downto 0);
+            wb_adr_i      : in unsigned(ADR_WIDTH-1 downto 0);
             wb_cyc_i      : in std_logic;
             wb_stall_o    : out std_logic;
             wb_err_o      : out std_logic;
@@ -105,8 +105,8 @@ package pic is
             wb_rty_o      : out std_logic;
             wb_sel_i      : in std_logic_vector(DATA_WIDTH-1 downto 0);
             wb_stb_i      : in std_logic;
-            wb_tga_i      : in std_logic_vector(ADR_WIDTH-1 downto 0);
-            wb_tgc_i      : in std_logic_vector(DATA_WIDTH-1 downto 0); -- size correct?
+            wb_tga_i      : in unsigned(ADR_WIDTH-1 downto 0);
+            wb_tgc_i      : in unsigned(DATA_WIDTH-1 downto 0); -- size correct?
             wb_we_i       : in std_logic
         );
     end component interrupt_controller;

@@ -119,18 +119,18 @@ architecture Structural of gmZPU is
     signal zw_ena           : std_logic;
     signal zw_busy          : std_logic;
     signal zw_ready         : std_logic;
-    signal zw_addr          : std_logic_vector(ADDR_W-3 downto 0);
+    signal zw_addr          : unsigned(ADDR_W-3 downto 0);
     signal zw_re            : std_logic;
     signal zw_we            : std_logic;
-    signal zw_dat_i         : std_logic_vector(WORD_SIZE-1 downto 0);
-    signal zw_dat_o         : std_logic_vector(WORD_SIZE-1 downto 0);
+    signal zw_dat_i         : unsigned(WORD_SIZE-1 downto 0);
+    signal zw_dat_o         : unsigned(WORD_SIZE-1 downto 0);
     --
-    signal wb_dat_i         : std_logic_vector(WORD_SIZE-1 downto 0);
-    signal wb_dat_o         : std_logic_vector(WORD_SIZE-1 downto 0);
-    signal wb_tgd_i         : std_logic_vector(WORD_SIZE-1 downto 0);
-    signal wb_tgd_o         : std_logic_vector(WORD_SIZE-1 downto 0);
+    signal wb_dat_i         : unsigned(WORD_SIZE-1 downto 0);
+    signal wb_dat_o         : unsigned(WORD_SIZE-1 downto 0);
+    signal wb_tgd_i         : unsigned(WORD_SIZE-1 downto 0);
+    signal wb_tgd_o         : unsigned(WORD_SIZE-1 downto 0);
     signal wb_ack_i         : std_logic;
-    signal wb_adr_o         : std_logic_vector(ADDR_W-4-CS_WIDTH downto 0);
+    signal wb_adr_o         : unsigned(ADDR_W-4-CS_WIDTH downto 0);
     signal wb_cyc_o      : std_logic;
     signal wb_stall_i    : std_logic;
     signal wb_err_i      : std_logic;
@@ -138,8 +138,8 @@ architecture Structural of gmZPU is
     signal wb_rty_i      : std_logic;
     signal wb_sel_o      : std_logic_vector(WORD_SIZE-1 downto 0);
     signal wb_stb_o      : std_logic;
-    signal wb_tga_o      : std_logic_vector(ADDR_W-4-CS_WIDTH downto 0);
-    signal wb_tgc_o      : std_logic_vector(WORD_SIZE-1 downto 0); -- size correct?
+    signal wb_tga_o      : unsigned(ADDR_W-4-CS_WIDTH downto 0);
+    signal wb_tgc_o      : unsigned(WORD_SIZE-1 downto 0); -- size correct?
     signal wb_we_o       : std_logic;
     
 begin
@@ -205,9 +205,9 @@ begin
     zw_we  <= mem_we and mem_addr(IO_BIT) and mem_addr(ZW_BIT);
     zw_re  <= mem_re and mem_addr(IO_BIT) and mem_addr(ZW_BIT);
     zw_ena <= zw_we or zw_re;
-    zw_addr <= std_logic_vector(mem_addr(ADDR_W-3 downto 0));
+    zw_addr <= mem_addr(ADDR_W-3 downto 0);
 
-    zw_dat_i <= std_logic_vector(mem_write);
+    zw_dat_i <= mem_write;
     
 
    zpu : ZPUMediumCore

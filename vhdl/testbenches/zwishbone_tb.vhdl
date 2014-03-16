@@ -66,11 +66,11 @@ architecture Behave of zwishbone_TB is
                 -- c_decode
                 en_i        : in std_logic;
                 we_i        : in std_logic;
-                adr_i       : in std_logic_vector(ADR_WIDTH-1 downto 0);
-                dat_i       : in std_logic_vector(DATA_WIDTH-1 downto 0);
-                dat_o       : out std_logic_vector(DATA_WIDTH-1 downto 0);
+                adr_i       : in unsigned(ADR_WIDTH-1 downto 0);
+                dat_i       : in unsigned(DATA_WIDTH-1 downto 0);
+                dat_o       : out unsigned(DATA_WIDTH-1 downto 0);
                 -- config register value (0x0000, for c_control)
-                cfg_o       : out std_logic_vector(DATA_WIDTH-1 downto 0)
+                cfg_o       : out unsigned(DATA_WIDTH-1 downto 0)
             );
     end component zwishbone_c_regs;
 
@@ -82,10 +82,10 @@ architecture Behave of zwishbone_TB is
 
     signal enable       : std_logic;
     signal we       : std_logic;
-    signal adr      : std_logic_vector(15 downto 0);
-    signal dat_o    : std_logic_vector(31 downto 0);
-    signal dat_i    : std_logic_vector(31 downto 0);
-    signal cfg      : std_logic_vector(31 downto 0);
+    signal adr      : unsigned(15 downto 0);
+    signal dat_o    : unsigned(31 downto 0);
+    signal dat_i    : unsigned(31 downto 0);
+    signal cfg      : unsigned(31 downto 0);
 begin
    c_regs : zwishbone_c_regs
         generic map(
@@ -135,13 +135,13 @@ begin
                 case state is
                     when 0 =>
                         adr <= (others => '0');
-                        dat_o <= std_logic_vector(to_unsigned(2, dat_o'length));
+                        dat_o <= to_unsigned(2, dat_o'length);
                         we <= '1';
                         enable <= '1';
                         state := state + 1;
                     when 1 =>
                         adr <= (others => '0');
-                        dat_o <= std_logic_vector(to_unsigned(2, dat_o'length));
+                        dat_o <= to_unsigned(2, dat_o'length);
                         we <= '1';
                         enable <= '1';
                         state := state + 1;

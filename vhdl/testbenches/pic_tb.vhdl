@@ -74,12 +74,12 @@ architecture Behave of pic_TB is
             -- wishbone bus
             rst_i         : in std_logic;
             clk_i         : in std_logic;
-            wb_dat_o      : out std_logic_vector(DATA_WIDTH-1 downto 0);
-            wb_dat_i      : in std_logic_vector(DATA_WIDTH-1 downto 0);
-            wb_tgd_o      : out std_logic_vector(DATA_WIDTH-1 downto 0);
-            wb_tgd_i      : in std_logic_vector(DATA_WIDTH-1 downto 0);
+            wb_dat_o      : out unsigned(DATA_WIDTH-1 downto 0);
+            wb_dat_i      : in unsigned(DATA_WIDTH-1 downto 0);
+            wb_tgd_o      : out unsigned(DATA_WIDTH-1 downto 0);
+            wb_tgd_i      : in unsigned(DATA_WIDTH-1 downto 0);
             wb_ack_o      : out std_logic;
-            wb_adr_i      : in std_logic_vector(ADR_WIDTH-1 downto 0);
+            wb_adr_i      : in unsigned(ADR_WIDTH-1 downto 0);
             wb_cyc_i      : in std_logic;
             wb_stall_o    : out std_logic;
             wb_err_o      : out std_logic;
@@ -87,8 +87,8 @@ architecture Behave of pic_TB is
             wb_rty_o      : out std_logic;
             wb_sel_i      : in std_logic_vector(DATA_WIDTH-1 downto 0);
             wb_stb_i      : in std_logic;
-            wb_tga_i      : in std_logic_vector(ADR_WIDTH-1 downto 0);
-            wb_tgc_i      : in std_logic_vector(DATA_WIDTH-1 downto 0); -- size correct?
+            wb_tga_i      : in unsigned(ADR_WIDTH-1 downto 0);
+            wb_tgc_i      : in unsigned(DATA_WIDTH-1 downto 0); -- size correct?
             wb_we_i       : in std_logic
         );
     end component interrupt_controller;
@@ -97,15 +97,15 @@ architecture Behave of pic_TB is
         -- inputs
         int_i       : std_logic_vector((N_BANKS*DATA_WIDTH)-1 downto 0);
         rst_i       : std_logic;
-        wb_dat_i    : std_logic_vector(DATA_WIDTH-1 downto 0);
-        wb_tgd_i    : std_logic_vector(DATA_WIDTH-1 downto 0);
-        wb_adr_i    : std_logic_vector(ADR_WIDTH-1 downto 0);
+        wb_dat_i    : unsigned(DATA_WIDTH-1 downto 0);
+        wb_tgd_i    : unsigned(DATA_WIDTH-1 downto 0);
+        wb_adr_i    : unsigned(ADR_WIDTH-1 downto 0);
         wb_cyc_i    : std_logic;
         wb_lock_i   : std_logic;
         wb_sel_i    : std_logic_vector(DATA_WIDTH-1 downto 0);
         wb_stb_i    : std_logic;
-        wb_tga_i    : std_logic_vector(ADR_WIDTH-1 downto 0);
-        wb_tgc_i    : std_logic_vector(DATA_WIDTH-1 downto 0);
+        wb_tga_i    : unsigned(ADR_WIDTH-1 downto 0);
+        wb_tgc_i    : unsigned(DATA_WIDTH-1 downto 0);
         wb_we_i     : std_logic;
         -- outputs
     end record;
@@ -175,12 +175,12 @@ architecture Behave of pic_TB is
     -- wishbone bus
     signal rst_i         : std_logic;
     signal clk_i         : std_logic;
-    signal wb_dat_o      : std_logic_vector(DATA_WIDTH-1 downto 0);
-    signal wb_dat_i      : std_logic_vector(DATA_WIDTH-1 downto 0);
-    signal wb_tgd_o      : std_logic_vector(DATA_WIDTH-1 downto 0);
-    signal wb_tgd_i      : std_logic_vector(DATA_WIDTH-1 downto 0);
+    signal wb_dat_o      : unsigned(DATA_WIDTH-1 downto 0);
+    signal wb_dat_i      : unsigned(DATA_WIDTH-1 downto 0);
+    signal wb_tgd_o      : unsigned(DATA_WIDTH-1 downto 0);
+    signal wb_tgd_i      : unsigned(DATA_WIDTH-1 downto 0);
     signal wb_ack_o      : std_logic;
-    signal wb_adr_i      : std_logic_vector(ADR_WIDTH-1 downto 0);
+    signal wb_adr_i      : unsigned(ADR_WIDTH-1 downto 0);
     signal wb_cyc_i      : std_logic;
     signal wb_stall_o    : std_logic;
     signal wb_err_o      : std_logic;
@@ -188,8 +188,8 @@ architecture Behave of pic_TB is
     signal wb_rty_o      : std_logic;
     signal wb_sel_i      : std_logic_vector(DATA_WIDTH-1 downto 0);
     signal wb_stb_i      : std_logic;
-    signal wb_tga_i      : std_logic_vector(ADR_WIDTH-1 downto 0);
-    signal wb_tgc_i      : std_logic_vector(DATA_WIDTH-1 downto 0); -- size correct?
+    signal wb_tga_i      : unsigned(ADR_WIDTH-1 downto 0);
+    signal wb_tgc_i      : unsigned(DATA_WIDTH-1 downto 0); -- size correct?
     signal wb_we_i       : std_logic;
 
 begin

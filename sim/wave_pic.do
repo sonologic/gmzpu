@@ -65,7 +65,6 @@ add wave -noupdate -expand -group regs -expand -group bank1 -expand -group reg1 
 add wave -noupdate -expand -group regs -expand -group bank1 -expand -group reg1 -radix hexadecimal /pic_tb/pic/reg_generator(1)/regsX/irq
 add wave -noupdate -expand -group regs -expand -group bank1 -expand -group reg1 /pic_tb/pic/reg_generator(1)/regsX/icr_we
 add wave -noupdate -expand -group regs -expand -group bank1 -expand -group reg1 /pic_tb/pic/reg_generator(1)/regsX/ready_r
-add wave -noupdate -expand -group regs -expand -group bank1 -expand -group reg1 /pic_tb/pic/reg_generator(1)/regsX/reading_r
 add wave -noupdate -expand -group regs -expand -group bank1 -group icr1 /pic_tb/pic/reg_generator(1)/regsX/icr_generator(15)/ICRX/clk_i
 add wave -noupdate -expand -group regs -expand -group bank1 -group icr1 /pic_tb/pic/reg_generator(1)/regsX/icr_generator(15)/ICRX/int_i
 add wave -noupdate -expand -group regs -expand -group bank1 -group icr1 /pic_tb/pic/reg_generator(1)/regsX/icr_generator(15)/ICRX/irq_o
@@ -339,7 +338,6 @@ add wave -noupdate -expand -group regs -expand -group bank0 -expand -group reg0 
 add wave -noupdate -expand -group regs -expand -group bank0 -expand -group reg0 -radix hexadecimal /pic_tb/pic/reg_generator(0)/regsX/irq
 add wave -noupdate -expand -group regs -expand -group bank0 -expand -group reg0 /pic_tb/pic/reg_generator(0)/regsX/icr_we
 add wave -noupdate -expand -group regs -expand -group bank0 -expand -group reg0 /pic_tb/pic/reg_generator(0)/regsX/ready_r
-add wave -noupdate -expand -group regs -expand -group bank0 -expand -group reg0 /pic_tb/pic/reg_generator(0)/regsX/reading_r
 add wave -noupdate -expand -group regs -expand -group bank0 -group icr0 /pic_tb/pic/reg_generator(0)/regsX/icr_generator(15)/ICRX/clk_i
 add wave -noupdate -expand -group regs -expand -group bank0 -group icr0 /pic_tb/pic/reg_generator(0)/regsX/icr_generator(15)/ICRX/int_i
 add wave -noupdate -expand -group regs -expand -group bank0 -group icr0 /pic_tb/pic/reg_generator(0)/regsX/icr_generator(15)/ICRX/irq_o

@@ -67,23 +67,23 @@ architecture Behave of zwishbone_decode_TB is
             );
             port (
                 -- zpu fabric
-                adr_i       : in std_logic_vector(ADR_WIDTH-1 downto 0);
-                dat_i       : in std_logic_vector(DATA_WIDTH-1 downto 0);
-                dat_o       : out std_logic_vector(DATA_WIDTH-1 downto 0);
+                adr_i       : in unsigned(ADR_WIDTH-1 downto 0);
+                dat_i       : in unsigned(DATA_WIDTH-1 downto 0);
+                dat_o       : out unsigned(DATA_WIDTH-1 downto 0);
                 ena_i       : in std_logic;
                 rst_i       : in std_logic;
                 we_i        : in std_logic;
                 -- internal fabric
                 reg_en_o    : out std_logic;
                 bus_en_o    : out std_logic;
-                radr_o      : out std_logic_vector(ADR_WIDTH-2-CS_WIDTH downto 0);
-                badr_o      : out std_logic_vector(ADR_WIDTH-2-CS_WIDTH downto 0);
-                reg_i       : in std_logic_vector(DATA_WIDTH-1 downto 0);
-                reg_o       : out std_logic_vector(DATA_WIDTH-1 downto 0);
-                bus_i       : in std_logic_vector(DATA_WIDTH-1 downto 0);
-                bus_o       : out std_logic_vector(DATA_WIDTH-1 downto 0);
+                radr_o      : out unsigned(ADR_WIDTH-2-CS_WIDTH downto 0);
+                badr_o      : out unsigned(ADR_WIDTH-2-CS_WIDTH downto 0);
+                reg_i       : in unsigned(DATA_WIDTH-1 downto 0);
+                reg_o       : out unsigned(DATA_WIDTH-1 downto 0);
+                bus_i       : in unsigned(DATA_WIDTH-1 downto 0);
+                bus_o       : out unsigned(DATA_WIDTH-1 downto 0);
                 -- chip select
-                cs_o        : out std_logic_vector(CS_WIDTH-1 downto 0)
+                cs_o        : out unsigned(CS_WIDTH-1 downto 0)
             );
     end component zwishbone_c_decode;
 
@@ -93,10 +93,10 @@ architecture Behave of zwishbone_decode_TB is
         reset       : std_logic;
         enable      : std_logic;
         we          : std_logic;
-        adr         : std_logic_vector(ADR_WIDTH-1 downto 0);
-        dat_i       : std_logic_vector(DATA_WIDTH-1 downto 0);
-        reg_i       : std_logic_vector(DATA_WIDTH-1 downto 0);
-        bus_i       : std_logic_vector(DATA_WIDTH-1 downto 0);
+        adr         : unsigned(ADR_WIDTH-1 downto 0);
+        dat_i       : unsigned(DATA_WIDTH-1 downto 0);
+        reg_i       : unsigned(DATA_WIDTH-1 downto 0);
+        bus_i       : unsigned(DATA_WIDTH-1 downto 0);
         -- outputs
         --dat_o       : std_logic_vector(DATA_WIDTH-1 downto 0);
         bus_en_o    : std_logic;
@@ -133,22 +133,22 @@ architecture Behave of zwishbone_decode_TB is
     signal reset    : std_logic:='1';
     signal enable   : std_logic;
     signal we       : std_logic;
-    signal adr      : std_logic_vector(ADR_WIDTH-1 downto 0);
-    signal dat_o    : std_logic_vector(DATA_WIDTH-1 downto 0);
-    signal dat_i    : std_logic_vector(DATA_WIDTH-1 downto 0);
+    signal adr      : unsigned(ADR_WIDTH-1 downto 0);
+    signal dat_o    : unsigned(DATA_WIDTH-1 downto 0);
+    signal dat_i    : unsigned(DATA_WIDTH-1 downto 0);
 
     signal bus_en_o : std_logic;
     signal reg_en_o : std_logic;
 
-    signal reg_o    : std_logic_vector(DATA_WIDTH-1 downto 0);
-    signal reg_i    : std_logic_vector(DATA_WIDTH-1 downto 0);
-    signal bus_o    : std_logic_vector(DATA_WIDTH-1 downto 0);
-    signal bus_i    : std_logic_vector(DATA_WIDTH-1 downto 0);
+    signal reg_o    : unsigned(DATA_WIDTH-1 downto 0);
+    signal reg_i    : unsigned(DATA_WIDTH-1 downto 0);
+    signal bus_o    : unsigned(DATA_WIDTH-1 downto 0);
+    signal bus_i    : unsigned(DATA_WIDTH-1 downto 0);
 
-    signal radr_o   : std_logic_vector(ADR_WIDTH-CS_WIDTH-2 downto 0);
-    signal badr_o   : std_logic_vector(ADR_WIDTH-CS_WIDTH-2 downto 0);
+    signal radr_o   : unsigned(ADR_WIDTH-CS_WIDTH-2 downto 0);
+    signal badr_o   : unsigned(ADR_WIDTH-CS_WIDTH-2 downto 0);
 
-    signal cs_o     : std_logic_vector(CS_WIDTH-1 downto 0);
+    signal cs_o     : unsigned(CS_WIDTH-1 downto 0);
 
 begin
     c_decode : zwishbone_c_decode

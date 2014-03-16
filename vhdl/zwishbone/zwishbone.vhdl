@@ -53,15 +53,15 @@ entity zwishbone_c_regs is
         ready_o     : out std_logic;
         en_i        : in std_logic;
         we_i        : in std_logic;
-        adr_i       : in std_logic_vector(ADR_WIDTH-1 downto 0);
-        dat_i       : in std_logic_vector(DATA_WIDTH-1 downto 0);
-        dat_o       : out std_logic_vector(DATA_WIDTH-1 downto 0);
+        adr_i       : in unsigned(ADR_WIDTH-1 downto 0);
+        dat_i       : in unsigned(DATA_WIDTH-1 downto 0);
+        dat_o       : out unsigned(DATA_WIDTH-1 downto 0);
         -- bus
         to_inc_i    : in std_logic;
         to_rst_i    : in std_logic;
         to_o        : out std_logic;
         -- config register value (0x0000, for c_control)
-        cfg_o       : out std_logic_vector(DATA_WIDTH-1 downto 0);
+        cfg_o       : out unsigned(DATA_WIDTH-1 downto 0);
         -- status register value (0x0004, from c_control / bus)
         err_i       : in std_logic;
         rty_i       : in std_logic
@@ -70,8 +70,8 @@ end entity zwishbone_c_regs;
 
 architecture rtl of zwishbone_c_regs is
     -- registers
-    signal reg_config   : std_logic_vector(DATA_WIDTH-1 downto 0); -- := (others => '0');
-    signal reg_status   : std_logic_vector(DATA_WIDTH-1 downto 0); -- := (others => '0');
+    signal reg_config   : unsigned(DATA_WIDTH-1 downto 0); -- := (others => '0');
+    signal reg_status   : unsigned(DATA_WIDTH-1 downto 0); -- := (others => '0');
     signal reg_to_cmp   : unsigned(DATA_WIDTH-1 downto 0); -- := (others => '0');
     signal reg_to_val   : unsigned(DATA_WIDTH-1 downto 0); -- := (others => '0');
     -- reg_status signals
@@ -139,39 +139,39 @@ begin
                 -- only act when enabled 
                 if en_i='1' then
                     -- adr 0x0 : CONFIG register
-                    if adr_i=std_logic_vector(to_unsigned(0,ADR_WIDTH)) then
+                    if adr_i=to_unsigned(0, adr_i'length) then
                             -- write/read CONFIG register
                             if we_i/='1' then
                                 reading_r <= '1';
                                 dat_o <= reg_config;
                             else
-                                reg_config <= std_logic_vector(dat_i);
+                                reg_config <= dat_i;
                                 dat_o <= (others => 'Z');
                             end if;
                     -- adr 0x4 : STATUS register
-                    elsif adr_i=std_logic_vector(to_unsigned(4,ADR_WIDTH)) then
+                    elsif adr_i=to_unsigned(4,adr_i'length) then
                             -- status can only be read
                             if we_i/='1' then
                                 reading_r <= '1';
-                                dat_o <= std_logic_vector(reg_status);
+                                dat_o <= reg_status;
                             else
                                 -- ignore writes
                                 dat_o <= (others => 'Z');
                             end if;
                     -- adr 0x8 : TO_CMP register
-                    elsif adr_i=std_logic_vector(to_unsigned(8,ADR_WIDTH)) then
+                    elsif adr_i=to_unsigned(8,adr_i'length) then
                             if we_i/='1' then
                                 reading_r <= '1';
-                                dat_o <= std_logic_vector(reg_to_cmp);
+                                dat_o <= reg_to_cmp;
                             else
-                                reg_to_cmp <= unsigned(dat_i);
+                                reg_to_cmp <= dat_i;
                                 dat_o <= (others => 'Z');
                             end if;
                     -- adr 0xc : TO_VAL register
-                    elsif adr_i=std_logic_vector(to_unsigned(12,ADR_WIDTH)) then
+                    elsif adr_i=to_unsigned(12,adr_i'length) then
                             if we_i/='1' then
                                 reading_r <= '1';
-                                dat_o <= std_logic_vector(reg_to_val);
+                                dat_o <= reg_to_val;
                             else
                                 -- ignore writes
                                 dat_o <= (others => 'Z');
@@ -181,7 +181,7 @@ begin
                             if we_i/='1' then
                                 -- always read zeroes
                                 reading_r <= '1';
-                                dat_o <= std_logic_vector(to_unsigned(0,DATA_WIDTH));
+                                dat_o <= (others => '0');
                             else
                                 -- ignore writes
                                 dat_o <= (others => 'Z');
@@ -222,19 +222,19 @@ entity zwishbone_controller is
         ena_i       : in std_logic; -- enable wb controller
         busy_o      : out std_logic; -- controller busy
 	    ready_o	    : out std_logic; -- read request ready
-        adr_i       : in std_logic_vector(ADR_WIDTH-1 downto 0);
+        adr_i       : in unsigned(ADR_WIDTH-1 downto 0);
         we_i        : in std_logic;
-        dat_i      : in std_logic_vector(DATA_WIDTH-1 downto 0);
-        dat_o      : out std_logic_vector(DATA_WIDTH-1 downto 0);
+        dat_i      : in unsigned(DATA_WIDTH-1 downto 0);
+        dat_o      : out unsigned(DATA_WIDTH-1 downto 0);
         -- I/O decoder
         --cs_o        : out std_logic_vector(CS_WIDTH-1 downto 0);
         -- wishbone bus
-        wb_dat_i      : in std_logic_vector(DATA_WIDTH-1 downto 0);
-        wb_dat_o      : out std_logic_vector(DATA_WIDTH-1 downto 0);
-        wb_tgd_i      : in std_logic_vector(DATA_WIDTH-1 downto 0);
-        wb_tgd_o      : out std_logic_vector(DATA_WIDTH-1 downto 0);
+        wb_dat_i      : in unsigned(DATA_WIDTH-1 downto 0);
+        wb_dat_o      : out unsigned(DATA_WIDTH-1 downto 0);
+        wb_tgd_i      : in unsigned(DATA_WIDTH-1 downto 0);
+        wb_tgd_o      : out unsigned(DATA_WIDTH-1 downto 0);
         wb_ack_i      : in std_logic;
-        wb_adr_o      : out std_logic_vector(ADR_WIDTH-CS_WIDTH-2 downto 0);
+        wb_adr_o      : out unsigned(ADR_WIDTH-CS_WIDTH-2 downto 0);
         wb_cyc_o      : out std_logic;
         wb_stall_i    : in std_logic;
         wb_err_i      : in std_logic;
@@ -242,8 +242,8 @@ entity zwishbone_controller is
         wb_rty_i      : in std_logic;
         wb_sel_o      : out std_logic_vector(DATA_WIDTH-1 downto 0);
         wb_stb_o      : out std_logic_vector((2**CS_WIDTH)-1 downto 0);
-        wb_tga_o      : out std_logic_vector(ADR_WIDTH-CS_WIDTH-2 downto 0);
-        wb_tgc_o      : out std_logic_vector(DATA_WIDTH-1 downto 0); -- size correct?
+        wb_tga_o      : out unsigned(ADR_WIDTH-CS_WIDTH-2 downto 0);
+        wb_tgc_o      : out unsigned(DATA_WIDTH-1 downto 0); -- size correct?
         wb_we_o       : out std_logic
 
     );
@@ -266,15 +266,15 @@ architecture rtl of zwishbone_controller is
                 ready_o     : out std_logic;
                 en_i        : in std_logic;
                 we_i        : in std_logic;
-                adr_i       : in std_logic_vector(ADR_WIDTH-1 downto 0);
-                dat_i       : in std_logic_vector(DATA_WIDTH-1 downto 0);
-                dat_o       : out std_logic_vector(DATA_WIDTH-1 downto 0);
+                adr_i       : in unsigned(ADR_WIDTH-1 downto 0);
+                dat_i       : in unsigned(DATA_WIDTH-1 downto 0);
+                dat_o       : out unsigned(DATA_WIDTH-1 downto 0);
                 -- bus
                 to_inc_i    : in std_logic;
                 to_rst_i    : in std_logic;
                 to_o        : out std_logic;
                 -- config register value (0x0000, for c_control)
-                cfg_o       : out std_logic_vector(DATA_WIDTH-1 downto 0);
+                cfg_o       : out unsigned(DATA_WIDTH-1 downto 0);
                 -- status register value (0x0004, from c_control / bus)
                 err_i       : in std_logic;
                 rty_i       : in std_logic
@@ -295,20 +295,20 @@ architecture rtl of zwishbone_controller is
                 ready_o     : out std_logic;
                 en_i        : in std_logic;     -- enable wb bus (internal)
                 we_i        : in std_logic;
-                adr_i       : in std_logic_vector(ADR_WIDTH-1 downto 0);
-                dat_i       : in std_logic_vector(DATA_WIDTH-1 downto 0);
-                dat_o       : out std_logic_vector(DATA_WIDTH-1 downto 0);
-                cs_i        : in std_logic_vector(CS_WIDTH-1 downto 0);
+                adr_i       : in unsigned(ADR_WIDTH-1 downto 0);
+                dat_i       : in unsigned(DATA_WIDTH-1 downto 0);
+                dat_o       : out unsigned(DATA_WIDTH-1 downto 0);
+                cs_i        : in unsigned(CS_WIDTH-1 downto 0);
                 to_i        : in std_logic;
                 to_inc_o    : out std_logic;
                 to_rst_o    : out std_logic;
                 -- wishbone MASTER signals
-                b_dat_i      : in std_logic_vector(DATA_WIDTH-1 downto 0);
-                b_dat_o      : out std_logic_vector(DATA_WIDTH-1 downto 0);
-                b_tgd_i      : in std_logic_vector(DATA_WIDTH-1 downto 0);
-                b_tgd_o      : out std_logic_vector(DATA_WIDTH-1 downto 0);
+                b_dat_i      : in unsigned(DATA_WIDTH-1 downto 0);
+                b_dat_o      : out unsigned(DATA_WIDTH-1 downto 0);
+                b_tgd_i      : in unsigned(DATA_WIDTH-1 downto 0);
+                b_tgd_o      : out unsigned(DATA_WIDTH-1 downto 0);
                 b_ack_i      : in std_logic;
-                b_adr_o      : out std_logic_vector(ADR_WIDTH-1 downto 0);
+                b_adr_o      : out unsigned(ADR_WIDTH-1 downto 0);
                 b_cyc_o      : out std_logic;
                 b_stall_i    : in std_logic;
                 b_err_i      : in std_logic;
@@ -316,8 +316,8 @@ architecture rtl of zwishbone_controller is
                 b_rty_i      : in std_logic;
                 b_sel_o      : out std_logic_vector(DATA_WIDTH-1 downto 0);
                 b_stb_o      : out std_logic_vector((2**CS_WIDTH)-1 downto 0);
-                b_tga_o      : out std_logic_vector(ADR_WIDTH-1 downto 0);
-                b_tgc_o      : out std_logic_vector(DATA_WIDTH-1 downto 0); -- size correct?
+                b_tga_o      : out unsigned(ADR_WIDTH-1 downto 0);
+                b_tgc_o      : out unsigned(DATA_WIDTH-1 downto 0); -- size correct?
                 b_we_o       : out std_logic
             );
     end component zwishbone_c_bus;
@@ -330,35 +330,35 @@ architecture rtl of zwishbone_controller is
             );
             port (
                 -- zpu fabric
-                adr_i       : in std_logic_vector(ADR_WIDTH-1 downto 0);
+                adr_i       : in unsigned(ADR_WIDTH-1 downto 0);
                 ena_i       : in std_logic;
                 rst_i       : in std_logic;
                 we_i        : in std_logic;
                 -- internal fabric
                 reg_en_o    : out std_logic;
                 bus_en_o    : out std_logic;
-                radr_o      : out std_logic_vector(ADR_WIDTH-2-CS_WIDTH downto 0);
-                badr_o      : out std_logic_vector(ADR_WIDTH-2-CS_WIDTH downto 0);
+                radr_o      : out unsigned(ADR_WIDTH-2-CS_WIDTH downto 0);
+                badr_o      : out unsigned(ADR_WIDTH-2-CS_WIDTH downto 0);
                 -- chip select
-                cs_o        : out std_logic_vector(CS_WIDTH-1 downto 0)
+                cs_o        : out unsigned(CS_WIDTH-1 downto 0)
             );
     end component zwishbone_c_decode;
 
     -- internal
-    signal config   : std_logic_vector(DATA_WIDTH-1 downto 0);
+    signal config   : unsigned(DATA_WIDTH-1 downto 0);
     signal status_err_r : std_logic;
     signal status_rty_r : std_logic;
     signal reg_en   : std_logic;
     signal bus_en   : std_logic;
-    signal radr     : std_logic_vector(ADR_WIDTH-CS_WIDTH-2 downto 0);
-    signal badr     : std_logic_vector(ADR_WIDTH-CS_WIDTH-2 downto 0);
+    signal radr     : unsigned(ADR_WIDTH-CS_WIDTH-2 downto 0);
+    signal badr     : unsigned(ADR_WIDTH-CS_WIDTH-2 downto 0);
 
     signal reg_busy_r : std_logic;
     signal reg_ready_r : std_logic;
     signal zwc_busy_r : std_logic;
     signal zwc_ready_r : std_logic;
     -- 
-    signal cs       : std_logic_vector(CS_WIDTH-1 downto 0);
+    signal cs       : unsigned(CS_WIDTH-1 downto 0);
 
     signal to_rst   : std_logic;
     signal to_inc   : std_logic;
@@ -464,10 +464,10 @@ entity zwishbone_intercon is
         rst_i       : in  std_logic;
         stb_i       : in  std_logic;
         cyc_i       : in  std_logic;
-        adr_i       : in  std_logic_vector(ADR_WIDTH-1 downto 0);
-        cs_i        : in  std_logic_vector(CS_WIDTH-1 downto 0);
+        adr_i       : in  unsigned(ADR_WIDTH-1 downto 0);
+        cs_i        : in  unsigned(CS_WIDTH-1 downto 0);
         stb_o       : out std_logic_vector((2**CS_WIDTH)-1 downto 0);
-        adr_o       : out std_logic_vector(ADR_WIDTH-1 downto 0)
+        adr_o       : out unsigned(ADR_WIDTH-1 downto 0)
     );
 
 end entity zwishbone_intercon;
@@ -502,17 +502,17 @@ entity zwishbone_c_decode is
             );
             port (
                 -- zpu fabric
-                adr_i       : in std_logic_vector(ADR_WIDTH-1 downto 0);
+                adr_i       : in unsigned(ADR_WIDTH-1 downto 0);
                 ena_i       : in std_logic;
                 rst_i       : in std_logic;
                 we_i        : in std_logic;
                 -- internal fabric
                 reg_en_o    : out std_logic;
                 bus_en_o    : out std_logic;
-                radr_o      : out std_logic_vector(ADR_WIDTH-2-CS_WIDTH downto 0);
-                badr_o      : out std_logic_vector(ADR_WIDTH-2-CS_WIDTH downto 0);
+                radr_o      : out unsigned(ADR_WIDTH-2-CS_WIDTH downto 0);
+                badr_o      : out unsigned(ADR_WIDTH-2-CS_WIDTH downto 0);
                 -- chip select
-                cs_o        : out std_logic_vector(CS_WIDTH-1 downto 0)
+                cs_o        : out unsigned(CS_WIDTH-1 downto 0)
             );
 end entity zwishbone_c_decode;
 
@@ -522,9 +522,9 @@ architecture zwc_decode of zwishbone_c_decode is
     signal en_r     : std_logic;
     signal re_r     : std_logic;
     signal we_r     : std_logic;
-    signal cs_r     : std_logic_vector(CS_WIDTH-1 downto 0);
-    signal adr      : std_logic_vector(ADR_WIDTH-1 downto 0);
-    signal io_adr_r : std_logic_vector(ADR_WIDTH-CS_WIDTH-2 downto 0);
+    signal cs_r     : unsigned(CS_WIDTH-1 downto 0);
+    signal adr      : unsigned(ADR_WIDTH-1 downto 0);
+    signal io_adr_r : unsigned(ADR_WIDTH-CS_WIDTH-2 downto 0);
 begin
     -- enable
     en_r <= ena_i and not rst_i;
@@ -573,20 +573,20 @@ entity zwishbone_c_bus is
                 ready_o     : out std_logic;
                 en_i        : in std_logic;     -- enable wb bus (internal)
                 we_i        : in std_logic;
-                adr_i       : in std_logic_vector(ADR_WIDTH-1 downto 0);
-                dat_i       : in std_logic_vector(DATA_WIDTH-1 downto 0);
-                dat_o       : out std_logic_vector(DATA_WIDTH-1 downto 0);
-                cs_i        : in std_logic_vector(CS_WIDTH-1 downto 0);
+                adr_i       : in unsigned(ADR_WIDTH-1 downto 0);
+                dat_i       : in unsigned(DATA_WIDTH-1 downto 0);
+                dat_o       : out unsigned(DATA_WIDTH-1 downto 0);
+                cs_i        : in unsigned(CS_WIDTH-1 downto 0);
                 to_i        : in std_logic;
                 to_inc_o    : out std_logic;
                 to_rst_o    : out std_logic;
                 -- wishbone MASTER signals
-                b_dat_i      : in std_logic_vector(DATA_WIDTH-1 downto 0);
-                b_dat_o      : out std_logic_vector(DATA_WIDTH-1 downto 0);
-                b_tgd_i      : in std_logic_vector(DATA_WIDTH-1 downto 0);
-                b_tgd_o      : out std_logic_vector(DATA_WIDTH-1 downto 0);
+                b_dat_i      : in unsigned(DATA_WIDTH-1 downto 0);
+                b_dat_o      : out unsigned(DATA_WIDTH-1 downto 0);
+                b_tgd_i      : in unsigned(DATA_WIDTH-1 downto 0);
+                b_tgd_o      : out unsigned(DATA_WIDTH-1 downto 0);
                 b_ack_i      : in std_logic;
-                b_adr_o      : out std_logic_vector(ADR_WIDTH-1 downto 0);
+                b_adr_o      : out unsigned(ADR_WIDTH-1 downto 0);
                 b_cyc_o      : out std_logic;
                 b_stall_i    : in std_logic;
                 b_err_i      : in std_logic;
@@ -594,8 +594,8 @@ entity zwishbone_c_bus is
                 b_rty_i      : in std_logic;
                 b_sel_o      : out std_logic_vector(DATA_WIDTH-1 downto 0);
                 b_stb_o      : out std_logic_vector((2**CS_WIDTH)-1 downto 0);
-                b_tga_o      : out std_logic_vector(ADR_WIDTH-1 downto 0);
-                b_tgc_o      : out std_logic_vector(DATA_WIDTH-1 downto 0); -- size correct?
+                b_tga_o      : out unsigned(ADR_WIDTH-1 downto 0);
+                b_tgc_o      : out unsigned(DATA_WIDTH-1 downto 0); -- size correct?
                 b_we_o       : out std_logic
             );
 
