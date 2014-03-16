@@ -8,6 +8,8 @@ set BreakOnAssertion 1
 vlib gmzpu
 vcom -work gmzpu ../vhdl/zwishbone/zwishbone_pkg.vhdl
 vcom -work gmzpu ../vhdl/zwishbone/zwishbone.vhdl
+vcom -work gmzpu ../vhdl/interrupt/interrupt_pkg.vhdl
+vcom -work gmzpu ../vhdl/interrupt/interrupt.vhdl
 
 vlib zpu
 #vcom -work zpu ../vhdl/roms/hello_bram.vhdl
