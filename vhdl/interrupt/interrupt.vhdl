@@ -242,19 +242,12 @@ begin
             else
                 -- en_i='0'
                 ready_r <= '0';
-                dat_o <= (others => 'Z');
             end if; -- en_i='1'
         end if; -- rising_edge(clk_i)
     end process;
    
     ready_o <= en_i and ready_r; 
-    --ready_o <= en_i and reading_r;
-    --process(clk_i)
-    --begin
-    --    if rising_edge(clk_i) then
-    --    end if;
-    --end process;
-                
+
 end architecture rtl;
 
 library IEEE;
@@ -324,7 +317,8 @@ architecture rtl of interrupt_controller is
     signal ack_r    : std_logic;
 begin
     -- enable on cycle and strobe
-    en_r  <= wb_cyc_i and wb_stb_i;
+    en_r  <= wb_cyc_i;
+    -- and wb_stb_i;
 
     -- unsupported signals
     wb_tgd_o <= (others => '0') when en_r='1' else (others => 'Z');
