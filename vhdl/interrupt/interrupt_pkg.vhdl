@@ -1,3 +1,43 @@
+------------------------------------------------------------------------------
+----                                                                      ----
+----  Programmable Interrupt Controller (PIC)                             ----
+----                                                                      ----
+----  http://github.com/sonologic/gmzpu                                   ----
+----                                                                      ----
+----  Description:                                                        ----
+----  gmZPU interrupt controller. Parametrised design to create           ----
+----  a PIC with a number of N_BANKS registers. Each bank                 ----
+----  has the full set of ICR, IMR, ITR and IER registers for             ----
+----  DATA_WIDTH interrupt lines.                                         ----
+----                                                                      ----
+----  Author:                                                             ----
+----    - "Koen Martens" <gmc sonologic.nl>                               ----
+----                                                                      ----
+------------------------------------------------------------------------------
+----                                                                      ----
+---- Copyright (c) 2014 Koen Martens                                      ----
+----                                                                      ----
+---- Distributed under the BSD license                                    ----
+----                                                                      ----
+------------------------------------------------------------------------------
+----                                                                      ----
+---- Design unit:      pic (package)                                      ----
+---- File name:        interrupt_pkg.vhdl                                 ----
+---- Note:             None                                               ----
+---- Limitations:      None known                                         ----
+---- Errors:           None known                                         ----
+---- Library:          gmzpu                                              ----
+---- Dependencies:     IEEE.std_logic_1164                                ----
+----                   IEEE.numeric_std                                   ----
+---- Target FPGA:      N/A                                                ----
+---- Language:         VHDL                                               ----
+---- Wishbone:         Yes                                                ----
+---- Synthesis tools:  ModelSim                                           ----
+---- Simulation tools: ModelSim                                           ----
+---- Text editor:      vim                                                ----
+----                                                                      ----
+------------------------------------------------------------------------------
+
 library IEEE;
 use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all;

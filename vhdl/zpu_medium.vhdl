@@ -7,6 +7,7 @@
 ----  Description:                                                        ----
 ----  ZPU is a 32 bits small stack cpu. This is the medium size version.  ----
 ----  Supports external memories.                                         ----
+----  Modified to support the interrupt line.                             ----
 ----                                                                      ----
 ----  To Do:                                                              ----
 ----  -                                                                   ----

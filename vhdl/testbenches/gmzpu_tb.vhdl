@@ -5,10 +5,7 @@
 ----  http://github.com/sonologic/gmzpu                                   ----
 ----                                                                      ----
 ----  Description:                                                        ----
-----  This is the testbench for the gmZPU core                            ----
-----                                                                      ----
-----  To Do:                                                              ----
-----  -                                                                   ----
+----  This is the testbench for the gmZPU core.                           ----
 ----                                                                      ----
 ----  Author:                                                             ----
 ----    - Salvador E. Tropea, salvador inti.gob.ar                        ----

@@ -1,11 +1,11 @@
 ------------------------------------------------------------------------------
 ----                                                                      ----
-----  gmzpu interrupt regs component testbench                            ----
+----  gmzpu programmable interrupt controller (pic) testbench             ----
 ----                                                                      ----
 ----  http://github.com/sonologic/gmzpu                                   ----
 ----                                                                      ----
 ----  Description:                                                        ----
-----  This is the testbench for the gmZPU core                            ----
+----  This is the testbench for the PIC                                   ----
 ----                                                                      ----
 ----  To Do:                                                              ----
 ----  -                                                                   ----
@@ -24,8 +24,8 @@
 ----                                                                      ----
 ------------------------------------------------------------------------------
 ----                                                                      ----
----- Design unit:      zwishbone_TB                                       ----
----- File name:        gmzpu_tb.vhdl                                      ----
+---- Design unit:      pic_TB                                             ----
+---- File name:        pic_tb.vhdl                                        ----
 ---- Note:             None                                               ----
 ---- Limitations:      None known                                         ----
 ---- Errors:           None known                                         ----

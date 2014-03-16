@@ -1,14 +1,11 @@
 ------------------------------------------------------------------------------
 ----                                                                      ----
-----  Wishbone Package                                                    ----
+----  ZWISHBONE gmZPU WISHBONE B4 controller                              ----
 ----                                                                      ----
-----  http://www.opencores.org/                                           ----
+----  http://github.com/sonologic/gmzpu                                   ----
 ----                                                                      ----
 ----  Description:                                                        ----
-----  ZPU wishbone controller                                             ----
-----                                                                      ----
-----  To Do:                                                              ----
-----  -                                                                   ----
+----  Interface between the gmZPU zpu core and the WISHBONE B4 bus.       ----
 ----                                                                      ----
 ----  Author:                                                             ----
 ----    - "Koen Martens" <gmc sonologic.nl>                               ----
@@ -21,20 +18,20 @@
 ----                                                                      ----
 ------------------------------------------------------------------------------
 ----                                                                      ----
----- Design unit:      zpupkg, UART (Package)                             ----
----- File name:        zpu_medium.vhdl                                    ----
+---- Design unit:      zwishbone (package)                                ----
+---- File name:        zwishbone_pkg.vhdl                                 ----
 ---- Note:             None                                               ----
 ---- Limitations:      None known                                         ----
 ---- Errors:           None known                                         ----
----- Library:          zpu                                                ----
+---- Library:          gmzpu                                              ----
 ---- Dependencies:     IEEE.std_logic_1164                                ----
 ----                   IEEE.numeric_std                                   ----
----- Target FPGA:      Spartan 3 (XC3S400-4-FT256)                        ----
+---- Target FPGA:      N/A                                                ----
 ---- Language:         VHDL                                               ----
----- Wishbone:         No                                                 ----
----- Synthesis tools:  Xilinx Release 9.2.03i - xst J.39                  ----
----- Simulation tools: GHDL [Sokcho edition] (0.2x)                       ----
----- Text editor:      SETEdit 0.5.x                                      ----
+---- Wishbone:         Yes                                                ----
+---- Synthesis tools:  ModelSim                                           ----
+---- Simulation tools: ModelSim                                           ----
+---- Text editor:      vim                                                ----
 ----                                                                      ----
 ------------------------------------------------------------------------------
 
