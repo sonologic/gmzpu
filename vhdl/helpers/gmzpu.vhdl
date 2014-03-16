@@ -53,6 +53,7 @@ use zpu.zpupkg.all;
 
 library gmzpu;
 use gmzpu.zwishbone.all;
+use gmzpu.pic.all;
 
 -- RAM declaration
 library work;
@@ -81,39 +82,48 @@ entity gmZPU is
 end entity gmZPU;
 
 architecture Structural of gmZPU is
-   constant BYTE_BITS  : integer:=WORD_SIZE/16; -- # of bits in a word that addresses bytes
-   constant IO_BIT     : integer:=ADDR_W-1; -- Address bit to determine this is an I/O
+    constant BYTE_BITS  : integer:=WORD_SIZE/16; -- # of bits in a word that addresses bytes
+    constant IO_BIT     : integer:=ADDR_W-1; -- Address bit to determine this is an I/O
                                             -- 0 = memory, 1= I/O
-   constant ZW_BIT     : integer:=ADDR_W-2; -- Address bit to determine zwishbone from phiIO
+    constant ZW_BIT     : integer:=ADDR_W-2; -- Address bit to determine zwishbone from phiIO
                                             -- 0 = phiIO, 1 = zwishbone
-   constant BRDIVISOR  : positive:=CLK_FREQ*1e6/BRATE/4;
-   -- zwishbone
-   constant CS_WIDTH   : natural:=4;
+    constant BRDIVISOR  : positive:=CLK_FREQ*1e6/BRATE/4;
 
-   -- I/O & memory (ZPU)
-   signal mem_busy     : std_logic;
-   signal mem_read     : unsigned(WORD_SIZE-1 downto 0);
-   signal mem_write    : unsigned(WORD_SIZE-1 downto 0);
-   signal mem_addr     : unsigned(ADDR_W-1 downto 0);
-   signal mem_we       : std_logic;
-   signal mem_re       : std_logic;
+    -- zwishbone
+    constant CS_WIDTH   : natural:=4;
+    -- devices on the bus
+    constant WB_CS_PIC  : natural:=0;
 
-   -- Memory (SinglePort_RAM)
-   signal ram_busy     : std_logic;
-   signal ram_read     : unsigned(WORD_SIZE-1 downto 0);
-   signal ram_addr     : unsigned(BRAM_W-1 downto BYTE_BITS);
-   signal ram_we       : std_logic;
-   signal ram_re       : std_logic;
-   signal ram_ready_r  : std_logic:='0';
+    -- PIC interrupt mapping
+    constant PIC_INT_EXT    : natural:=0;
+    constant PIC_INT_ZWC    : natural:=1;
+    constant PIC_INT_UNUSED : natural:=2;
+   
 
-   -- I/O (ZPU_IO)
-   signal phi_io_busy      : std_logic;
-   signal phi_io_re        : std_logic;
-   signal phi_io_we        : std_logic;
-   signal phi_io_read      : unsigned(WORD_SIZE-1 downto 0);
-   signal phi_io_ready     : std_logic;
-   signal phi_io_reading_r : std_logic:='0';
-   signal phi_io_addr      : unsigned(2 downto 0);
+    -- I/O & memory (ZPU)
+    signal mem_busy     : std_logic;
+    signal mem_read     : unsigned(WORD_SIZE-1 downto 0);
+    signal mem_write    : unsigned(WORD_SIZE-1 downto 0);
+    signal mem_addr     : unsigned(ADDR_W-1 downto 0);
+    signal mem_we       : std_logic;
+    signal mem_re       : std_logic;
+
+    -- Memory (SinglePort_RAM)
+    signal ram_busy     : std_logic;
+    signal ram_read     : unsigned(WORD_SIZE-1 downto 0);
+    signal ram_addr     : unsigned(BRAM_W-1 downto BYTE_BITS);
+    signal ram_we       : std_logic;
+    signal ram_re       : std_logic;
+    signal ram_ready_r  : std_logic:='0';
+
+    -- I/O (ZPU_IO)
+    signal phi_io_busy      : std_logic;
+    signal phi_io_re        : std_logic;
+    signal phi_io_we        : std_logic;
+    signal phi_io_read      : unsigned(WORD_SIZE-1 downto 0);
+    signal phi_io_ready     : std_logic;
+    signal phi_io_reading_r : std_logic:='0';
+    signal phi_io_addr      : unsigned(2 downto 0);
 
     -- I/O (zwishbone)
     signal zw_ena           : std_logic;
@@ -137,11 +147,15 @@ architecture Structural of gmZPU is
     signal wb_lock_o     : std_logic;
     signal wb_rty_i      : std_logic;
     signal wb_sel_o      : std_logic_vector(WORD_SIZE-1 downto 0);
-    signal wb_stb_o      : std_logic;
+    signal wb_stb_o      : std_logic_vector((2**CS_WIDTH)-1 downto 0);
     signal wb_tga_o      : unsigned(ADDR_W-4-CS_WIDTH downto 0);
     signal wb_tgc_o      : unsigned(WORD_SIZE-1 downto 0); -- size correct?
     signal wb_we_o       : std_logic;
-    
+   
+    -- interrupt
+    signal irq_r            : std_logic; 
+    signal zwc_irq_r        : std_logic;
+    signal int_r            : std_logic_vector(WORD_SIZE-1 downto 0);
 begin
    memory: SinglePortRAM
       generic map(
@@ -190,12 +204,13 @@ begin
             DATA_WIDTH => WORD_SIZE, ADR_WIDTH => ADDR_W-2, CS_WIDTH => 4
         )
         port map(
-            clk_i => clk_i, rst_i => rst_i, ena_i => zw_ena, busy_o => zw_busy, ready_o => zw_ready,
+            clk_i => clk_i, rst_i => rst_i, ena_i => zw_ena, busy_o => zw_busy, ready_o => zw_ready, irq_o => zwc_irq_r,
             adr_i => zw_addr, we_i => zw_we, dat_i => zw_dat_i, dat_o => zw_dat_o,
             wb_dat_i => wb_dat_i, wb_dat_o => wb_dat_o, 
             wb_tgd_i => wb_tgd_i, wb_tgd_o => wb_tgd_o, 
             wb_ack_i => wb_ack_i, wb_adr_o => wb_adr_o,
             wb_cyc_o => wb_cyc_o, wb_stall_i => wb_stall_i, wb_err_i => wb_err_i, wb_lock_o => wb_lock_o, wb_rty_i => wb_rty_i,
+            wb_stb_o => wb_stb_o,
             wb_sel_o => wb_sel_o,
             wb_tga_o => wb_tga_o,
             wb_tgc_o => wb_tgc_o, 
@@ -208,48 +223,66 @@ begin
     zw_addr <= mem_addr(ADDR_W-3 downto 0);
 
     zw_dat_i <= mem_write;
-    
 
-   zpu : ZPUMediumCore
-      generic map(
-         WORD_SIZE => WORD_SIZE, ADDR_W => ADDR_W, MEM_W => BRAM_W,
-         D_CARE_VAL => D_CARE_VAL)
-      port map(
-         clk_i => clk_i, reset_i => rst_i, interrupt_i => interrupt_i, enable_i => '1',
-         break_o => break_o, dbg_o => dbg_o,
-         -- Memory
-         mem_busy_i => mem_busy, data_i => mem_read, data_o => mem_write,
-         addr_o => mem_addr, write_en_o => mem_we, read_en_o => mem_re);
-   mem_busy <= (phi_io_busy or ram_busy) or zw_busy;
+    -- PIC on zwishbone cs 0
+    pic: interrupt_controller
+        generic map(ADR_WIDTH => ADDR_W-CS_WIDTH-3, DATA_WIDTH => WORD_SIZE, N_BANKS => 1)
+        port map(
+            irq_o => irq_r, int_i => int_r, rst_i => rst_i, clk_i => clk_i,
+            wb_dat_o => wb_dat_i, wb_dat_i => wb_dat_o, wb_tgd_o => wb_tgd_i, wb_tgd_i => wb_tgd_o,
+            wb_ack_o => wb_ack_i, wb_adr_i => wb_adr_o, wb_cyc_i => wb_cyc_o,
+            wb_stall_o => wb_stall_i, wb_err_o => wb_err_i, wb_lock_i => wb_lock_o, wb_rty_o => wb_rty_i,
+            wb_sel_i => wb_sel_o, wb_stb_i => wb_stb_o(WB_CS_PIC),
+            wb_tga_i => wb_tga_o, wb_tgc_i => wb_tgc_o,
+            wb_we_i => wb_we_o
+        );
 
-   -- Memory reads either come from IO or DRAM. We need to pick the right one.
-   memory_control:
-   process (ram_read, ram_ready_r, phi_io_ready, phi_io_read, zw_dat_o, zw_ready)
-   begin
-      mem_read <= (others => '0');
-      if ram_ready_r='1' then
-         mem_read <= ram_read;
-      end if;
-      if phi_io_ready='1' then
-         mem_read <= phi_io_read;
-      end if;
-      if zw_ready='1' then
-        mem_read <= unsigned(zw_dat_o);
-      end if;
-   end process memory_control;
+    -- interrupt line connect
+    int_r(WORD_SIZE-1 downto PIC_INT_UNUSED) <= (others => '0');
+    int_r(PIC_INT_EXT) <= interrupt_i;
+    int_r(PIC_INT_ZWC) <= zwc_irq_r;
 
-   memory_control_sync:
-   process (clk_i)
-   begin
-      if rising_edge(clk_i) then
-         if rst_i='1' then
-            phi_io_reading_r <= '0';
-            ram_ready_r  <= '0';
-         else
-            phi_io_reading_r <= phi_io_busy or phi_io_re;
-            ram_ready_r  <= ram_re;
-         end if;
-      end if;
-   end process memory_control_sync;
+    zpu : ZPUMediumCore
+       generic map(
+          WORD_SIZE => WORD_SIZE, ADDR_W => ADDR_W, MEM_W => BRAM_W,
+          D_CARE_VAL => D_CARE_VAL)
+       port map(
+          clk_i => clk_i, reset_i => rst_i, interrupt_i => irq_r, enable_i => '1',
+          break_o => break_o, dbg_o => dbg_o,
+          -- Memory
+          mem_busy_i => mem_busy, data_i => mem_read, data_o => mem_write,
+          addr_o => mem_addr, write_en_o => mem_we, read_en_o => mem_re);
+    mem_busy <= (phi_io_busy or ram_busy) or zw_busy;
+ 
+    -- Memory reads either come from IO or DRAM. We need to pick the right one.
+    memory_control:
+    process (ram_read, ram_ready_r, phi_io_ready, phi_io_read, zw_dat_o, zw_ready)
+    begin
+       mem_read <= (others => '0');
+       if ram_ready_r='1' then
+          mem_read <= ram_read;
+       end if;
+       if phi_io_ready='1' then
+          mem_read <= phi_io_read;
+       end if;
+       if zw_ready='1' then
+         mem_read <= unsigned(zw_dat_o);
+       end if;
+    end process memory_control;
+ 
+    memory_control_sync:
+    process (clk_i)
+    begin
+       if rising_edge(clk_i) then
+          if rst_i='1' then
+             phi_io_reading_r <= '0';
+             ram_ready_r  <= '0';
+          else
+             phi_io_reading_r <= phi_io_busy or phi_io_re;
+             ram_ready_r  <= ram_re;
+          end if;
+       end if;
+    end process memory_control_sync;
+
 end architecture Structural; -- Entity: gmZPU
 
