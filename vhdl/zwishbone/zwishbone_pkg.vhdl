@@ -59,6 +59,7 @@ package zwishbone is
                 we_i        : in std_logic;
                 dat_i       : in unsigned(DATA_WIDTH-1 downto 0);
                 dat_o       : out unsigned(DATA_WIDTH-1 downto 0);
+                irq_o       : out std_logic;
                 -- I/O decoder
                 --cs_o        : out std_logic_vector(CS_WIDTH-1 downto 0);
                 -- wishbone bus
@@ -110,6 +111,7 @@ package zwishbone is
                 -- syscon
                 clk_i       : in std_logic;
                 rst_i       : in std_logic;
+                irq_o       : out std_logic;
                 -- memory control
                 busy_o      : out std_logic;
                 ready_o     : out std_logic;

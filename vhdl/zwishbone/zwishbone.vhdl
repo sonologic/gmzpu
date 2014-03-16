@@ -48,6 +48,7 @@ entity zwishbone_c_regs is
         -- syscon
         clk_i       : in std_logic;
         rst_i       : in std_logic;
+        irq_o       : out std_logic;
         -- memory control
         busy_o      : out std_logic;
         ready_o     : out std_logic;
@@ -99,6 +100,8 @@ begin
     reg_status(1) <= rty_i;
     reg_status(2) <= to_r;
     reg_status(DATA_WIDTH-1 downto 3) <= (others => '0');
+    
+    irq_o <= err_i or rty_i or to_r;
 
     process(clk_i)
     begin
@@ -226,6 +229,7 @@ entity zwishbone_controller is
         we_i        : in std_logic;
         dat_i      : in unsigned(DATA_WIDTH-1 downto 0);
         dat_o      : out unsigned(DATA_WIDTH-1 downto 0);
+        irq_o       : out std_logic;
         -- I/O decoder
         --cs_o        : out std_logic_vector(CS_WIDTH-1 downto 0);
         -- wishbone bus
@@ -261,6 +265,7 @@ architecture rtl of zwishbone_controller is
                 -- syscon
                 clk_i       : in std_logic;
                 rst_i       : in std_logic;
+                irq_o       : out std_logic;
                 -- memory control
                 busy_o      : out std_logic;
                 ready_o     : out std_logic;
@@ -375,14 +380,13 @@ begin
         port map (
             clk_i => clk_i, rst_i => rst_i, en_i => reg_en, we_i => we_i,
             adr_i => radr, dat_i => dat_i, dat_o => dat_o, cfg_o => config,
-            err_i => status_err_r,
-            rty_i => status_rty_r,
+            err_i => status_err_r, rty_i => status_rty_r, irq_o => irq_o,
 	        busy_o => reg_busy_r, ready_o => reg_ready_r,
             to_rst_i => to_rst, to_inc_i => to_inc, to_o => timeout
         );
 
-    status_err_r <= '1';
-    status_rty_r <= '1';
+    status_err_r <= '0';
+    status_rty_r <= '0';
 
     dec : zwishbone_c_decode
         generic map (
