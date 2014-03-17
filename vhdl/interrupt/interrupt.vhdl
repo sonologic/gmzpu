@@ -169,11 +169,15 @@ architecture rtl of interrupt_regs is
     signal icr_we   : std_logic;
     --signal reading_r    : std_logic;
     signal ready_r      : std_logic;
+
+    signal dat_r        : unsigned(DATA_WIDTH-1 downto 0);
 begin
  
  
     -- we to interrupt lines when upstream we or reset 
     icr_we <= (en_i and we_i) or (rst_i);
+
+    dat_r  <= dat_i when rst_i='0' else (dat_r'range => '0');
  
     icr_generator: 
     for i in DATA_WIDTH-1 downto 0 generate
@@ -183,7 +187,7 @@ begin
                 int_i => int_i(i),
                 irq_o => irq(i),
                 icr_o => ICR(i),
-                icr_i => dat_i(i),
+                icr_i => dat_r(i),
                 imr_i => IMR(i),
                 ier_i => IER(i),
                 itr_i => ITR(i),
@@ -316,15 +320,13 @@ architecture rtl of interrupt_controller is
     signal adr_r    : unsigned(1 downto 0);
     signal ack_r    : std_logic;
 begin
-    -- enable on cycle and strobe
-    en_r  <= wb_cyc_i;
     -- and wb_stb_i;
 
     -- unsupported signals
-    wb_tgd_o <= (others => '0') when en_r='1' else (others => 'Z');
-    wb_stall_o <= '0' when en_r='1' else 'Z';
-    wb_err_o <= '0' when en_r='1' else 'Z';
-    wb_rty_o <= '0' when en_r='1' else 'Z';
+    wb_tgd_o <= (others => '0') when wb_cyc_i='1' else (others => 'Z');
+    wb_stall_o <= '0' when wb_cyc_i='1' else 'Z';
+    wb_err_o <= '0' when wb_cyc_i='1' else 'Z';
+    wb_rty_o <= '0' when wb_cyc_i='1' else 'Z';
 
     -- split address bus in cs (msb) and adr (lsb)
     cs_r  <= wb_adr_i(ADR_WIDTH-1 downto 2);
@@ -332,7 +334,7 @@ begin
 
     -- 
     ack_r    <= '0' when ready_r=(ready_r'range=>'0') else '1';
-    wb_ack_o <= en_r and ack_r;
+    wb_ack_o <= wb_cyc_i and ack_r;
 
     -- aggregate bank irq's into irq_o
     irq_o <= '0' when irq_r=(irq_r'range => '0') else '1';
@@ -352,13 +354,13 @@ begin
             );
     end generate reg_generator;
 
-    process(en_r,cs_r,rst_i)
+    process(wb_cyc_i,cs_r,rst_i)
     begin
             if rst_i='1' then
                 regen_r <= (others => '0');
             else
                 regen_r <= (others => '0');
-                if en_r='1' then
+                if wb_cyc_i='1' then
                     -- decode address
                     for i in N_BANKS-1 downto 0 loop
                         if cs_r = to_unsigned(i, cs_r'length) then
