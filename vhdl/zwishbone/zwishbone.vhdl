@@ -664,10 +664,10 @@ begin
 
         b_we_o <= we_i and en_i;
 
-        b_adr_o <= adr_i when (cyc_r = '1') else (others => '0');
+        b_adr_o <= adr_i when (cyc_r = '1' or en_i='1') else (others => '0');
         b_tgc_o <= (others => '0') when (cyc_r = '0') else (others => 'Z');
 
         dat_o <= b_dat_i when ( we_i='0' and b_ack_i='1' ) else (others => 'Z');
-        b_dat_o <= dat_i when ( we_i='1' and cyc_r='1' ) else (others => 'Z');
+        b_dat_o <= dat_i when ( we_i='1' and en_i='1' ) else (others => 'Z');
 
  end architecture rtl;
