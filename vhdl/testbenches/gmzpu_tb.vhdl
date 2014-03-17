@@ -129,7 +129,7 @@ begin
      interrupt <= '1';
      wait for 4 us;
      interrupt <= '0';
-     wait for 20 ms;
+     wait for 5 ms;
    end process do_intr;
 
    do_reset:
