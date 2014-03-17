@@ -316,11 +316,11 @@ architecture rtl of interrupt_controller is
     signal regen_r  : std_logic_vector(N_BANKS-1 downto 0);
     signal ready_r  : std_logic_vector(N_BANKS-1 downto 0);
     signal irq_r    : std_logic_vector(N_BANKS-1 downto 0);
-    signal cs_r     : unsigned(ADR_WIDTH-3 downto 0);
+    signal cs_r     : unsigned(ADR_WIDTH-5 downto 0);
     signal adr_r    : unsigned(1 downto 0);
     signal ack_r    : std_logic;
 begin
-    -- and wb_stb_i;
+    -- TODO: assert on address width < 6 (6 depends on N_BANKS)
 
     -- unsupported signals
     wb_tgd_o <= (others => '0') when wb_cyc_i='1' else (others => 'Z');
@@ -329,10 +329,11 @@ begin
     wb_rty_o <= '0' when wb_cyc_i='1' else 'Z';
 
     -- split address bus in cs (msb) and adr (lsb)
-    cs_r  <= wb_adr_i(ADR_WIDTH-1 downto 2);
-    adr_r <= wb_adr_i(1 downto 0);
+    cs_r  <= wb_adr_i(ADR_WIDTH-1 downto 4);
+    -- strip trailing byte addresses as reg address 32-bit words
+    adr_r <= wb_adr_i(3 downto 2);
 
-    -- 
+    -- ack propagation
     ack_r    <= '0' when ready_r=(ready_r'range=>'0') else '1';
     wb_ack_o <= wb_cyc_i and ack_r;
 
