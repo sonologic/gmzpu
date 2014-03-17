@@ -12,12 +12,14 @@ vcom -work gmzpu ../vhdl/interrupt/interrupt_pkg.vhdl
 vcom -work gmzpu ../vhdl/interrupt/interrupt.vhdl
 
 vlib zpu
+vcom -work zpu ../vhdl/roms/zwc_int_test.vhdl
+
 #vcom -work zpu ../vhdl/roms/hello_bram.vhdl
 #vcom -work zpu ../vhdl/roms/my_hello.vhdl
 #vcom -work zpu ../vhdl/roms/hello.vhdl
 #vcom -work zpu ../vhdl/roms/int_test.vhdl
-vcom -work zpu ../vhdl/roms/zwc_test.vhdl
 #vcom -work zpu ../vhdl/roms/hello_dbram.vhdl
+
 vcom -work zpu ../vhdl/roms/rom_pkg.vhdl
 
 vcom -work zpu ../vhdl/zpu_pkg.vhdl
