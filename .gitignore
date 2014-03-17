@@ -6,6 +6,10 @@ sim/zpu
 sim/work
 sim/wave.do
 roms/*/*.dis
+roms/*/*.bin
+roms/*/*.elf
+roms/*/*.ram
+roms/zwc_test/zwc_test.vhdl
 sim/*.vstf
 *.bak
 roms/hello/hello.vhdl
