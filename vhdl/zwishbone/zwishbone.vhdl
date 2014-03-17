@@ -385,8 +385,8 @@ begin
             to_rst_i => to_rst, to_inc_i => to_inc, to_o => timeout
         );
 
-    status_err_r <= '0';
-    status_rty_r <= '0';
+    status_err_r <= '1';
+    status_rty_r <= '1';
 
     dec : zwishbone_c_decode
         generic map (
@@ -607,22 +607,24 @@ end entity zwishbone_c_bus;
 
 architecture rtl of zwishbone_c_bus is
     signal cyc_r    : std_logic;
-    signal stb_r    : std_logic;
 begin
 
     decode_cs:
-    process(cs_i,stb_r,cyc_r)
+    process(cs_i,en_i,cyc_r)
         variable page_sel     : integer range 0 to (2**CS_WIDTH)-1;
     begin
         page_sel := to_integer(unsigned(cs_i));
 
         b_stb_o <= (others => '0');
-        b_stb_o(page_sel) <= stb_r and cyc_r;
+        b_stb_o(page_sel) <= en_i or cyc_r;
         -- adr_o <= ..
     end process;
 
     to_inc_o <= cyc_r;
     to_rst_o <= en_i;
+
+    -- cyc_o = cyc_r or en_i;
+
 
     process(clk_i)
     begin
@@ -656,12 +658,11 @@ begin
         b_tga_o <= (others => 'Z');
         b_lock_o <= '0';
 
-        b_cyc_o <= cyc_r;
+        b_cyc_o <= cyc_r or en_i;
         ready_o <= b_ack_i;
         busy_o <= en_i or cyc_r;
 
         b_we_o <= we_i and en_i;
-        stb_r <= en_i;
 
         b_adr_o <= adr_i when (cyc_r = '1') else (others => '0');
         b_tgc_o <= (others => '0') when (cyc_r = '0') else (others => 'Z');
