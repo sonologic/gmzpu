@@ -48,6 +48,9 @@ use IEEE.numeric_std.all;
 library gmzpu;
 use gmzpu.pic;
 
+library zpu;
+use zpu.txt_util.all;
+
 entity interrupt_line_TB is
 end entity interrupt_line_TB;
 
@@ -119,6 +122,7 @@ begin
     process
         variable cycle_count    : integer:=0;
     begin
+        print("Start test");
         for i in test_data'range loop
             int_i <= test_data(i).int_i;
             icr_i <= test_data(i).icr_i;
@@ -132,8 +136,8 @@ begin
             clk <= '0';
             wait for CLK_S_PER;
 
-            assert (irq_o = test_data(i).irq_o) report "irq_o output mismatch" severity failure;
-            assert (icr_o = test_data(i).icr_o) report "icr_o output mismatch" severity failure;
+            assert (irq_o = test_data(i).irq_o) report "irq_o output mismatch" severity error;
+            assert (icr_o = test_data(i).icr_o) report "icr_o output mismatch" severity error;
         end loop;
         clk <= '0';
         wait;
