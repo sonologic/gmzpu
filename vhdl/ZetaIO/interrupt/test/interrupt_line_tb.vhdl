@@ -90,11 +90,41 @@ architecture Behave of interrupt_line_TB is
             ('0','0','0','0','0','1',  '0','U'),
             ('0','0','0','0','0','0',  '0','0'),
             ('0','0','0','0','0','0',  '0','0'),
+            -- assert imr, then int_i
+            ('0','0','1','0','0','0',  '0','0'),
             ('1','0','1','0','0','0',  '0','0'),
             ('0','0','1','0','0','0',  '1','1'),
             ('0','0','1','0','0','0',  '1','1'),
             ('0','0','0','0','0','1',  '0','1'),
             ('0','0','0','0','0','0',  '0','0'),
+            -- rising edge
+            ('0','0','0','0','0','0',  '0','0'),
+            ('0','0','0','0','0','0',  '0','0'),
+            ('1','0','0','0','0','0',  '0','0'),
+            ('1','0','0','0','0','0',  '0','1'),
+            ('1','0','0','0','0','0',  '0','1'),
+            ('1','0','0','0','0','0',  '0','1'),
+            ('1','0','0','0','0','1',  '0','1'),
+            ('1','0','0','0','0','0',  '0','0'),
+            ('1','0','0','0','0','0',  '0','0'),
+            ('0','0','0','0','0','0',  '0','0'),
+            ('0','0','0','0','0','0',  '0','0'),
+            -- falling edge
+            ('0','0','0','1','0','0',  '0','0'),
+            ('0','0','0','1','0','0',  '0','0'),
+            ('1','0','0','1','0','0',  '0','0'),
+            ('1','0','0','1','0','0',  '0','0'),
+            ('1','0','0','1','0','0',  '0','0'),
+            ('1','0','0','1','0','0',  '0','0'),
+            ('1','0','0','1','0','0',  '0','0'),
+            ('0','0','0','1','0','0',  '0','1'),
+            ('0','0','0','1','0','0',  '0','1'),
+            ('0','0','0','1','0','1',  '0','1'),
+            ('0','0','0','1','0','0',  '0','0'),
+            ('0','0','0','1','0','0',  '0','0'),
+            
+
+            -- terminate
             ('0','0','0','0','0','0',  '0','0')
         );
         
@@ -110,6 +140,7 @@ architecture Behave of interrupt_line_TB is
     signal irq_o       : std_logic;
     signal icr_o       : std_logic;
 
+    signal valid       : std_logic;
 begin
     line : interrupt_line
         port map(int_i => int_i, icr_i => icr_i, imr_i => imr_i, ier_i => ier_i, itr_i => itr_i, we_i => we_i,
@@ -132,8 +163,16 @@ begin
             clk <= '0';
             wait for CLK_S_PER;
 
-            assert (irq_o = test_data(i).irq_o) report "irq_o output mismatch" severity failure;
-            assert (icr_o = test_data(i).icr_o) report "icr_o output mismatch" severity failure;
+            valid <= '1';
+            if irq_o/=test_data(i).irq_o then
+                valid <= 'Z';
+            end if;
+            if icr_o/=test_data(i).icr_o then
+                valid <= 'Z';
+            end if;
+
+            assert (irq_o = test_data(i).irq_o) report "irq_o output mismatch" severity error;
+            assert (icr_o = test_data(i).icr_o) report "icr_o output mismatch" severity error;
         end loop;
         clk <= '0';
         wait;

@@ -23,6 +23,7 @@ add wave -noupdate -expand -group internal /interrupt_line_tb/line/level
 add wave -noupdate -expand -group internal /interrupt_line_tb/line/set
 add wave -noupdate -expand -group internal /interrupt_line_tb/line/rst
 add wave -noupdate -expand -group internal /interrupt_line_tb/line/q
+add wave -noupdate /interrupt_line_tb/valid
 TreeUpdate [SetDefaultTree]
 WaveRestoreCursors {{Cursor 1} {5960 ps} 0}
 quietly wave cursor active 1
@@ -40,4 +41,4 @@ configure wave -griddelta 40
 configure wave -timeline 0
 configure wave -timelineunits ms
 update
-WaveRestoreZoom {0 ps} {120097 ps}
+WaveRestoreZoom {545908 ps} {666005 ps}
