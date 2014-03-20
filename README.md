@@ -5,7 +5,7 @@ gmZPU is a System-on-Chip (SoC) core based on the zpu medium core.
 
 In progress:
 - implement wishbone controller
-- add interrupt controller
+- implement non-interactive unit test suite
 
 Todo:
 - implement synthesizable PhiIO
@@ -14,6 +14,10 @@ Todo:
 - add process contexts
 - virtual memory
 - add dma
+
+Done:
+- add interrupt controller
+
 
 Goals:
 - for me to learn vhdl
