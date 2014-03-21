@@ -1,4 +1,4 @@
-set BreakOnAssertion 1
+#set BreakOnAssertion 1
 
 vlib gmzpu
 vcom -work gmzpu ../interrupt_pkg.vhdl
