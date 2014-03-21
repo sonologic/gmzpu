@@ -57,59 +57,53 @@ entity interrupt_line is
 end entity interrupt_line;
 
 architecture rtl of interrupt_line is
-    signal rising   : std_logic;
-    signal falling  : std_logic;
-    signal level    : std_logic;
-    signal set      : std_logic;
-    signal rst      : std_logic;
     signal q        : std_logic;
-    signal prev_q   : std_logic;
+    signal sample_r : std_logic;
 begin
 
     edge_triggered:
-    process(int_i,we_i)
-        -- edge triggered checks
-    begin
-        rising <= '0';
-        falling <= '0';
-
-        if rising_edge(int_i) then
-            rising <= '1';
-        elsif falling_edge(int_i) then
-            falling <= '0';
-        end if;
-
-        if we_i='1' then
-            rising <= '0';
-            falling <= '0';
-        end if;
-    end process;
-
-    -- level triggered
-    level <= itr_i and int_i;
-
-    -- flipflop inputs
-    set <= level or (not itr_i and ((rising and not ier_i) or (falling and ier_i)));
-
-    rst <= we_i and not icr_i;
-
-
-    flipflop:
     process(clk_i)
-        -- output flipflop
+        variable rising_r   : std_logic;
+        variable falling_r  : std_logic;
+        variable level_r    : std_logic;
     begin
-        if rising_edge(clk_i) then
-            if set='1' then
-                q <= '1';
-                prev_q <= '1';
-            elsif rst='1' then
-                q <= '0';
-                prev_q <= '0';
+        rising_r := '0';
+        falling_r := '0';
+
+        if we_i='0' then
+            if sample_r='0' then
+                if int_i='1' then
+                    rising_r := '1';
+                end if;
             else
-                q <= prev_q;
-                prev_q <= q;
+                if int_i='0' then
+                    falling_r := '1';
+                end if;
+            end if;
+
+            level_r := itr_i and int_i;
+
+            if itr_i='0' then
+                if rising_r='1' and ier_i='0' then
+                    q <= '1';
+                elsif falling_r='1' and ier_i='1' then
+                    q <= '1';
+                end if;
+            else --if itr='1' then
+                if level_r='1' then
+                    q <= '1';
+                else
+                    q <= '0';
+                end if;
+            end if;
+        else
+            -- we_i='1'
+            if icr_i='0' then
+                q <= '0';
             end if;
         end if;
+
+        sample_r <= int_i;
     end process;
 
     -- output
