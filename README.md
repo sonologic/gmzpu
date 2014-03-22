@@ -8,6 +8,7 @@ In progress:
 - implement non-interactive unit test suite
 
 Todo:
+- fix timer reg mem timing
 - implement synthesizable PhiIO
 - increase address width
 - add memory management
