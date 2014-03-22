@@ -1,0 +1,21 @@
+set BreakOnAssertion 1
+
+vlib gmzpu
+vcom -work gmzpu ../interrupt_pkg.vhdl
+vcom -work gmzpu ../interrupt.vhdl
+
+vlib work
+vcom -work work pic_tb.vhdl
+
+# run tb
+vsim pic_TB
+
+view wave
+
+do wave/wave_pic.do
+
+view structure
+view signals
+
+run -all
+
