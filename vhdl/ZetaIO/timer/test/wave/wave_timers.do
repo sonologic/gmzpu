@@ -17,9 +17,8 @@ add wave -noupdate -expand -group dut -radix hexadecimal /timers_tb/dut/dat_i
 add wave -noupdate -expand -group dut -radix hexadecimal /timers_tb/dut/dat_o
 add wave -noupdate -expand -group dut /timers_tb/dut/irq_o
 add wave -noupdate -expand -group dut /timers_tb/dut/irq_r
-add wave -noupdate -expand -group dut /timers_tb/dut/re_r
-add wave -noupdate -expand -group dut /timers_tb/dut/we_r
 add wave -noupdate -expand -group dut -radix binary /timers_tb/dut/cs_r
+add wave -noupdate -expand -group dut /timers_tb/dut/ten_r
 add wave -noupdate -expand -group dut -group timer3 /timers_tb/dut/timer_gen(3)/timerX/clk_i
 add wave -noupdate -expand -group dut -group timer3 /timers_tb/dut/timer_gen(3)/timerX/rst_i
 add wave -noupdate -expand -group dut -group timer3 /timers_tb/dut/timer_gen(3)/timerX/inc_i
