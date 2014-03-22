@@ -27,7 +27,7 @@ for d in `find $PWD -type d -name test`; do
             OK=$(( ${OK} + 1 ))
         else
             echo -e "\r[${RED}FAIL${NO}"
-            FAIL=$(( ${OK} + 1 ))
+            FAIL=$(( ${FAIL} + 1 ))
         fi
         cd ${d}
         #cd ${OLDDIR}
