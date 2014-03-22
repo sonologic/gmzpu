@@ -306,7 +306,6 @@ architecture rtl of interrupt_controller is
         );
     end component interrupt_regs;
 
-    signal en_r     : std_logic;
     signal regen_r  : std_logic_vector(N_BANKS-1 downto 0);
     signal ready_r  : std_logic_vector(N_BANKS-1 downto 0);
     signal irq_r    : std_logic_vector(N_BANKS-1 downto 0);
