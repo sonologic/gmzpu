@@ -16,12 +16,30 @@ package timer is
             dat_o   : out unsigned(DATA_WIDTH-1 downto 0);
             dat_i   : in unsigned(DATA_WIDTH-1 downto 0);
             we_i    : in std_logic;
-            re_i    : in std_logic;
+            en_i    : in std_logic;
             thresh_o: out std_logic;
             th_hlt_i  : in std_logic;     -- halt when threshold reached
             th_rst_i  : in std_logic;     -- reset when threshold reached
             th_stk_i  : in std_logic      -- sticky threshold
         );
     end component timer;
+
+    component timers is
+        generic (
+            DATA_WIDTH : natural:=32;
+            ADR_WIDTH : natural:=4;
+            N_TIMERS  : natural:=4
+        );
+        port (
+            clk_i       : in std_logic;
+            rst_i       : in std_logic;
+            we_i        : in std_logic;
+            en_i        : in std_logic;
+            addr_i      : in unsigned(ADR_WIDTH-1 downto 0);
+            dat_i       : in unsigned(DATA_WIDTH-1 downto 0);
+            dat_o       : out unsigned(DATA_WIDTH-1 downto 0);
+            irq_o       : out std_logic
+        );
+    end component timers;
 
 end package timer;

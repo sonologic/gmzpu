@@ -70,7 +70,7 @@ architecture Behave of timer_TB is
             dat_o   : out unsigned(DATA_WIDTH-1 downto 0);
             dat_i   : in unsigned(DATA_WIDTH-1 downto 0);
             we_i    : in std_logic;
-            re_i    : in std_logic;
+            en_i    : in std_logic;
             thresh_o: out std_logic;
             th_hlt_i  : in std_logic;     -- halt when threshold reached
             th_rst_i  : in std_logic;     -- reset when threshold reached
@@ -86,7 +86,7 @@ architecture Behave of timer_TB is
         addr_i      : unsigned(ADR_WIDTH-1 downto 0);
         dat_i       : unsigned(DATA_WIDTH-1 downto 0);
         we_i        : std_logic;
-        re_i        : std_logic;
+        en_i        : std_logic;
         th_hlt_i    : std_logic;
         th_rst_i    : std_logic;
         th_stk_i    : std_logic;
@@ -97,11 +97,11 @@ architecture Behave of timer_TB is
     type sample_array is array(natural range <>) of sample;
     constant test_data : sample_array :=
         (
-        --   rst inc addr   dat_i        we   re   hlt  rst  stk    dat_o        thr
+        --   rst inc addr   dat_i        we   en   hlt  rst  stk    dat_o        thr
             ('1','0',"000", X"00000000", '0', '0', '0', '0', '0',   X"00000000", '0'),
             ('1','0',"000", X"00000000", '0', '0', '0', '0', '0',   X"00000000", '0'),
             ('0','0',"000", X"00000000", '0', '0', '0', '0', '0',   X"00000000", '0'),
-            ('0','0',"001", X"00000004", '1', '0', '0', '0', '0',   X"00000000", '0'),
+            ('0','0',"001", X"00000004", '1', '1', '0', '0', '0',   X"00000000", '0'),
             -- 1
             ('0','1',"000", X"00000000", '0', '0', '0', '0', '0',   X"00000000", '0'),
             ('0','0',"000", X"00000000", '0', '0', '0', '0', '0',   X"00000000", '0'),
@@ -158,7 +158,7 @@ architecture Behave of timer_TB is
     signal dat_o   : unsigned(DATA_WIDTH-1 downto 0);
     signal dat_i   : unsigned(DATA_WIDTH-1 downto 0);
     signal we_i    : std_logic;
-    signal re_i    : std_logic;
+    signal en_i    : std_logic;
     signal thresh_o: std_logic;
     signal th_hlt_i  : std_logic;     -- halt when threshold reached
     signal th_rst_i  : std_logic;     -- reset when threshold reached
@@ -168,7 +168,7 @@ begin
     dut : timer
         generic map(ADR_WIDTH => ADR_WIDTH, DATA_WIDTH => DATA_WIDTH)
         port map(clk_i => clk, inc_i => inc_i, rst_i => rst_i, addr_i => addr_i, dat_o => dat_o, dat_i => dat_i,
-                we_i => we_i, re_i => re_i, thresh_o => thresh_o, th_hlt_i => th_hlt_i,
+                we_i => we_i, en_i => en_i, thresh_o => thresh_o, th_hlt_i => th_hlt_i,
                 th_rst_i => th_rst_i, th_stk_i => th_stk_i);
 
     process
@@ -180,7 +180,7 @@ begin
             addr_i <= test_data(i).addr_i;
             dat_i <= test_data(i).dat_i;
             we_i <= test_data(i).we_i;
-            re_i <= test_data(i).re_i;
+            en_i <= test_data(i).en_i;
             th_hlt_i <= test_data(i).th_hlt_i;
             th_rst_i <= test_data(i).th_rst_i;
             th_stk_i <= test_data(i).th_stk_i;

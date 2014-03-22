@@ -15,7 +15,7 @@ entity timer is
         dat_o   : out unsigned(DATA_WIDTH-1 downto 0);
         dat_i   : in unsigned(DATA_WIDTH-1 downto 0);
         we_i    : in std_logic;
-        re_i    : in std_logic;
+        en_i    : in std_logic;
         thresh_o: out std_logic;
         th_hlt_i  : in std_logic;     -- halt when threshold reached
         th_rst_i  : in std_logic;     -- reset when threshold reached
@@ -24,49 +24,41 @@ entity timer is
 end entity timer;
 
 architecture rtl of timer is
+    -- single timer
+    -- registers:
+    --  CNT     0x0
+    --  THR     0x1
+    -- output:
+    --  thresh_o
     signal CNT      : unsigned(DATA_WIDTH-1 downto 0);
     signal THR      : unsigned(DATA_WIDTH-1 downto 0);
     signal halt_r   : std_logic;
     signal thresh_r : std_logic;
 begin
 
-    process(clk_i,rst_i)
+    process(clk_i)
     begin
-        if rst_i='1' then
-            --CNT <= (others => '0');
-            THR <= (others => '1');
-            dat_o <= (others => 'Z');
-            --thresh_r <= '0';
-        elsif rising_edge(clk_i) then
-            -- count and compare
-            --if halt_r='0' then
-            --    CNT <= CNT + to_unsigned(1, CNT'length);
-            --end if;
-            --if CNT>=THR then
-            --    -- set threshold output
-            --    thresh_r <= '1';
-            --else
-            --    -- reset threshold output (if not sticky)
-            --    if th_stk_i='0' and thresh_r='1' then
-            --        thresh_r <= '0';
-            --    end if;
-            --end if;
-
-            -- mem i/o
-            dat_o <= (others => 'Z');
-            if we_i='1' then
-                --if addr_i=to_unsigned(0,ADR_WIDTH) then
-                --    CNT <= dat_i;
-                if addr_i=to_unsigned(1,ADR_WIDTH) then
-                    THR <= dat_i;
-                end if;
-            elsif re_i='1' then
-                if addr_i=to_unsigned(0,ADR_WIDTH) then
-                    dat_o <= CNT;
-                elsif addr_i=to_unsigned(1,ADR_WIDTH) then
-                    dat_o <= THR;
-                end if;
-            end if;     
+        if rising_edge(clk_i) then
+            if rst_i='1' then
+                dat_o <= (others => 'Z');
+                THR <= (others => '1');
+            elsif en_i='1' then 
+                -- mem i/o
+                dat_o <= (others => 'Z');
+                if we_i='1' then
+                    if addr_i=to_unsigned(1,ADR_WIDTH) then
+                        THR <= dat_i;
+                    end if;
+                else
+                    if addr_i=to_unsigned(0,ADR_WIDTH) then
+                        dat_o <= CNT;
+                    elsif addr_i=to_unsigned(1,ADR_WIDTH) then
+                        dat_o <= THR;
+                    end if;
+                end if;     
+            else
+                dat_o <= (others => 'Z');
+            end if;
         end if;
     end process;
 
@@ -117,8 +109,8 @@ entity timers is
     port (
         clk_i       : in std_logic;
         rst_i       : in std_logic;
+        en_i        : in std_logic;
         we_i        : in std_logic;
-        re_i        : in std_logic;
         addr_i      : in unsigned(ADR_WIDTH-1 downto 0);
         dat_i       : in unsigned(DATA_WIDTH-1 downto 0);
         dat_o       : out unsigned(DATA_WIDTH-1 downto 0);
@@ -139,8 +131,8 @@ architecture rtl of timers is
             addr_i  : in unsigned(ADR_WIDTH-1 downto 0);
             dat_o   : out unsigned(DATA_WIDTH-1 downto 0);
             dat_i   : in unsigned(DATA_WIDTH-1 downto 0);
+            en_i    : in std_logic;
             we_i    : in std_logic;
-            re_i    : in std_logic;
             thresh_o: out std_logic;
             th_hlt_i  : in std_logic;     -- halt when threshold reached
             th_rst_i  : in std_logic;     -- reset when threshold reached
@@ -149,8 +141,7 @@ architecture rtl of timers is
     end component timer;
 
     signal irq_r    : std_logic_vector(N_TIMERS-1 downto 0);
-    signal re_r     : std_logic_vector(N_TIMERS-1 downto 0);
-    signal we_r     : std_logic_vector(N_TIMERS-1 downto 0);
+    signal ten_r    : std_logic_vector(N_TIMERS-1 downto 0);
     signal cs_r     : unsigned(ADR_WIDTH-3 downto 0);
 begin
     timer_gen: for i in N_TIMERS-1 downto 0 generate
@@ -159,25 +150,94 @@ begin
             port map(clk_i => clk_i, rst_i => rst_i, inc_i => clk_i,
                      addr_i => addr_i(1 downto 0), thresh_o => irq_r(i),
                      dat_o => dat_o, dat_i => dat_i,
-                     we_i => we_r(i), re_i => re_r(i),
+                     we_i => we_i, en_i => ten_r(i),
                      th_hlt_i => '0', th_rst_i => '1', th_stk_i => '1');
     end generate;
 
-    irq_o <= '0' when irq_r=(irq_r'range => '0') else '1';
+    irq_o <= '0' when irq_r=(irq_r'range => '0') or rst_i='1' else '1';
     
     cs_r <= addr_i(ADR_WIDTH-1 downto 2);
 
     chip_select:
-    process(cs_r)
-        variable shift : integer;
+    process(en_i,cs_r,rst_i)
     begin
-        we_r <= (others => '0');
-        re_r <= (others => '0');
-
-        shift := 2**to_integer(cs_r);
-
-        we_r(shift) <= we_i;
-        re_r(shift) <= re_i;
-    end process;
+            if rst_i='1' then
+                ten_r <= (others => '0');
+            else
+                ten_r <= (others => '0');
+                if en_i='1' then
+                    -- decode address
+                    for i in N_TIMERS-1 downto 0 loop
+                        if cs_r = to_unsigned(i, cs_r'length) then
+                            ten_r(i) <= '1';
+                        end if;
+                    end loop;
+                end if;
+            end if;
+    end process chip_select;
 
 end architecture rtl;
+
+library IEEE;
+use IEEE.std_logic_1164.all;
+use IEEE.numeric_std.all;
+
+entity wb_timer is
+    generic (
+        DATA_WIDTH : natural:=32;
+        ADR_WIDTH : natural:=4;
+        N_TIMERS  : natural:=4
+    );
+    port (
+        -- wishbone bus
+        rst_i         : in std_logic;
+        clk_i         : in std_logic;
+        wb_dat_o      : out unsigned(DATA_WIDTH-1 downto 0);
+        wb_dat_i      : in unsigned(DATA_WIDTH-1 downto 0);
+        wb_tgd_o      : out unsigned(DATA_WIDTH-1 downto 0);
+        wb_tgd_i      : in unsigned(DATA_WIDTH-1 downto 0);
+        wb_ack_o      : out std_logic;
+        wb_adr_i      : in unsigned(ADR_WIDTH-1 downto 0);
+        wb_cyc_i      : in std_logic;
+        wb_stall_o    : out std_logic;
+        wb_err_o      : out std_logic;
+        wb_lock_i     : in std_logic;
+        wb_rty_o      : out std_logic;
+        wb_sel_i      : in std_logic_vector(DATA_WIDTH-1 downto 0);
+        wb_stb_i      : in std_logic;
+        wb_tga_i      : in unsigned(ADR_WIDTH-1 downto 0);
+        wb_tgc_i      : in unsigned(DATA_WIDTH-1 downto 0); -- size correct?
+        wb_we_i       : in std_logic;
+        -- non wishbone
+        irq_o         : out std_logic
+    );
+end entity wb_timer;
+
+architecture rtl of wb_timer is
+    component timers is
+        generic (
+            DATA_WIDTH : natural:=32;
+            ADR_WIDTH : natural:=4;
+            N_TIMERS  : natural:=4
+        );
+        port (
+            clk_i       : in std_logic;
+            rst_i       : in std_logic;
+            we_i        : in std_logic;
+            re_i        : in std_logic;
+            addr_i      : in unsigned(ADR_WIDTH-1 downto 0);
+            dat_i       : in unsigned(DATA_WIDTH-1 downto 0);
+            dat_o       : out unsigned(DATA_WIDTH-1 downto 0);
+            irq_o       : out std_logic
+        );
+    end component timers;
+
+begin
+    controller : timers
+        generic map ( DATA_WIDTH => DATA_WIDTH, ADR_WIDTH => ADR_WIDTH, N_TIMERS => N_TIMERS )
+        port map ( clk_i => clk_i, rst_i => rst_i,
+                   we_i => wb_we_i, re_i => wb_stb_i, addr_i => wb_adr_i,
+                   dat_i => wb_dat_i, dat_o => wb_dat_o, irq_o => irq_o );
+
+end architecture rtl;
+
