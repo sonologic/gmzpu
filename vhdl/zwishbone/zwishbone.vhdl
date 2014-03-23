@@ -526,7 +526,6 @@ architecture zwc_decode of zwishbone_c_decode is
     signal en_r     : std_logic;
     signal re_r     : std_logic;
     signal we_r     : std_logic;
-    signal cs_r     : unsigned(CS_WIDTH-1 downto 0);
     signal adr      : unsigned(ADR_WIDTH-1 downto 0);
     signal io_adr_r : unsigned(ADR_WIDTH-CS_WIDTH-2 downto 0);
 begin
@@ -546,9 +545,7 @@ begin
     reg_en_o <= reg_en_r;
 
     -- chip select
-    cs_r <= adr_i(ADR_WIDTH-2 downto ADR_WIDTH-CS_WIDTH-1);
-
-    cs_o <= cs_r;
+    cs_o <= adr_i(ADR_WIDTH-2 downto ADR_WIDTH-CS_WIDTH-1);
 
     -- bus and register address
     io_adr_r <= adr_i(ADR_WIDTH-CS_WIDTH-2 downto 0);
@@ -609,16 +606,10 @@ architecture rtl of zwishbone_c_bus is
     signal cyc_r    : std_logic;
 begin
 
-    decode_cs:
-    process(cs_i,en_i,cyc_r)
-        variable page_sel     : integer range 0 to (2**CS_WIDTH)-1;
-    begin
-        page_sel := to_integer(unsigned(cs_i));
-
-        b_stb_o <= (others => '0');
-        b_stb_o(page_sel) <= en_i or cyc_r;
-        -- adr_o <= ..
-    end process;
+    decode_cs: for i in b_stb_o'range generate
+        b_stb_o(i) <= en_i or cyc_r when i=to_integer(cs_i) else '0';
+    end generate;
+    
 
     to_inc_o <= cyc_r;
     to_rst_o <= en_i;
