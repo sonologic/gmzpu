@@ -92,7 +92,7 @@ architecture Behave of gmZPU_TB is
    signal rs232_tx     : std_logic;
    signal rs232_rx     : std_logic;
 begin
-   zpu : gmZPU
+   soc : gmZPU
       generic map(
          WORD_SIZE => WORD_SIZE, D_CARE_VAL => D_CARE_VAL,
          CLK_FREQ => CLK_FREQ, BRATE => BRATE, ADDR_W => ADDR_W,

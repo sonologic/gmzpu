@@ -8,8 +8,14 @@ set BreakOnAssertion 1
 vlib gmzpu
 vcom -work gmzpu ../vhdl/zwishbone/zwishbone_pkg.vhdl
 vcom -work gmzpu ../vhdl/zwishbone/zwishbone.vhdl
-vcom -work gmzpu ../vhdl/interrupt/interrupt_pkg.vhdl
-vcom -work gmzpu ../vhdl/interrupt/interrupt.vhdl
+vcom -work gmzpu ../vhdl/gmzpu/gmzpu_pkg.vhdl
+vcom -work gmzpu ../vhdl/gmzpu/zwc.vhdl
+
+vlib zetaio
+vcom -work zetaio ../vhdl/ZetaIO/interrupt/interrupt_pkg.vhdl
+vcom -work zetaio ../vhdl/ZetaIO/interrupt/interrupt.vhdl
+vcom -work zetaio ../vhdl/ZetaIO/timer/timer_pkg.vhdl
+vcom -work zetaio ../vhdl/ZetaIO/timer/timer.vhdl
 
 vlib zpu
 vcom -work zpu ../vhdl/roms/zwc_int_test.vhdl
@@ -26,7 +32,8 @@ vcom -work zpu ../vhdl/zpu_pkg.vhdl
 #vcom -work zpu ../vhdl/zpu_small.vhdl
 vcom -work zpu ../vhdl/zpu_medium.vhdl
 
-vcom -work zpu ../vhdl/helpers/gmzpu.vhdl
+vcom -work zpu ../vhdl/gmzpu/gmzpu.vhdl
+
 #vcom -work zpu ../vhdl/helpers/zpu_small1.vhdl
 
 vcom -work zpu  ../vhdl/devices/txt_util.vhdl
@@ -48,6 +55,7 @@ vsim gmZPU_TB
 view wave
 
 do wave_gmzpu.do
+#add wave -recursive *
 
 view structure
 
