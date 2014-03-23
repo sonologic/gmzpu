@@ -37,38 +37,31 @@ architecture rtl of timer is
     signal dat_en_r : std_logic;
 begin
 
+    -- enable dat_o when not in reset and read enable
     dat_en_r <= (not rst_i) and en_i and (not we_i);
-
+    -- assign register or high-z to dat_o
     dat_o <= CNT when dat_en_r='1' and addr_i=to_unsigned(0,ADR_WIDTH) else
              THR when dat_en_r='1' and addr_i=to_unsigned(1,ADR_WIDTH) else
              (others => 'Z');
 
+    write_thr:
     process(clk_i)
     begin
         if rising_edge(clk_i) then
             if rst_i='1' then
---                dat_o <= (others => 'Z');
                 THR <= (others => '1');
             elsif en_i='1' then 
                 -- mem i/o
-                --dat_o <= (others => 'Z');
                 if we_i='1' then
                     if addr_i=to_unsigned(1,ADR_WIDTH) then
                         THR <= dat_i;
                     end if;
-                --else
-                --    if addr_i=to_unsigned(0,ADR_WIDTH) then
-                --        dat_o <= CNT;
-                --    elsif addr_i=to_unsigned(1,ADR_WIDTH) then
-                --        dat_o <= THR;
-                --    end if;
                 end if;     
-            --else
-            --    dat_o <= (others => 'Z');
             end if;
         end if;
-    end process;
+    end process write_thr;
 
+    counter:
     process(inc_i,rst_i)
         variable newCNT : unsigned(DATA_WIDTH-1 downto 0);
     begin
@@ -96,10 +89,11 @@ begin
                 end if;
             end if;
         end if;
-    end process;
+    end process counter;
 
     thresh_o <= thresh_r;
 
+    -- halt counter when th_hlt_i asserted and threshold detected
     halt_r <= th_hlt_i and thresh_r;
 end architecture rtl;
        
@@ -154,9 +148,10 @@ architecture rtl of timers is
     signal addr_r   : unsigned(ADR_WIDTH-1 downto 0);
     signal en_r     : std_logic;
     signal we_r     : std_logic;
-    signal we_rr    : std_logic;
+    signal dat_r    : unsigned(DATA_WIDTH-1 downto 0);
+    -- delayed signals
+    signal we_d     : std_logic;
     signal dat_d    : unsigned(DATA_WIDTH-1 downto 0);
-    signal dat_dd   : unsigned(DATA_WIDTH-1 downto 0);
     signal addr_d   : unsigned(ADR_WIDTH-1 downto 0);
 begin
     timer_gen: for i in N_TIMERS-1 downto 0 generate
@@ -164,8 +159,8 @@ begin
             generic map(ADR_WIDTH => 2, DATA_WIDTH => DATA_WIDTH)
             port map(clk_i => clk_i, rst_i => rst_i, inc_i => clk_i,
                      addr_i => addr_d(1 downto 0), thresh_o => irq_r(i),
-                     dat_o => dat_o, dat_i => dat_dd,
-                     we_i => we_rr, en_i => ten_r(i),
+                     dat_o => dat_o, dat_i => dat_d,
+                     we_i => we_d, en_i => ten_r(i),
                      th_hlt_i => '0', th_rst_i => '1', th_stk_i => '1');
     end generate;
 
@@ -174,17 +169,18 @@ begin
     process(clk_i)
     begin
         if rising_edge(clk_i) then
-            addr_d <= addr_r;
+            -- clock in input signals
             addr_r <= addr_i;
-
             en_r <= en_i;
-
-            we_rr <= we_r;
             we_r <= we_i;
+            dat_r <= dat_i;
 
-            dat_dd <= dat_d;
-            dat_d <= dat_i;
+            -- delay signals to allow chip select to settle
+            addr_d <= addr_r;
+            we_d <= we_r;
+            dat_d <= dat_r;
 
+            -- decode cs_i to ten_r
             for i in ten_r'range loop
                 if i=cs_r then
                     ten_r(i) <= en_r and not rst_i;
