@@ -4,6 +4,7 @@ transcript
 sim/gmzpu
 sim/zpu
 sim/work
+sim/zetaio
 sim/wave.do
 roms/*/*.dis
 roms/*/*.bin
