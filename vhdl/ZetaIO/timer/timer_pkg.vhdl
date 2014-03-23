@@ -2,7 +2,7 @@ library IEEE;
 use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all;
 
-package timer is
+package tim is
     component timer is
         generic (
             ADR_WIDTH : natural:=3;
@@ -55,4 +55,4 @@ package timer is
         );
     end component timers;
 
-end package timer;
+end package tim;
