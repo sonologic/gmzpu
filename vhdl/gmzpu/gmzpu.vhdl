@@ -53,7 +53,11 @@ use zpu.zpupkg.all;
 
 library gmzpu;
 use gmzpu.zwishbone.all;
-use gmzpu.pic.all;
+use gmzpu.soc.all;
+
+library zetaio;
+use zetaio.pic.all;
+use zetaio.tim.all;
 
 -- RAM declaration
 library work;
@@ -95,9 +99,9 @@ architecture Structural of gmZPU is
     constant WB_CS_PIC  : natural:=0;
 
     -- PIC interrupt mapping
-    constant PIC_INT_EXT    : natural:=0;
-    constant PIC_INT_ZWC    : natural:=1;
-    constant PIC_INT_UNUSED : natural:=2;
+    --constant PIC_INT_EXT    : natural:=0;
+    --constant PIC_INT_ZWC    : natural:=1;
+    --constant PIC_INT_UNUSED : natural:=2;
    
 
     -- I/O & memory (ZPU)
@@ -154,8 +158,6 @@ architecture Structural of gmZPU is
    
     -- interrupt
     signal irq_r            : std_logic; 
-    signal zwc_irq_r        : std_logic;
-    signal int_r            : std_logic_vector(WORD_SIZE-1 downto 0);
 begin
    memory: SinglePortRAM
       generic map(
@@ -199,22 +201,14 @@ begin
    phi_io_ready <= (phi_io_reading_r or phi_io_re) and not phi_io_busy;
 
     -- I/O: zwishbone
-    zwc: zwishbone_controller
+    zwc0: zwc
         generic map(
             DATA_WIDTH => WORD_SIZE, ADR_WIDTH => ADDR_W-2, CS_WIDTH => 4
         )
         port map(
-            clk_i => clk_i, rst_i => rst_i, ena_i => zw_ena, busy_o => zw_busy, ready_o => zw_ready, irq_o => zwc_irq_r,
+            clk_i => clk_i, rst_i => rst_i, ena_i => zw_ena, busy_o => zw_busy, ready_o => zw_ready, irq_o => irq_r,
             adr_i => zw_addr, we_i => zw_we, dat_i => zw_dat_i, dat_o => zw_dat_o,
-            wb_dat_i => wb_dat_i, wb_dat_o => wb_dat_o, 
-            wb_tgd_i => wb_tgd_i, wb_tgd_o => wb_tgd_o, 
-            wb_ack_i => wb_ack_i, wb_adr_o => wb_adr_o,
-            wb_cyc_o => wb_cyc_o, wb_stall_i => wb_stall_i, wb_err_i => wb_err_i, wb_lock_o => wb_lock_o, wb_rty_i => wb_rty_i,
-            wb_stb_o => wb_stb_o,
-            wb_sel_o => wb_sel_o,
-            wb_tga_o => wb_tga_o,
-            wb_tgc_o => wb_tgc_o, 
-            wb_we_o => wb_we_o
+            int_i => interrupt_i
         );
     -- ADDR_W = 18, IO_BIT = 17, ZW_BIT = 16
     zw_we  <= mem_we and mem_addr(IO_BIT) and mem_addr(ZW_BIT);
@@ -224,23 +218,10 @@ begin
 
     zw_dat_i <= mem_write;
 
-    -- PIC on zwishbone cs 0
-    pic: interrupt_controller
-        generic map(ADR_WIDTH => ADDR_W-CS_WIDTH-3, DATA_WIDTH => WORD_SIZE, N_BANKS => 1)
-        port map(
-            irq_o => irq_r, int_i => int_r, rst_i => rst_i, clk_i => clk_i,
-            wb_dat_o => wb_dat_i, wb_dat_i => wb_dat_o, wb_tgd_o => wb_tgd_i, wb_tgd_i => wb_tgd_o,
-            wb_ack_o => wb_ack_i, wb_adr_i => wb_adr_o, wb_cyc_i => wb_cyc_o,
-            wb_stall_o => wb_stall_i, wb_err_o => wb_err_i, wb_lock_i => wb_lock_o, wb_rty_o => wb_rty_i,
-            wb_sel_i => wb_sel_o, wb_stb_i => wb_stb_o(WB_CS_PIC),
-            wb_tga_i => wb_tga_o, wb_tgc_i => wb_tgc_o,
-            wb_we_i => wb_we_o
-        );
-
     -- interrupt line connect
-    int_r(WORD_SIZE-1 downto PIC_INT_UNUSED) <= (others => '0');
-    int_r(PIC_INT_EXT) <= interrupt_i;
-    int_r(PIC_INT_ZWC) <= zwc_irq_r;
+    --int_r(WORD_SIZE-1 downto PIC_INT_UNUSED) <= (others => '0');
+    --int_r(PIC_INT_EXT) <= interrupt_i;
+    --int_r(PIC_INT_ZWC) <= zwc_irq_r;
 
     zpu : ZPUMediumCore
        generic map(
