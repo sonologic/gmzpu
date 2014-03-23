@@ -65,7 +65,7 @@ static inline void _write_raw(__uint32_t *ptr, __uint32_t data)
 /* interrupt bits */
 #define     INT_EXT     (1<<0)      /* external interrupt   */
 #define     INT_ZWC0    (1<<1)      /* zwishbone controller */
-#define     INT_IRQ2    (1<<2)
+#define     INT_TIMER   (1<<2)      /* timer interrupt      */
 #define     INT_IRQ3    (1<<3)
 #define     INT_IRQ4    (1<<4)
 #define     INT_IRQ5    (1<<5)
@@ -95,4 +95,48 @@ static inline void _write_raw(__uint32_t *ptr, __uint32_t data)
 #define     INT_IRQ29   (1<<29)
 #define     INT_IRQ30   (1<<30)
 #define     INT_IRQ31   (1<<31)
+
+/* TIMERS on zwc0.1 */
+#define     TIMER_BASE          (ZWC_0_BASE)
+/* timer base addresses */
+#define     TIMER0_BASE         (ZWC_0_BASE)
+#define     TIMER1_BASE         (ZWC_0_BASE + (1<<2))
+#define     TIMER2_BASE         (ZWC_0_BASE + (2<<2))
+#define     TIMER3_BASE         (ZWC_0_BASE + (3<<2))
+/* regs */
+#define     TIMER_CNT           (0x0)
+#define     TIMER_THR           (0x4)
+#define     TIMER_CFG           (0x8)
+#define     TIMER_ACK           (0xc)
+
+/* CFG */
+#define     TIMER_HLT           (1<<0) // halt when threshold reached
+#define     TIMER_RST           (1<<1) // reset CNT when threshold reached
+#define     TIMER_STK           (1<<2) // sticky threshold out
+#define     TIMER_IEN           (1<<3) // threshold interrupt enable
+#define     TIMER_TEN           (1<<4) // timer enable
+
+/* TIMER0 */
+#define     TIMER0_CNT          (TIMER0_BASE + TIMER_CNT)
+#define     TIMER0_THR          (TIMER0_BASE + TIMER_THR)
+#define     TIMER0_CFG          (TIMER0_BASE + TIMER_CFG)
+#define     TIMER0_ACK          (TIMER0_BASE + TIMER_ACK)
+
+/* TIMER1 */
+#define     TIMER1_CNT          (TIMER1_BASE + TIMER_CNT)
+#define     TIMER1_THR          (TIMER1_BASE + TIMER_THR)
+#define     TIMER1_CFG          (TIMER1_BASE + TIMER_CFG)
+#define     TIMER1_ACK          (TIMER1_BASE + TIMER_ACK)
+
+/* TIMER2 */
+#define     TIMER2_CNT          (TIMER2_BASE + TIMER_CNT)
+#define     TIMER2_THR          (TIMER2_BASE + TIMER_THR)
+#define     TIMER2_CFG          (TIMER2_BASE + TIMER_CFG)
+#define     TIMER2_ACK          (TIMER2_BASE + TIMER_ACK)
+
+/* TIMER3 */
+#define     TIMER3_CNT          (TIMER3_BASE + TIMER_CNT)
+#define     TIMER3_THR          (TIMER3_BASE + TIMER_THR)
+#define     TIMER3_CFG          (TIMER3_BASE + TIMER_CFG)
+#define     TIMER4_ACK          (TIMER4_BASE + TIMER_ACK)
 
