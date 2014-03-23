@@ -158,23 +158,9 @@ begin
     
     cs_r <= addr_i(ADR_WIDTH-1 downto 2);
 
-    chip_select:
-    process(en_i,cs_r,rst_i)
-    begin
-            if rst_i='1' then
-                ten_r <= (others => '0');
-            else
-                ten_r <= (others => '0');
-                if en_i='1' then
-                    -- decode address
-                    for i in N_TIMERS-1 downto 0 loop
-                        if cs_r = to_unsigned(i, cs_r'length) then
-                            ten_r(i) <= '1';
-                        end if;
-                    end loop;
-                end if;
-            end if;
-    end process chip_select;
+    decode_cs: for i in ten_r'range generate
+        ten_r(i) <= en_i and not rst_i when i=cs_r else '0';
+    end generate;
 
 end architecture rtl;
 
