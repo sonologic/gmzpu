@@ -17,10 +17,7 @@ package tim is
             dat_i   : in unsigned(DATA_WIDTH-1 downto 0);
             we_i    : in std_logic;
             en_i    : in std_logic;
-            thresh_o: out std_logic;
-            th_hlt_i  : in std_logic;     -- halt when threshold reached
-            th_rst_i  : in std_logic;     -- reset when threshold reached
-            th_stk_i  : in std_logic      -- sticky threshold
+            thresh_o: out std_logic
         );
     end component timer;
 

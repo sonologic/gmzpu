@@ -16,10 +16,7 @@ entity timer is
         dat_i   : in unsigned(DATA_WIDTH-1 downto 0);
         we_i    : in std_logic;
         en_i    : in std_logic;
-        thresh_o: out std_logic;
-        th_hlt_i  : in std_logic;     -- halt when threshold reached
-        th_rst_i  : in std_logic;     -- reset when threshold reached
-        th_stk_i  : in std_logic      -- sticky threshold
+        thresh_o: out std_logic
     );
 end entity timer;
 
@@ -32,69 +29,140 @@ architecture rtl of timer is
     --  thresh_o
     signal CNT      : unsigned(DATA_WIDTH-1 downto 0);
     signal THR      : unsigned(DATA_WIDTH-1 downto 0);
+    signal CFG      : unsigned(DATA_WIDTH-1 downto 0);
     signal halt_r   : std_logic;
     signal thresh_r : std_logic;
     signal dat_en_r : std_logic;
+    -- CFG reg
+    signal cfg_hlt_r: std_logic;
+    signal cfg_rst_r: std_logic;
+    signal cfg_stk_r: std_logic;
+    signal cfg_ien_r: std_logic;
+    signal cfg_ten_r: std_logic;
+    -- cross clock domain handshake
+    --  reset CNT
+    signal clk_to_inc_rst_r : std_logic;
+    signal inc_to_clk_rst_r : std_logic;
+    --  acknowledge theshold
+    signal clk_to_inc_ack_r : std_logic;
+    signal inc_to_clk_ack_r : std_logic;
 begin
+    -- config register
+    cfg_hlt_r <= CFG(0);
+    cfg_rst_r <= CFG(1);
+    cfg_stk_r <= CFG(2);
+    cfg_ien_r <= CFG(3);
+    cfg_ten_r <= CFG(4);
 
     -- enable dat_o when not in reset and read enable
     dat_en_r <= (not rst_i) and en_i and (not we_i);
     -- assign register or high-z to dat_o
     dat_o <= CNT when dat_en_r='1' and addr_i=to_unsigned(0,ADR_WIDTH) else
              THR when dat_en_r='1' and addr_i=to_unsigned(1,ADR_WIDTH) else
+             CFG when dat_en_r='1' and addr_i=to_unsigned(2,ADR_WIDTH) else
              (others => 'Z');
 
-    write_thr:
+    process(clk_i)
+    begin
+        
+    end process;
+
+    write_regs:
     process(clk_i)
     begin
         if rising_edge(clk_i) then
             if rst_i='1' then
                 THR <= (others => '1');
+                CFG <= (others => '0');
+                clk_to_inc_rst_r <= '0';
+                clk_to_inc_ack_r <= '0';
             elsif en_i='1' then 
                 -- mem i/o
                 if we_i='1' then
-                    if addr_i=to_unsigned(1,ADR_WIDTH) then
+                    if addr_i=to_unsigned(0,ADR_WIDTH) then
+                        -- write to CNT, trigger CNT reset
+                        clk_to_inc_rst_r <= '1';
+                    elsif addr_i=to_unsigned(1,ADR_WIDTH) then
+                        -- write to THR
                         THR <= dat_i;
+                    elsif addr_i=to_unsigned(2,ADR_WIDTH) then
+                        -- write to CFG
+                        CFG <= dat_i;
+                        if dat_i(3)='1' then
+                            -- if ien is written, reset cnt and ack threshold
+                            clk_to_inc_rst_r <= '1';
+                            clk_to_inc_ack_r <= '1';
+                        end if;
+                    elsif addr_i=to_unsigned(3,ADR_WIDTH) then
+                        -- write to ACK, trigger threshold reset
+                        clk_to_inc_ack_r <= '1';
                     end if;
-                end if;     
+                end if;
+            end if;
+            if inc_to_clk_rst_r='1' then
+                clk_to_inc_rst_r <= '0';
+            end if;
+            if inc_to_clk_ack_r='1' then
+                clk_to_inc_ack_r <= '0';
             end if;
         end if;
-    end process write_thr;
+    end process write_regs;
 
     counter:
-    process(inc_i,rst_i)
+    process(inc_i,rst_i,cfg_ten_r)
         variable newCNT : unsigned(DATA_WIDTH-1 downto 0);
     begin
         if rst_i='1' then
             CNT <= (others => '0');
             thresh_r <= '0';
+            inc_to_clk_rst_r <= '0';
+            inc_to_clk_ack_r <= '0';
         elsif rising_edge(inc_i) then
-            -- count and compare
-            newCNT := CNT;
-            if halt_r='0' then
-                newCNT := CNT + to_unsigned(1, CNT'length);
+            -- reset 
+            if clk_to_inc_rst_r='1' then
+                CNT <= (others => '0');
+                inc_to_clk_rst_r <= '1';
+            else -- clk_to_inc_rst_r='0'
+                inc_to_clk_rst_r <= '0';
             end if;
-            CNT <= newCNT;
-            if newCNT>=THR then
-                -- set threshold output
-                thresh_r <= '1';
-                -- reset counter
-                if th_rst_i='1' then
-                    CNT <= (others => '0');
-                end if;
+
+            -- ack threshold
+            if clk_to_inc_ack_r='1' then
+                thresh_r <= '0';
+                inc_to_clk_ack_r <= '1';
             else
-                -- reset threshold output (if not sticky)
-                if th_stk_i='0' and thresh_r='1' then
-                    thresh_r <= '0';
+                inc_to_clk_ack_r <= '0';
+            end if;
+            
+            -- count and compare
+            if cfg_ten_r='1' and clk_to_inc_rst_r='0' then
+                newCNT := CNT;
+                if halt_r='0' then
+                    -- inc(CNT)
+                    newCNT := CNT + to_unsigned(1, CNT'length);
+                end if;
+                CNT <= newCNT;
+                if newCNT>=THR then
+                    -- set threshold output
+                    thresh_r <= '1';
+                    -- reset counter
+                    if cfg_rst_r='1' then
+                        CNT <= (others => '0');
+                    end if;
+                else
+                    -- reset threshold output (if not sticky)
+                    if cfg_stk_r='0' and thresh_r='1' then
+                        thresh_r <= '0';
+                    end if;
                 end if;
             end if;
         end if;
     end process counter;
 
-    thresh_o <= thresh_r;
+    thresh_o <= cfg_ien_r and thresh_r;
 
-    -- halt counter when th_hlt_i asserted and threshold detected
-    halt_r <= th_hlt_i and thresh_r;
+    -- halt counter when cfg_hlt_r asserted and threshold detected
+    halt_r <= cfg_hlt_r and thresh_r;
 end architecture rtl;
        
 library IEEE;
@@ -147,10 +215,7 @@ architecture rtl of timers is
             dat_i   : in unsigned(DATA_WIDTH-1 downto 0);
             en_i    : in std_logic;
             we_i    : in std_logic;
-            thresh_o: out std_logic;
-            th_hlt_i  : in std_logic;     -- halt when threshold reached
-            th_rst_i  : in std_logic;     -- reset when threshold reached
-            th_stk_i  : in std_logic      -- sticky threshold
+            thresh_o: out std_logic
         );
     end component timer;
 
@@ -173,8 +238,7 @@ begin
             port map(clk_i => clk_i, rst_i => rst_i, inc_i => clk_i,
                      addr_i => addr_d(1 downto 0), thresh_o => irq_r(i),
                      dat_o => wb_dat_o, dat_i => dat_d,
-                     we_i => we_d, en_i => ten_r(i),
-                     th_hlt_i => '0', th_rst_i => '1', th_stk_i => '1');
+                     we_i => we_d, en_i => ten_r(i));
     end generate;
 
     wb_tgd_o <= (others => 'Z');
