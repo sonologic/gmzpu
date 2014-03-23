@@ -108,14 +108,27 @@ entity timers is
         N_TIMERS  : natural:=4
     );
     port (
-        clk_i       : in std_logic;
-        rst_i       : in std_logic;
-        en_i        : in std_logic;
-        we_i        : in std_logic;
-        addr_i      : in unsigned(ADR_WIDTH-1 downto 0);
-        dat_i       : in unsigned(DATA_WIDTH-1 downto 0);
-        dat_o       : out unsigned(DATA_WIDTH-1 downto 0);
-        irq_o       : out std_logic
+        -- wishbone bus
+        rst_i         : in std_logic;
+        clk_i         : in std_logic;
+        wb_dat_o      : out unsigned(DATA_WIDTH-1 downto 0);
+        wb_dat_i      : in unsigned(DATA_WIDTH-1 downto 0);
+        wb_tgd_o      : out unsigned(DATA_WIDTH-1 downto 0);
+        wb_tgd_i      : in unsigned(DATA_WIDTH-1 downto 0);
+        wb_ack_o      : out std_logic;
+        wb_adr_i      : in unsigned(ADR_WIDTH-1 downto 0);
+        wb_cyc_i      : in std_logic;
+        wb_stall_o    : out std_logic;
+        wb_err_o      : out std_logic;
+        wb_lock_i     : in std_logic;
+        wb_rty_o      : out std_logic;
+        wb_sel_i      : in std_logic_vector(DATA_WIDTH-1 downto 0);
+        wb_stb_i      : in std_logic;
+        wb_tga_i      : in unsigned(ADR_WIDTH-1 downto 0);
+        wb_tgc_i      : in unsigned(DATA_WIDTH-1 downto 0); -- size correct?
+        wb_we_i       : in std_logic;
+        -- non wishbone
+        irq_o         : out std_logic
     );
 end entity timers; 
 
@@ -159,23 +172,33 @@ begin
             generic map(ADR_WIDTH => 2, DATA_WIDTH => DATA_WIDTH)
             port map(clk_i => clk_i, rst_i => rst_i, inc_i => clk_i,
                      addr_i => addr_d(1 downto 0), thresh_o => irq_r(i),
-                     dat_o => dat_o, dat_i => dat_d,
+                     dat_o => wb_dat_o, dat_i => dat_d,
                      we_i => we_d, en_i => ten_r(i),
                      th_hlt_i => '0', th_rst_i => '1', th_stk_i => '1');
     end generate;
 
+    wb_tgd_o <= (others => 'Z');
+    wb_tgd_o <= (others => 'Z');
+    wb_stall_o <= '0';
+    wb_err_o <= '0';
+    wb_rty_o <= '0';
+ 
     cs_r <= addr_r(ADR_WIDTH-1 downto 2);
+
+    --wb_ack_o <= cyc_r and not en_r;
+    wb_ack_o <= '0'     when ten_r=(ten_r'range => '0') else
+                wb_cyc_i;
 
     process(clk_i)
     begin
         if rising_edge(clk_i) then
             -- clock in input signals
-            addr_r <= addr_i;
-            en_r <= en_i;
-            we_r <= we_i;
-            dat_r <= dat_i;
+            addr_r <= wb_adr_i;
+            en_r <= wb_stb_i and wb_cyc_i;
+            we_r <= wb_we_i;
+            dat_r <= wb_dat_i;
 
-            -- delay signals to allow chip select to settle
+            -- delay signals to allow one cycle for chip select
             addr_d <= addr_r;
             we_d <= we_r;
             dat_d <= dat_r;
@@ -200,67 +223,3 @@ begin
     --end generate;
 
 end architecture rtl;
-
-library IEEE;
-use IEEE.std_logic_1164.all;
-use IEEE.numeric_std.all;
-
-entity wb_timer is
-    generic (
-        DATA_WIDTH : natural:=32;
-        ADR_WIDTH : natural:=4;
-        N_TIMERS  : natural:=4
-    );
-    port (
-        -- wishbone bus
-        rst_i         : in std_logic;
-        clk_i         : in std_logic;
-        wb_dat_o      : out unsigned(DATA_WIDTH-1 downto 0);
-        wb_dat_i      : in unsigned(DATA_WIDTH-1 downto 0);
-        wb_tgd_o      : out unsigned(DATA_WIDTH-1 downto 0);
-        wb_tgd_i      : in unsigned(DATA_WIDTH-1 downto 0);
-        wb_ack_o      : out std_logic;
-        wb_adr_i      : in unsigned(ADR_WIDTH-1 downto 0);
-        wb_cyc_i      : in std_logic;
-        wb_stall_o    : out std_logic;
-        wb_err_o      : out std_logic;
-        wb_lock_i     : in std_logic;
-        wb_rty_o      : out std_logic;
-        wb_sel_i      : in std_logic_vector(DATA_WIDTH-1 downto 0);
-        wb_stb_i      : in std_logic;
-        wb_tga_i      : in unsigned(ADR_WIDTH-1 downto 0);
-        wb_tgc_i      : in unsigned(DATA_WIDTH-1 downto 0); -- size correct?
-        wb_we_i       : in std_logic;
-        -- non wishbone
-        irq_o         : out std_logic
-    );
-end entity wb_timer;
-
-architecture rtl of wb_timer is
-    component timers is
-        generic (
-            DATA_WIDTH : natural:=32;
-            ADR_WIDTH : natural:=4;
-            N_TIMERS  : natural:=4
-        );
-        port (
-            clk_i       : in std_logic;
-            rst_i       : in std_logic;
-            we_i        : in std_logic;
-            re_i        : in std_logic;
-            addr_i      : in unsigned(ADR_WIDTH-1 downto 0);
-            dat_i       : in unsigned(DATA_WIDTH-1 downto 0);
-            dat_o       : out unsigned(DATA_WIDTH-1 downto 0);
-            irq_o       : out std_logic
-        );
-    end component timers;
-
-begin
-    controller : timers
-        generic map ( DATA_WIDTH => DATA_WIDTH, ADR_WIDTH => ADR_WIDTH, N_TIMERS => N_TIMERS )
-        port map ( clk_i => clk_i, rst_i => rst_i,
-                   we_i => wb_we_i, re_i => wb_stb_i, addr_i => wb_adr_i,
-                   dat_i => wb_dat_i, dat_o => wb_dat_o, irq_o => irq_o );
-
-end architecture rtl;
-
