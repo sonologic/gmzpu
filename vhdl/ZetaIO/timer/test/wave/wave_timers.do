@@ -13,12 +13,19 @@ add wave -noupdate -expand -group dut /timers_tb/dut/rst_i
 add wave -noupdate -expand -group dut /timers_tb/dut/we_i
 add wave -noupdate -expand -group dut /timers_tb/dut/en_i
 add wave -noupdate -expand -group dut /timers_tb/dut/addr_i
+add wave -noupdate -expand -group dut /timers_tb/dut/en_r
+add wave -noupdate -expand -group dut -radix hexadecimal /timers_tb/dut/dat_d
+add wave -noupdate -expand -group dut -radix hexadecimal /timers_tb/dut/dat_dd
+add wave -noupdate -expand -group dut -radix hexadecimal /timers_tb/dut/addr_r
+add wave -noupdate -expand -group dut -radix hexadecimal /timers_tb/dut/addr_d
 add wave -noupdate -expand -group dut -radix hexadecimal /timers_tb/dut/dat_i
 add wave -noupdate -expand -group dut -radix hexadecimal /timers_tb/dut/dat_o
 add wave -noupdate -expand -group dut /timers_tb/dut/irq_o
 add wave -noupdate -expand -group dut /timers_tb/dut/irq_r
 add wave -noupdate -expand -group dut -radix binary /timers_tb/dut/cs_r
 add wave -noupdate -expand -group dut /timers_tb/dut/ten_r
+add wave -noupdate -expand -group dut /timers_tb/dut/we_r
+add wave -noupdate -expand -group dut /timers_tb/dut/we_rr
 add wave -noupdate -expand -group dut -group timer3 /timers_tb/dut/timer_gen(3)/timerX/clk_i
 add wave -noupdate -expand -group dut -group timer3 /timers_tb/dut/timer_gen(3)/timerX/rst_i
 add wave -noupdate -expand -group dut -group timer3 /timers_tb/dut/timer_gen(3)/timerX/inc_i
@@ -98,6 +105,6 @@ configure wave -gridoffset 0
 configure wave -gridperiod 1
 configure wave -griddelta 40
 configure wave -timeline 0
-configure wave -timelineunits ms
+configure wave -timelineunits ns
 update
 WaveRestoreZoom {0 ps} {197120 ps}

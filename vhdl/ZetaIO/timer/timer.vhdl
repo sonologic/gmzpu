@@ -34,30 +34,37 @@ architecture rtl of timer is
     signal THR      : unsigned(DATA_WIDTH-1 downto 0);
     signal halt_r   : std_logic;
     signal thresh_r : std_logic;
+    signal dat_en_r : std_logic;
 begin
+
+    dat_en_r <= (not rst_i) and en_i and (not we_i);
+
+    dat_o <= CNT when dat_en_r='1' and addr_i=to_unsigned(0,ADR_WIDTH) else
+             THR when dat_en_r='1' and addr_i=to_unsigned(1,ADR_WIDTH) else
+             (others => 'Z');
 
     process(clk_i)
     begin
         if rising_edge(clk_i) then
             if rst_i='1' then
-                dat_o <= (others => 'Z');
+--                dat_o <= (others => 'Z');
                 THR <= (others => '1');
             elsif en_i='1' then 
                 -- mem i/o
-                dat_o <= (others => 'Z');
+                --dat_o <= (others => 'Z');
                 if we_i='1' then
                     if addr_i=to_unsigned(1,ADR_WIDTH) then
                         THR <= dat_i;
                     end if;
-                else
-                    if addr_i=to_unsigned(0,ADR_WIDTH) then
-                        dat_o <= CNT;
-                    elsif addr_i=to_unsigned(1,ADR_WIDTH) then
-                        dat_o <= THR;
-                    end if;
+                --else
+                --    if addr_i=to_unsigned(0,ADR_WIDTH) then
+                --        dat_o <= CNT;
+                --    elsif addr_i=to_unsigned(1,ADR_WIDTH) then
+                --        dat_o <= THR;
+                --    end if;
                 end if;     
-            else
-                dat_o <= (others => 'Z');
+            --else
+            --    dat_o <= (others => 'Z');
             end if;
         end if;
     end process;
@@ -143,24 +150,58 @@ architecture rtl of timers is
     signal irq_r    : std_logic_vector(N_TIMERS-1 downto 0);
     signal ten_r    : std_logic_vector(N_TIMERS-1 downto 0);
     signal cs_r     : unsigned(ADR_WIDTH-3 downto 0);
+
+    signal addr_r   : unsigned(ADR_WIDTH-1 downto 0);
+    signal en_r     : std_logic;
+    signal we_r     : std_logic;
+    signal we_rr    : std_logic;
+    signal dat_d    : unsigned(DATA_WIDTH-1 downto 0);
+    signal dat_dd   : unsigned(DATA_WIDTH-1 downto 0);
+    signal addr_d   : unsigned(ADR_WIDTH-1 downto 0);
 begin
     timer_gen: for i in N_TIMERS-1 downto 0 generate
         timerX : timer
             generic map(ADR_WIDTH => 2, DATA_WIDTH => DATA_WIDTH)
             port map(clk_i => clk_i, rst_i => rst_i, inc_i => clk_i,
-                     addr_i => addr_i(1 downto 0), thresh_o => irq_r(i),
-                     dat_o => dat_o, dat_i => dat_i,
-                     we_i => we_i, en_i => ten_r(i),
+                     addr_i => addr_d(1 downto 0), thresh_o => irq_r(i),
+                     dat_o => dat_o, dat_i => dat_dd,
+                     we_i => we_rr, en_i => ten_r(i),
                      th_hlt_i => '0', th_rst_i => '1', th_stk_i => '1');
     end generate;
 
+    cs_r <= addr_r(ADR_WIDTH-1 downto 2);
+
+    process(clk_i)
+    begin
+        if rising_edge(clk_i) then
+            addr_d <= addr_r;
+            addr_r <= addr_i;
+
+            en_r <= en_i;
+
+            we_rr <= we_r;
+            we_r <= we_i;
+
+            dat_dd <= dat_d;
+            dat_d <= dat_i;
+
+            for i in ten_r'range loop
+                if i=cs_r then
+                    ten_r(i) <= en_r and not rst_i;
+                else
+                    ten_r(i) <= '0';
+                end if;
+            end loop;
+            
+        end if;
+    end process;
+
     irq_o <= '0' when irq_r=(irq_r'range => '0') or rst_i='1' else '1';
     
-    cs_r <= addr_i(ADR_WIDTH-1 downto 2);
 
-    decode_cs: for i in ten_r'range generate
-        ten_r(i) <= en_i and not rst_i when i=cs_r else '0';
-    end generate;
+    --decode_cs: for i in ten_r'range generate
+    --    ten_r(i) <= en_i and not rst_i when i=cs_r else '0';
+    --end generate;
 
 end architecture rtl;
 
