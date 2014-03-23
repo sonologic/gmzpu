@@ -18,6 +18,7 @@ vsim timer_TB
 view wave
 
 do wave/wave_timer.do
+#add wave -recursive *
 
 #view structure
 #view signals

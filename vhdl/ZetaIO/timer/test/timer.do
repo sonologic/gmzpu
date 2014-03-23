@@ -17,7 +17,6 @@ vsim timer_TB
 
 #view wave
 
-#do wave_timer.do
 
 #view structure
 #view signals
