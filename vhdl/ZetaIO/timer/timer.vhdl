@@ -79,24 +79,25 @@ begin
             elsif en_i='1' then 
                 -- mem i/o
                 if we_i='1' then
-                    if addr_i=to_unsigned(0,ADR_WIDTH) then
-                        -- write to CNT, trigger CNT reset
-                        clk_to_inc_rst_r <= '1';
-                    elsif addr_i=to_unsigned(1,ADR_WIDTH) then
-                        -- write to THR
-                        THR <= dat_i;
-                    elsif addr_i=to_unsigned(2,ADR_WIDTH) then
-                        -- write to CFG
-                        CFG <= dat_i;
-                        if dat_i(3)='1' then
-                            -- if ien is written, reset cnt and ack threshold
+                    case addr_i(1 downto 0) is
+                        when "00" =>
+                            -- write to CNT, trigger CNT reset
                             clk_to_inc_rst_r <= '1';
+                        when "01" => 
+                            -- write to THR
+                            THR <= dat_i;
+                        when "10" =>
+                            -- write to CFG
+                            CFG <= dat_i;
+                            if dat_i(3)='1' then
+                                -- if ien is written, reset cnt and ack threshold
+                                clk_to_inc_rst_r <= '1';
+                                clk_to_inc_ack_r <= '1';
+                            end if;
+                        when others =>
+                            -- write to ACK, trigger threshold reset
                             clk_to_inc_ack_r <= '1';
-                        end if;
-                    elsif addr_i=to_unsigned(3,ADR_WIDTH) then
-                        -- write to ACK, trigger threshold reset
-                        clk_to_inc_ack_r <= '1';
-                    end if;
+                    end case;
                 end if;
             end if;
             if inc_to_clk_rst_r='1' then
