@@ -7,7 +7,7 @@
 
 vlib gmzpu
 vcom -work gmzpu ../zwishbone_pkg.vhdl
-vcom -work gmzpu ../zwishbone2.vhdl
+vcom -work gmzpu ../zwishbone.vhdl
 
 vlib work
 vcom -work work zwishbone_controller_tb.vhdl
