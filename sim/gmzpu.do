@@ -5,21 +5,22 @@
 
 set BreakOnAssertion 1
 
-vlib gmzpu
-vcom -work gmzpu ../vhdl/zwishbone/zwishbone_pkg.vhdl
-vcom -work gmzpu ../vhdl/zwishbone/zwishbone.vhdl
-vcom -work gmzpu ../vhdl/gmzpu/gmzpu_pkg.vhdl
-vcom -work gmzpu ../vhdl/gmzpu/zwc.vhdl
-
 vlib zetaio
 vcom -work zetaio ../vhdl/ZetaIO/interrupt/interrupt_pkg.vhdl
 vcom -work zetaio ../vhdl/ZetaIO/interrupt/interrupt.vhdl
 vcom -work zetaio ../vhdl/ZetaIO/timer/timer_pkg.vhdl
 vcom -work zetaio ../vhdl/ZetaIO/timer/timer.vhdl
 
-vlib zpu
-vcom -work zpu ../vhdl/roms/zwc_int_test.vhdl
+vlib gmzpu
+vcom -work gmzpu ../vhdl/zwishbone/zwishbone_pkg.vhdl
+vcom -work gmzpu ../vhdl/zwishbone/zwishbone.vhdl
+vcom -work gmzpu ../vhdl/gmzpu/gmzpu_pkg.vhdl
+vcom -work gmzpu ../vhdl/gmzpu/zwc.vhdl
 
+vlib zpu
+vcom -work zpu ../vhdl/roms/zwc_timer_test.vhdl
+
+#vcom -work zpu ../vhdl/roms/zwc_int_test.vhdl
 #vcom -work zpu ../vhdl/roms/hello_bram.vhdl
 #vcom -work zpu ../vhdl/roms/my_hello.vhdl
 #vcom -work zpu ../vhdl/roms/hello.vhdl
