@@ -137,6 +137,7 @@ begin
                         -- adr 0x4 (0100) : STATUS register
                         -- adr 0x8 (1000) : TO_CMP register
                         -- adr 0xc (1100) : TO_VAL register
+                        -- only two msb are relevant
                         when "00" =>
                             dat_o <= reg_config;
                         when "01" =>
@@ -558,7 +559,7 @@ begin
                 wb_cyc_o <= '0';
                 wb_lock_o <= '0';
                 wb_sel_o <= (others => 'Z');
-                wb_stb_o <= (others => 'Z');
+                wb_stb_o <= (others => '0');
                 wb_tga_o <= (others => 'Z');
                 wb_tgc_o <= (others => 'Z');
                 --
