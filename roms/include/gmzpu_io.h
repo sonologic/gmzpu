@@ -4,8 +4,8 @@
 #define	ADDR_W			18
 
 #define ZWC_CS_W		4
-#define ZWC_WB_ADR_W		ADDR_W - ZMC_CS_W - 3
-#define ZWC_CS_SIZE		( (1<<ZWC_WB_ADR_W)-1 )
+#define ZWC_WB_ADR_W	( ADDR_W - ZWC_CS_W - 3 )
+#define ZWC_CS_SIZE		( (1<<ZWC_WB_ADR_W) )
 
 
 /*
@@ -48,7 +48,6 @@ static inline void _write_raw(__uint32_t *ptr, __uint32_t data)
 
 #define		ZWC_CONFIG		(IO_MASK | ZWC_MASK)
 #define		ZWC_STATUS		(IO_MASK | ZWC_MASK | 4)
-
 #define		ZWC_0_BASE		(IO_MASK | ZWC_MASK | ZWC_BUS_MASK)
 #define		ZWC_1_BASE		(ZWC_0_BASE + ZWC_CS_SIZE)
 #define		ZWC_2_BASE		(ZWC_1_BASE + ZWC_CS_SIZE)
@@ -97,12 +96,12 @@ static inline void _write_raw(__uint32_t *ptr, __uint32_t data)
 #define     INT_IRQ31   (1<<31)
 
 /* TIMERS on zwc0.1 */
-#define     TIMER_BASE          (ZWC_0_BASE)
+#define     TIMER_BASE          (ZWC_1_BASE)
 /* timer base addresses */
-#define     TIMER0_BASE         (ZWC_0_BASE)
-#define     TIMER1_BASE         (ZWC_0_BASE + (1<<2))
-#define     TIMER2_BASE         (ZWC_0_BASE + (2<<2))
-#define     TIMER3_BASE         (ZWC_0_BASE + (3<<2))
+#define     TIMER0_BASE         (TIMER_BASE)
+#define     TIMER1_BASE         (TIMER_BASE + (1<<2))
+#define     TIMER2_BASE         (TIMER_BASE + (2<<2))
+#define     TIMER3_BASE         (TIMER_BASE + (3<<2))
 /* regs */
 #define     TIMER_CNT           (0x0)
 #define     TIMER_THR           (0x4)
