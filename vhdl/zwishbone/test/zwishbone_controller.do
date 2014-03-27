@@ -15,14 +15,6 @@ vcom -work work zwishbone_controller_tb.vhdl
 # run tb
 vsim zwishbone_controller_TB
 
-view wave
-
-do wave/wave_zwishbone_controller.do
-#add wave -recursive *
-
-#view structure
-#view signals
-
 run -all
 
-#exit
+exit
