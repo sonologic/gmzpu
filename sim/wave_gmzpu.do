@@ -162,22 +162,22 @@ add wave -noupdate -expand -group soc -expand -group zwc0 /gmzpu_tb/soc/zwc0/int
 add wave -noupdate -expand -group soc -expand -group zwc0 /gmzpu_tb/soc/zwc0/int_pic_r
 add wave -noupdate -expand -group soc -expand -group zwc0 /gmzpu_tb/soc/zwc0/int_timer_r
 add wave -noupdate -expand -group soc -expand -group zwc0 -radix hexadecimal /gmzpu_tb/soc/zwc0/int_r
-add wave -noupdate -expand -group soc -expand -group zwc0 -group wb0 -radix hexadecimal /gmzpu_tb/soc/zwc0/wb_dat_i
-add wave -noupdate -expand -group soc -expand -group zwc0 -group wb0 -radix hexadecimal /gmzpu_tb/soc/zwc0/wb_dat_o
-add wave -noupdate -expand -group soc -expand -group zwc0 -group wb0 -radix hexadecimal /gmzpu_tb/soc/zwc0/wb_tgd_i
-add wave -noupdate -expand -group soc -expand -group zwc0 -group wb0 -radix hexadecimal /gmzpu_tb/soc/zwc0/wb_tgd_o
-add wave -noupdate -expand -group soc -expand -group zwc0 -group wb0 /gmzpu_tb/soc/zwc0/wb_ack_i
-add wave -noupdate -expand -group soc -expand -group zwc0 -group wb0 -radix hexadecimal /gmzpu_tb/soc/zwc0/wb_adr_o
-add wave -noupdate -expand -group soc -expand -group zwc0 -group wb0 /gmzpu_tb/soc/zwc0/wb_cyc_o
-add wave -noupdate -expand -group soc -expand -group zwc0 -group wb0 /gmzpu_tb/soc/zwc0/wb_stall_i
-add wave -noupdate -expand -group soc -expand -group zwc0 -group wb0 /gmzpu_tb/soc/zwc0/wb_err_i
-add wave -noupdate -expand -group soc -expand -group zwc0 -group wb0 /gmzpu_tb/soc/zwc0/wb_lock_o
-add wave -noupdate -expand -group soc -expand -group zwc0 -group wb0 /gmzpu_tb/soc/zwc0/wb_rty_i
-add wave -noupdate -expand -group soc -expand -group zwc0 -group wb0 -radix hexadecimal /gmzpu_tb/soc/zwc0/wb_sel_o
-add wave -noupdate -expand -group soc -expand -group zwc0 -group wb0 -radix hexadecimal /gmzpu_tb/soc/zwc0/wb_stb_o
-add wave -noupdate -expand -group soc -expand -group zwc0 -group wb0 -radix hexadecimal /gmzpu_tb/soc/zwc0/wb_tga_o
-add wave -noupdate -expand -group soc -expand -group zwc0 -group wb0 -radix hexadecimal /gmzpu_tb/soc/zwc0/wb_tgc_o
-add wave -noupdate -expand -group soc -expand -group zwc0 -group wb0 /gmzpu_tb/soc/zwc0/wb_we_o
+add wave -noupdate -expand -group soc -expand -group zwc0 -expand -group wb0 /gmzpu_tb/soc/zwc0/wb_cyc_o
+add wave -noupdate -expand -group soc -expand -group zwc0 -expand -group wb0 -radix hexadecimal /gmzpu_tb/soc/zwc0/wb_stb_o
+add wave -noupdate -expand -group soc -expand -group zwc0 -expand -group wb0 /gmzpu_tb/soc/zwc0/wb_ack_i
+add wave -noupdate -expand -group soc -expand -group zwc0 -expand -group wb0 /gmzpu_tb/soc/zwc0/wb_we_o
+add wave -noupdate -expand -group soc -expand -group zwc0 -expand -group wb0 -radix hexadecimal /gmzpu_tb/soc/zwc0/wb_dat_i
+add wave -noupdate -expand -group soc -expand -group zwc0 -expand -group wb0 -radix hexadecimal /gmzpu_tb/soc/zwc0/wb_dat_o
+add wave -noupdate -expand -group soc -expand -group zwc0 -expand -group wb0 -radix hexadecimal /gmzpu_tb/soc/zwc0/wb_tgd_i
+add wave -noupdate -expand -group soc -expand -group zwc0 -expand -group wb0 -radix hexadecimal /gmzpu_tb/soc/zwc0/wb_tgd_o
+add wave -noupdate -expand -group soc -expand -group zwc0 -expand -group wb0 -radix hexadecimal /gmzpu_tb/soc/zwc0/wb_adr_o
+add wave -noupdate -expand -group soc -expand -group zwc0 -expand -group wb0 /gmzpu_tb/soc/zwc0/wb_stall_i
+add wave -noupdate -expand -group soc -expand -group zwc0 -expand -group wb0 /gmzpu_tb/soc/zwc0/wb_err_i
+add wave -noupdate -expand -group soc -expand -group zwc0 -expand -group wb0 /gmzpu_tb/soc/zwc0/wb_lock_o
+add wave -noupdate -expand -group soc -expand -group zwc0 -expand -group wb0 /gmzpu_tb/soc/zwc0/wb_rty_i
+add wave -noupdate -expand -group soc -expand -group zwc0 -expand -group wb0 -radix hexadecimal /gmzpu_tb/soc/zwc0/wb_sel_o
+add wave -noupdate -expand -group soc -expand -group zwc0 -expand -group wb0 -radix hexadecimal /gmzpu_tb/soc/zwc0/wb_tga_o
+add wave -noupdate -expand -group soc -expand -group zwc0 -expand -group wb0 -radix hexadecimal /gmzpu_tb/soc/zwc0/wb_tgc_o
 add wave -noupdate -expand -group soc -expand -group zwc0 -group zwishbone_controller /gmzpu_tb/soc/zwc0/controller/clk_i
 add wave -noupdate -expand -group soc -expand -group zwc0 -group zwishbone_controller /gmzpu_tb/soc/zwc0/controller/rst_i
 add wave -noupdate -expand -group soc -expand -group zwc0 -group zwishbone_controller /gmzpu_tb/soc/zwc0/controller/ena_i
@@ -683,145 +683,133 @@ add wave -noupdate -expand -group soc -expand -group zwc0 -expand -group pic -gr
 add wave -noupdate -expand -group soc -expand -group zwc0 -expand -group pic -group regs /gmzpu_tb/soc/zwc0/pic/reg_generator(0)/regsX/icr_generator(0)/ICRX/we_i
 add wave -noupdate -expand -group soc -expand -group zwc0 -expand -group pic -group regs /gmzpu_tb/soc/zwc0/pic/reg_generator(0)/regsX/icr_generator(0)/ICRX/q
 add wave -noupdate -expand -group soc -expand -group zwc0 -expand -group pic -group regs /gmzpu_tb/soc/zwc0/pic/reg_generator(0)/regsX/icr_generator(0)/ICRX/sample_r
-add wave -noupdate -expand -group soc -expand -group zwc0 -group timer /gmzpu_tb/soc/zwc0/timrs/rst_i
-add wave -noupdate -expand -group soc -expand -group zwc0 -group timer /gmzpu_tb/soc/zwc0/timrs/clk_i
-add wave -noupdate -expand -group soc -expand -group zwc0 -group timer /gmzpu_tb/soc/zwc0/timrs/wb_dat_o
-add wave -noupdate -expand -group soc -expand -group zwc0 -group timer /gmzpu_tb/soc/zwc0/timrs/wb_dat_i
-add wave -noupdate -expand -group soc -expand -group zwc0 -group timer /gmzpu_tb/soc/zwc0/timrs/wb_tgd_o
-add wave -noupdate -expand -group soc -expand -group zwc0 -group timer /gmzpu_tb/soc/zwc0/timrs/wb_tgd_i
-add wave -noupdate -expand -group soc -expand -group zwc0 -group timer /gmzpu_tb/soc/zwc0/timrs/wb_ack_o
-add wave -noupdate -expand -group soc -expand -group zwc0 -group timer /gmzpu_tb/soc/zwc0/timrs/wb_adr_i
-add wave -noupdate -expand -group soc -expand -group zwc0 -group timer /gmzpu_tb/soc/zwc0/timrs/wb_cyc_i
-add wave -noupdate -expand -group soc -expand -group zwc0 -group timer /gmzpu_tb/soc/zwc0/timrs/wb_stall_o
-add wave -noupdate -expand -group soc -expand -group zwc0 -group timer /gmzpu_tb/soc/zwc0/timrs/wb_err_o
-add wave -noupdate -expand -group soc -expand -group zwc0 -group timer /gmzpu_tb/soc/zwc0/timrs/wb_lock_i
-add wave -noupdate -expand -group soc -expand -group zwc0 -group timer /gmzpu_tb/soc/zwc0/timrs/wb_rty_o
-add wave -noupdate -expand -group soc -expand -group zwc0 -group timer /gmzpu_tb/soc/zwc0/timrs/wb_sel_i
-add wave -noupdate -expand -group soc -expand -group zwc0 -group timer /gmzpu_tb/soc/zwc0/timrs/wb_stb_i
-add wave -noupdate -expand -group soc -expand -group zwc0 -group timer /gmzpu_tb/soc/zwc0/timrs/wb_tga_i
-add wave -noupdate -expand -group soc -expand -group zwc0 -group timer /gmzpu_tb/soc/zwc0/timrs/wb_tgc_i
-add wave -noupdate -expand -group soc -expand -group zwc0 -group timer /gmzpu_tb/soc/zwc0/timrs/wb_we_i
-add wave -noupdate -expand -group soc -expand -group zwc0 -group timer /gmzpu_tb/soc/zwc0/timrs/irq_o
-add wave -noupdate -expand -group soc -expand -group zwc0 -group timer /gmzpu_tb/soc/zwc0/timrs/irq_r
-add wave -noupdate -expand -group soc -expand -group zwc0 -group timer /gmzpu_tb/soc/zwc0/timrs/ten_r
-add wave -noupdate -expand -group soc -expand -group zwc0 -group timer /gmzpu_tb/soc/zwc0/timrs/cs_r
-add wave -noupdate -expand -group soc -expand -group zwc0 -group timer /gmzpu_tb/soc/zwc0/timrs/addr_r
-add wave -noupdate -expand -group soc -expand -group zwc0 -group timer /gmzpu_tb/soc/zwc0/timrs/en_r
-add wave -noupdate -expand -group soc -expand -group zwc0 -group timer /gmzpu_tb/soc/zwc0/timrs/we_r
-add wave -noupdate -expand -group soc -expand -group zwc0 -group timer /gmzpu_tb/soc/zwc0/timrs/dat_r
-add wave -noupdate -expand -group soc -expand -group zwc0 -group timer /gmzpu_tb/soc/zwc0/timrs/we_d
-add wave -noupdate -expand -group soc -expand -group zwc0 -group timer /gmzpu_tb/soc/zwc0/timrs/dat_d
-add wave -noupdate -expand -group soc -expand -group zwc0 -group timer /gmzpu_tb/soc/zwc0/timrs/addr_d
-add wave -noupdate -expand -group soc -expand -group zwc0 -group timer -group timer0 /gmzpu_tb/soc/zwc0/timrs/timer_gen(0)/timerX/clk_i
-add wave -noupdate -expand -group soc -expand -group zwc0 -group timer -group timer0 /gmzpu_tb/soc/zwc0/timrs/timer_gen(0)/timerX/rst_i
-add wave -noupdate -expand -group soc -expand -group zwc0 -group timer -group timer0 /gmzpu_tb/soc/zwc0/timrs/timer_gen(0)/timerX/inc_i
-add wave -noupdate -expand -group soc -expand -group zwc0 -group timer -group timer0 /gmzpu_tb/soc/zwc0/timrs/timer_gen(0)/timerX/addr_i
-add wave -noupdate -expand -group soc -expand -group zwc0 -group timer -group timer0 /gmzpu_tb/soc/zwc0/timrs/timer_gen(0)/timerX/dat_o
-add wave -noupdate -expand -group soc -expand -group zwc0 -group timer -group timer0 /gmzpu_tb/soc/zwc0/timrs/timer_gen(0)/timerX/dat_i
-add wave -noupdate -expand -group soc -expand -group zwc0 -group timer -group timer0 /gmzpu_tb/soc/zwc0/timrs/timer_gen(0)/timerX/we_i
-add wave -noupdate -expand -group soc -expand -group zwc0 -group timer -group timer0 /gmzpu_tb/soc/zwc0/timrs/timer_gen(0)/timerX/en_i
-add wave -noupdate -expand -group soc -expand -group zwc0 -group timer -group timer0 /gmzpu_tb/soc/zwc0/timrs/timer_gen(0)/timerX/thresh_o
-add wave -noupdate -expand -group soc -expand -group zwc0 -group timer -group timer0 /gmzpu_tb/soc/zwc0/timrs/timer_gen(0)/timerX/th_hlt_i
-add wave -noupdate -expand -group soc -expand -group zwc0 -group timer -group timer0 /gmzpu_tb/soc/zwc0/timrs/timer_gen(0)/timerX/th_rst_i
-add wave -noupdate -expand -group soc -expand -group zwc0 -group timer -group timer0 /gmzpu_tb/soc/zwc0/timrs/timer_gen(0)/timerX/th_stk_i
-add wave -noupdate -expand -group soc -expand -group zwc0 -group timer -group timer0 /gmzpu_tb/soc/zwc0/timrs/timer_gen(0)/timerX/CNT
-add wave -noupdate -expand -group soc -expand -group zwc0 -group timer -group timer0 /gmzpu_tb/soc/zwc0/timrs/timer_gen(0)/timerX/THR
-add wave -noupdate -expand -group soc -expand -group zwc0 -group timer -group timer0 /gmzpu_tb/soc/zwc0/timrs/timer_gen(0)/timerX/halt_r
-add wave -noupdate -expand -group soc -expand -group zwc0 -group timer -group timer0 /gmzpu_tb/soc/zwc0/timrs/timer_gen(0)/timerX/thresh_r
-add wave -noupdate -expand -group soc -expand -group zwc0 -group timer -group timer0 /gmzpu_tb/soc/zwc0/timrs/timer_gen(0)/timerX/dat_en_r
-add wave -noupdate -expand -group soc -expand -group zwc0 -group timer -group timer1 /gmzpu_tb/soc/zwc0/timrs/timer_gen(1)/timerX/clk_i
-add wave -noupdate -expand -group soc -expand -group zwc0 -group timer -group timer1 /gmzpu_tb/soc/zwc0/timrs/timer_gen(1)/timerX/rst_i
-add wave -noupdate -expand -group soc -expand -group zwc0 -group timer -group timer1 /gmzpu_tb/soc/zwc0/timrs/timer_gen(1)/timerX/inc_i
-add wave -noupdate -expand -group soc -expand -group zwc0 -group timer -group timer1 /gmzpu_tb/soc/zwc0/timrs/timer_gen(1)/timerX/addr_i
-add wave -noupdate -expand -group soc -expand -group zwc0 -group timer -group timer1 /gmzpu_tb/soc/zwc0/timrs/timer_gen(1)/timerX/dat_o
-add wave -noupdate -expand -group soc -expand -group zwc0 -group timer -group timer1 /gmzpu_tb/soc/zwc0/timrs/timer_gen(1)/timerX/dat_i
-add wave -noupdate -expand -group soc -expand -group zwc0 -group timer -group timer1 /gmzpu_tb/soc/zwc0/timrs/timer_gen(1)/timerX/we_i
-add wave -noupdate -expand -group soc -expand -group zwc0 -group timer -group timer1 /gmzpu_tb/soc/zwc0/timrs/timer_gen(1)/timerX/en_i
-add wave -noupdate -expand -group soc -expand -group zwc0 -group timer -group timer1 /gmzpu_tb/soc/zwc0/timrs/timer_gen(1)/timerX/thresh_o
-add wave -noupdate -expand -group soc -expand -group zwc0 -group timer -group timer1 /gmzpu_tb/soc/zwc0/timrs/timer_gen(1)/timerX/th_hlt_i
-add wave -noupdate -expand -group soc -expand -group zwc0 -group timer -group timer1 /gmzpu_tb/soc/zwc0/timrs/timer_gen(1)/timerX/th_rst_i
-add wave -noupdate -expand -group soc -expand -group zwc0 -group timer -group timer1 /gmzpu_tb/soc/zwc0/timrs/timer_gen(1)/timerX/th_stk_i
-add wave -noupdate -expand -group soc -expand -group zwc0 -group timer -group timer1 /gmzpu_tb/soc/zwc0/timrs/timer_gen(1)/timerX/CNT
-add wave -noupdate -expand -group soc -expand -group zwc0 -group timer -group timer1 /gmzpu_tb/soc/zwc0/timrs/timer_gen(1)/timerX/THR
-add wave -noupdate -expand -group soc -expand -group zwc0 -group timer -group timer1 /gmzpu_tb/soc/zwc0/timrs/timer_gen(1)/timerX/halt_r
-add wave -noupdate -expand -group soc -expand -group zwc0 -group timer -group timer1 /gmzpu_tb/soc/zwc0/timrs/timer_gen(1)/timerX/thresh_r
-add wave -noupdate -expand -group soc -expand -group zwc0 -group timer -group timer1 /gmzpu_tb/soc/zwc0/timrs/timer_gen(1)/timerX/dat_en_r
-add wave -noupdate -expand -group soc -expand -group zwc0 -group timer -group timer2 /gmzpu_tb/soc/zwc0/timrs/timer_gen(2)/timerX/clk_i
-add wave -noupdate -expand -group soc -expand -group zwc0 -group timer -group timer2 /gmzpu_tb/soc/zwc0/timrs/timer_gen(2)/timerX/rst_i
-add wave -noupdate -expand -group soc -expand -group zwc0 -group timer -group timer2 /gmzpu_tb/soc/zwc0/timrs/timer_gen(2)/timerX/inc_i
-add wave -noupdate -expand -group soc -expand -group zwc0 -group timer -group timer2 /gmzpu_tb/soc/zwc0/timrs/timer_gen(2)/timerX/addr_i
-add wave -noupdate -expand -group soc -expand -group zwc0 -group timer -group timer2 /gmzpu_tb/soc/zwc0/timrs/timer_gen(2)/timerX/dat_o
-add wave -noupdate -expand -group soc -expand -group zwc0 -group timer -group timer2 /gmzpu_tb/soc/zwc0/timrs/timer_gen(2)/timerX/dat_i
-add wave -noupdate -expand -group soc -expand -group zwc0 -group timer -group timer2 /gmzpu_tb/soc/zwc0/timrs/timer_gen(2)/timerX/we_i
-add wave -noupdate -expand -group soc -expand -group zwc0 -group timer -group timer2 /gmzpu_tb/soc/zwc0/timrs/timer_gen(2)/timerX/en_i
-add wave -noupdate -expand -group soc -expand -group zwc0 -group timer -group timer2 /gmzpu_tb/soc/zwc0/timrs/timer_gen(2)/timerX/thresh_o
-add wave -noupdate -expand -group soc -expand -group zwc0 -group timer -group timer2 /gmzpu_tb/soc/zwc0/timrs/timer_gen(2)/timerX/th_hlt_i
-add wave -noupdate -expand -group soc -expand -group zwc0 -group timer -group timer2 /gmzpu_tb/soc/zwc0/timrs/timer_gen(2)/timerX/th_rst_i
-add wave -noupdate -expand -group soc -expand -group zwc0 -group timer -group timer2 /gmzpu_tb/soc/zwc0/timrs/timer_gen(2)/timerX/th_stk_i
-add wave -noupdate -expand -group soc -expand -group zwc0 -group timer -group timer2 /gmzpu_tb/soc/zwc0/timrs/timer_gen(2)/timerX/CNT
-add wave -noupdate -expand -group soc -expand -group zwc0 -group timer -group timer2 /gmzpu_tb/soc/zwc0/timrs/timer_gen(2)/timerX/THR
-add wave -noupdate -expand -group soc -expand -group zwc0 -group timer -group timer2 /gmzpu_tb/soc/zwc0/timrs/timer_gen(2)/timerX/halt_r
-add wave -noupdate -expand -group soc -expand -group zwc0 -group timer -group timer2 /gmzpu_tb/soc/zwc0/timrs/timer_gen(2)/timerX/thresh_r
-add wave -noupdate -expand -group soc -expand -group zwc0 -group timer -group timer2 /gmzpu_tb/soc/zwc0/timrs/timer_gen(2)/timerX/dat_en_r
-add wave -noupdate -expand -group soc -expand -group zwc0 -group timer -group timer3 /gmzpu_tb/soc/zwc0/timrs/timer_gen(3)/timerX/clk_i
-add wave -noupdate -expand -group soc -expand -group zwc0 -group timer -group timer3 /gmzpu_tb/soc/zwc0/timrs/timer_gen(3)/timerX/rst_i
-add wave -noupdate -expand -group soc -expand -group zwc0 -group timer -group timer3 /gmzpu_tb/soc/zwc0/timrs/timer_gen(3)/timerX/inc_i
-add wave -noupdate -expand -group soc -expand -group zwc0 -group timer -group timer3 /gmzpu_tb/soc/zwc0/timrs/timer_gen(3)/timerX/addr_i
-add wave -noupdate -expand -group soc -expand -group zwc0 -group timer -group timer3 /gmzpu_tb/soc/zwc0/timrs/timer_gen(3)/timerX/dat_o
-add wave -noupdate -expand -group soc -expand -group zwc0 -group timer -group timer3 /gmzpu_tb/soc/zwc0/timrs/timer_gen(3)/timerX/dat_i
-add wave -noupdate -expand -group soc -expand -group zwc0 -group timer -group timer3 /gmzpu_tb/soc/zwc0/timrs/timer_gen(3)/timerX/we_i
-add wave -noupdate -expand -group soc -expand -group zwc0 -group timer -group timer3 /gmzpu_tb/soc/zwc0/timrs/timer_gen(3)/timerX/en_i
-add wave -noupdate -expand -group soc -expand -group zwc0 -group timer -group timer3 /gmzpu_tb/soc/zwc0/timrs/timer_gen(3)/timerX/thresh_o
-add wave -noupdate -expand -group soc -expand -group zwc0 -group timer -group timer3 /gmzpu_tb/soc/zwc0/timrs/timer_gen(3)/timerX/th_hlt_i
-add wave -noupdate -expand -group soc -expand -group zwc0 -group timer -group timer3 /gmzpu_tb/soc/zwc0/timrs/timer_gen(3)/timerX/th_rst_i
-add wave -noupdate -expand -group soc -expand -group zwc0 -group timer -group timer3 /gmzpu_tb/soc/zwc0/timrs/timer_gen(3)/timerX/th_stk_i
-add wave -noupdate -expand -group soc -expand -group zwc0 -group timer -group timer3 /gmzpu_tb/soc/zwc0/timrs/timer_gen(3)/timerX/CNT
-add wave -noupdate -expand -group soc -expand -group zwc0 -group timer -group timer3 /gmzpu_tb/soc/zwc0/timrs/timer_gen(3)/timerX/THR
-add wave -noupdate -expand -group soc -expand -group zwc0 -group timer -group timer3 /gmzpu_tb/soc/zwc0/timrs/timer_gen(3)/timerX/halt_r
-add wave -noupdate -expand -group soc -expand -group zwc0 -group timer -group timer3 /gmzpu_tb/soc/zwc0/timrs/timer_gen(3)/timerX/thresh_r
-add wave -noupdate -expand -group soc -expand -group zwc0 -group timer -group timer3 /gmzpu_tb/soc/zwc0/timrs/timer_gen(3)/timerX/dat_en_r
-add wave -noupdate -expand -group soc -group zpu /gmzpu_tb/soc/zpu/clk_i
-add wave -noupdate -expand -group soc -group zpu /gmzpu_tb/soc/zpu/reset_i
-add wave -noupdate -expand -group soc -group zpu /gmzpu_tb/soc/zpu/interrupt_i
-add wave -noupdate -expand -group soc -group zpu /gmzpu_tb/soc/zpu/enable_i
-add wave -noupdate -expand -group soc -group zpu /gmzpu_tb/soc/zpu/break_o
-add wave -noupdate -expand -group soc -group zpu /gmzpu_tb/soc/zpu/dbg_o
-add wave -noupdate -expand -group soc -group zpu /gmzpu_tb/soc/zpu/mem_busy_i
-add wave -noupdate -expand -group soc -group zpu /gmzpu_tb/soc/zpu/data_i
-add wave -noupdate -expand -group soc -group zpu /gmzpu_tb/soc/zpu/data_o
-add wave -noupdate -expand -group soc -group zpu /gmzpu_tb/soc/zpu/addr_o
-add wave -noupdate -expand -group soc -group zpu /gmzpu_tb/soc/zpu/write_en_o
-add wave -noupdate -expand -group soc -group zpu /gmzpu_tb/soc/zpu/read_en_o
-add wave -noupdate -expand -group soc -group zpu /gmzpu_tb/soc/zpu/pc_r
-add wave -noupdate -expand -group soc -group zpu /gmzpu_tb/soc/zpu/sp_r
-add wave -noupdate -expand -group soc -group zpu /gmzpu_tb/soc/zpu/inc_sp
-add wave -noupdate -expand -group soc -group zpu /gmzpu_tb/soc/zpu/inc_inc_sp
-add wave -noupdate -expand -group soc -group zpu /gmzpu_tb/soc/zpu/a_r
-add wave -noupdate -expand -group soc -group zpu /gmzpu_tb/soc/zpu/b_r
-add wave -noupdate -expand -group soc -group zpu /gmzpu_tb/soc/zpu/bin_op_res1_r
-add wave -noupdate -expand -group soc -group zpu /gmzpu_tb/soc/zpu/bin_op_res2_r
-add wave -noupdate -expand -group soc -group zpu /gmzpu_tb/soc/zpu/mult_res1_r
-add wave -noupdate -expand -group soc -group zpu /gmzpu_tb/soc/zpu/mult_res2_r
-add wave -noupdate -expand -group soc -group zpu /gmzpu_tb/soc/zpu/mult_res3_r
-add wave -noupdate -expand -group soc -group zpu /gmzpu_tb/soc/zpu/mult_a_r
-add wave -noupdate -expand -group soc -group zpu /gmzpu_tb/soc/zpu/mult_b_r
-add wave -noupdate -expand -group soc -group zpu /gmzpu_tb/soc/zpu/idim_r
-add wave -noupdate -expand -group soc -group zpu /gmzpu_tb/soc/zpu/write_en_r
-add wave -noupdate -expand -group soc -group zpu /gmzpu_tb/soc/zpu/read_en_r
-add wave -noupdate -expand -group soc -group zpu /gmzpu_tb/soc/zpu/addr_r
-add wave -noupdate -expand -group soc -group zpu /gmzpu_tb/soc/zpu/fetched_w_r
-add wave -noupdate -expand -group soc -group zpu /gmzpu_tb/soc/zpu/in_irq_r
-add wave -noupdate -expand -group soc -group zpu /gmzpu_tb/soc/zpu/state
-add wave -noupdate -expand -group soc -group zpu /gmzpu_tb/soc/zpu/insn
-add wave -noupdate -expand -group soc -group zpu /gmzpu_tb/soc/zpu/insns
-add wave -noupdate -expand -group soc -group zpu /gmzpu_tb/soc/zpu/opcode_r
+add wave -noupdate -expand -group soc -expand -group zwc0 -expand -group timer /gmzpu_tb/soc/zwc0/timrs/rst_i
+add wave -noupdate -expand -group soc -expand -group zwc0 -expand -group timer /gmzpu_tb/soc/zwc0/timrs/clk_i
+add wave -noupdate -expand -group soc -expand -group zwc0 -expand -group timer /gmzpu_tb/soc/zwc0/timrs/wb_cyc_i
+add wave -noupdate -expand -group soc -expand -group zwc0 -expand -group timer /gmzpu_tb/soc/zwc0/timrs/wb_stb_i
+add wave -noupdate -expand -group soc -expand -group zwc0 -expand -group timer /gmzpu_tb/soc/zwc0/timrs/wb_ack_o
+add wave -noupdate -expand -group soc -expand -group zwc0 -expand -group timer /gmzpu_tb/soc/zwc0/timrs/wb_we_i
+add wave -noupdate -expand -group soc -expand -group zwc0 -expand -group timer -radix hexadecimal /gmzpu_tb/soc/zwc0/timrs/wb_dat_o
+add wave -noupdate -expand -group soc -expand -group zwc0 -expand -group timer -radix hexadecimal /gmzpu_tb/soc/zwc0/timrs/wb_dat_i
+add wave -noupdate -expand -group soc -expand -group zwc0 -expand -group timer -radix hexadecimal /gmzpu_tb/soc/zwc0/timrs/wb_tgd_o
+add wave -noupdate -expand -group soc -expand -group zwc0 -expand -group timer -radix hexadecimal /gmzpu_tb/soc/zwc0/timrs/wb_tgd_i
+add wave -noupdate -expand -group soc -expand -group zwc0 -expand -group timer /gmzpu_tb/soc/zwc0/timrs/wb_adr_i
+add wave -noupdate -expand -group soc -expand -group zwc0 -expand -group timer /gmzpu_tb/soc/zwc0/timrs/wb_stall_o
+add wave -noupdate -expand -group soc -expand -group zwc0 -expand -group timer /gmzpu_tb/soc/zwc0/timrs/wb_err_o
+add wave -noupdate -expand -group soc -expand -group zwc0 -expand -group timer /gmzpu_tb/soc/zwc0/timrs/wb_lock_i
+add wave -noupdate -expand -group soc -expand -group zwc0 -expand -group timer /gmzpu_tb/soc/zwc0/timrs/wb_rty_o
+add wave -noupdate -expand -group soc -expand -group zwc0 -expand -group timer -radix hexadecimal /gmzpu_tb/soc/zwc0/timrs/wb_sel_i
+add wave -noupdate -expand -group soc -expand -group zwc0 -expand -group timer -radix hexadecimal /gmzpu_tb/soc/zwc0/timrs/wb_tga_i
+add wave -noupdate -expand -group soc -expand -group zwc0 -expand -group timer -radix hexadecimal /gmzpu_tb/soc/zwc0/timrs/wb_tgc_i
+add wave -noupdate -expand -group soc -expand -group zwc0 -expand -group timer /gmzpu_tb/soc/zwc0/timrs/irq_o
+add wave -noupdate -expand -group soc -expand -group zwc0 -expand -group timer /gmzpu_tb/soc/zwc0/timrs/irq_r
+add wave -noupdate -expand -group soc -expand -group zwc0 -expand -group timer /gmzpu_tb/soc/zwc0/timrs/ten_r
+add wave -noupdate -expand -group soc -expand -group zwc0 -expand -group timer /gmzpu_tb/soc/zwc0/timrs/cs_r
+add wave -noupdate -expand -group soc -expand -group zwc0 -expand -group timer /gmzpu_tb/soc/zwc0/timrs/addr_r
+add wave -noupdate -expand -group soc -expand -group zwc0 -expand -group timer /gmzpu_tb/soc/zwc0/timrs/en_r
+add wave -noupdate -expand -group soc -expand -group zwc0 -expand -group timer /gmzpu_tb/soc/zwc0/timrs/we_r
+add wave -noupdate -expand -group soc -expand -group zwc0 -expand -group timer /gmzpu_tb/soc/zwc0/timrs/dat_r
+add wave -noupdate -expand -group soc -expand -group zwc0 -expand -group timer /gmzpu_tb/soc/zwc0/timrs/we_d
+add wave -noupdate -expand -group soc -expand -group zwc0 -expand -group timer /gmzpu_tb/soc/zwc0/timrs/dat_d
+add wave -noupdate -expand -group soc -expand -group zwc0 -expand -group timer /gmzpu_tb/soc/zwc0/timrs/addr_d
+add wave -noupdate -expand -group soc -expand -group zwc0 -expand -group timer -group timer0 /gmzpu_tb/soc/zwc0/timrs/timer_gen(0)/timerX/clk_i
+add wave -noupdate -expand -group soc -expand -group zwc0 -expand -group timer -group timer0 /gmzpu_tb/soc/zwc0/timrs/timer_gen(0)/timerX/rst_i
+add wave -noupdate -expand -group soc -expand -group zwc0 -expand -group timer -group timer0 /gmzpu_tb/soc/zwc0/timrs/timer_gen(0)/timerX/inc_i
+add wave -noupdate -expand -group soc -expand -group zwc0 -expand -group timer -group timer0 /gmzpu_tb/soc/zwc0/timrs/timer_gen(0)/timerX/addr_i
+add wave -noupdate -expand -group soc -expand -group zwc0 -expand -group timer -group timer0 /gmzpu_tb/soc/zwc0/timrs/timer_gen(0)/timerX/dat_o
+add wave -noupdate -expand -group soc -expand -group zwc0 -expand -group timer -group timer0 /gmzpu_tb/soc/zwc0/timrs/timer_gen(0)/timerX/dat_i
+add wave -noupdate -expand -group soc -expand -group zwc0 -expand -group timer -group timer0 /gmzpu_tb/soc/zwc0/timrs/timer_gen(0)/timerX/we_i
+add wave -noupdate -expand -group soc -expand -group zwc0 -expand -group timer -group timer0 /gmzpu_tb/soc/zwc0/timrs/timer_gen(0)/timerX/en_i
+add wave -noupdate -expand -group soc -expand -group zwc0 -expand -group timer -group timer0 /gmzpu_tb/soc/zwc0/timrs/timer_gen(0)/timerX/thresh_o
+add wave -noupdate -expand -group soc -expand -group zwc0 -expand -group timer -group timer0 /gmzpu_tb/soc/zwc0/timrs/timer_gen(0)/timerX/CNT
+add wave -noupdate -expand -group soc -expand -group zwc0 -expand -group timer -group timer0 /gmzpu_tb/soc/zwc0/timrs/timer_gen(0)/timerX/THR
+add wave -noupdate -expand -group soc -expand -group zwc0 -expand -group timer -group timer0 /gmzpu_tb/soc/zwc0/timrs/timer_gen(0)/timerX/halt_r
+add wave -noupdate -expand -group soc -expand -group zwc0 -expand -group timer -group timer0 /gmzpu_tb/soc/zwc0/timrs/timer_gen(0)/timerX/thresh_r
+add wave -noupdate -expand -group soc -expand -group zwc0 -expand -group timer -group timer0 /gmzpu_tb/soc/zwc0/timrs/timer_gen(0)/timerX/dat_en_r
+add wave -noupdate -expand -group soc -expand -group zwc0 -expand -group timer -group timer1 /gmzpu_tb/soc/zwc0/timrs/timer_gen(1)/timerX/clk_i
+add wave -noupdate -expand -group soc -expand -group zwc0 -expand -group timer -group timer1 /gmzpu_tb/soc/zwc0/timrs/timer_gen(1)/timerX/rst_i
+add wave -noupdate -expand -group soc -expand -group zwc0 -expand -group timer -group timer1 /gmzpu_tb/soc/zwc0/timrs/timer_gen(1)/timerX/inc_i
+add wave -noupdate -expand -group soc -expand -group zwc0 -expand -group timer -group timer1 /gmzpu_tb/soc/zwc0/timrs/timer_gen(1)/timerX/addr_i
+add wave -noupdate -expand -group soc -expand -group zwc0 -expand -group timer -group timer1 /gmzpu_tb/soc/zwc0/timrs/timer_gen(1)/timerX/dat_o
+add wave -noupdate -expand -group soc -expand -group zwc0 -expand -group timer -group timer1 /gmzpu_tb/soc/zwc0/timrs/timer_gen(1)/timerX/dat_i
+add wave -noupdate -expand -group soc -expand -group zwc0 -expand -group timer -group timer1 /gmzpu_tb/soc/zwc0/timrs/timer_gen(1)/timerX/we_i
+add wave -noupdate -expand -group soc -expand -group zwc0 -expand -group timer -group timer1 /gmzpu_tb/soc/zwc0/timrs/timer_gen(1)/timerX/en_i
+add wave -noupdate -expand -group soc -expand -group zwc0 -expand -group timer -group timer1 /gmzpu_tb/soc/zwc0/timrs/timer_gen(1)/timerX/thresh_o
+add wave -noupdate -expand -group soc -expand -group zwc0 -expand -group timer -group timer1 /gmzpu_tb/soc/zwc0/timrs/timer_gen(1)/timerX/CNT
+add wave -noupdate -expand -group soc -expand -group zwc0 -expand -group timer -group timer1 /gmzpu_tb/soc/zwc0/timrs/timer_gen(1)/timerX/THR
+add wave -noupdate -expand -group soc -expand -group zwc0 -expand -group timer -group timer1 /gmzpu_tb/soc/zwc0/timrs/timer_gen(1)/timerX/halt_r
+add wave -noupdate -expand -group soc -expand -group zwc0 -expand -group timer -group timer1 /gmzpu_tb/soc/zwc0/timrs/timer_gen(1)/timerX/thresh_r
+add wave -noupdate -expand -group soc -expand -group zwc0 -expand -group timer -group timer1 /gmzpu_tb/soc/zwc0/timrs/timer_gen(1)/timerX/dat_en_r
+add wave -noupdate -expand -group soc -expand -group zwc0 -expand -group timer -group timer2 /gmzpu_tb/soc/zwc0/timrs/timer_gen(2)/timerX/clk_i
+add wave -noupdate -expand -group soc -expand -group zwc0 -expand -group timer -group timer2 /gmzpu_tb/soc/zwc0/timrs/timer_gen(2)/timerX/rst_i
+add wave -noupdate -expand -group soc -expand -group zwc0 -expand -group timer -group timer2 /gmzpu_tb/soc/zwc0/timrs/timer_gen(2)/timerX/inc_i
+add wave -noupdate -expand -group soc -expand -group zwc0 -expand -group timer -group timer2 /gmzpu_tb/soc/zwc0/timrs/timer_gen(2)/timerX/addr_i
+add wave -noupdate -expand -group soc -expand -group zwc0 -expand -group timer -group timer2 /gmzpu_tb/soc/zwc0/timrs/timer_gen(2)/timerX/dat_o
+add wave -noupdate -expand -group soc -expand -group zwc0 -expand -group timer -group timer2 /gmzpu_tb/soc/zwc0/timrs/timer_gen(2)/timerX/dat_i
+add wave -noupdate -expand -group soc -expand -group zwc0 -expand -group timer -group timer2 /gmzpu_tb/soc/zwc0/timrs/timer_gen(2)/timerX/we_i
+add wave -noupdate -expand -group soc -expand -group zwc0 -expand -group timer -group timer2 /gmzpu_tb/soc/zwc0/timrs/timer_gen(2)/timerX/en_i
+add wave -noupdate -expand -group soc -expand -group zwc0 -expand -group timer -group timer2 /gmzpu_tb/soc/zwc0/timrs/timer_gen(2)/timerX/thresh_o
+add wave -noupdate -expand -group soc -expand -group zwc0 -expand -group timer -group timer2 /gmzpu_tb/soc/zwc0/timrs/timer_gen(2)/timerX/CNT
+add wave -noupdate -expand -group soc -expand -group zwc0 -expand -group timer -group timer2 /gmzpu_tb/soc/zwc0/timrs/timer_gen(2)/timerX/THR
+add wave -noupdate -expand -group soc -expand -group zwc0 -expand -group timer -group timer2 /gmzpu_tb/soc/zwc0/timrs/timer_gen(2)/timerX/halt_r
+add wave -noupdate -expand -group soc -expand -group zwc0 -expand -group timer -group timer2 /gmzpu_tb/soc/zwc0/timrs/timer_gen(2)/timerX/thresh_r
+add wave -noupdate -expand -group soc -expand -group zwc0 -expand -group timer -group timer2 /gmzpu_tb/soc/zwc0/timrs/timer_gen(2)/timerX/dat_en_r
+add wave -noupdate -expand -group soc -expand -group zwc0 -expand -group timer -group timer3 /gmzpu_tb/soc/zwc0/timrs/timer_gen(3)/timerX/clk_i
+add wave -noupdate -expand -group soc -expand -group zwc0 -expand -group timer -group timer3 /gmzpu_tb/soc/zwc0/timrs/timer_gen(3)/timerX/rst_i
+add wave -noupdate -expand -group soc -expand -group zwc0 -expand -group timer -group timer3 /gmzpu_tb/soc/zwc0/timrs/timer_gen(3)/timerX/inc_i
+add wave -noupdate -expand -group soc -expand -group zwc0 -expand -group timer -group timer3 /gmzpu_tb/soc/zwc0/timrs/timer_gen(3)/timerX/addr_i
+add wave -noupdate -expand -group soc -expand -group zwc0 -expand -group timer -group timer3 /gmzpu_tb/soc/zwc0/timrs/timer_gen(3)/timerX/dat_o
+add wave -noupdate -expand -group soc -expand -group zwc0 -expand -group timer -group timer3 /gmzpu_tb/soc/zwc0/timrs/timer_gen(3)/timerX/dat_i
+add wave -noupdate -expand -group soc -expand -group zwc0 -expand -group timer -group timer3 /gmzpu_tb/soc/zwc0/timrs/timer_gen(3)/timerX/we_i
+add wave -noupdate -expand -group soc -expand -group zwc0 -expand -group timer -group timer3 /gmzpu_tb/soc/zwc0/timrs/timer_gen(3)/timerX/en_i
+add wave -noupdate -expand -group soc -expand -group zwc0 -expand -group timer -group timer3 /gmzpu_tb/soc/zwc0/timrs/timer_gen(3)/timerX/thresh_o
+add wave -noupdate -expand -group soc -expand -group zwc0 -expand -group timer -group timer3 /gmzpu_tb/soc/zwc0/timrs/timer_gen(3)/timerX/CNT
+add wave -noupdate -expand -group soc -expand -group zwc0 -expand -group timer -group timer3 /gmzpu_tb/soc/zwc0/timrs/timer_gen(3)/timerX/THR
+add wave -noupdate -expand -group soc -expand -group zwc0 -expand -group timer -group timer3 /gmzpu_tb/soc/zwc0/timrs/timer_gen(3)/timerX/halt_r
+add wave -noupdate -expand -group soc -expand -group zwc0 -expand -group timer -group timer3 /gmzpu_tb/soc/zwc0/timrs/timer_gen(3)/timerX/thresh_r
+add wave -noupdate -expand -group soc -expand -group zwc0 -expand -group timer -group timer3 /gmzpu_tb/soc/zwc0/timrs/timer_gen(3)/timerX/dat_en_r
+add wave -noupdate -expand -group soc -expand -group zpu /gmzpu_tb/soc/zpu/clk_i
+add wave -noupdate -expand -group soc -expand -group zpu /gmzpu_tb/soc/zpu/reset_i
+add wave -noupdate -expand -group soc -expand -group zpu /gmzpu_tb/soc/zpu/interrupt_i
+add wave -noupdate -expand -group soc -expand -group zpu /gmzpu_tb/soc/zpu/enable_i
+add wave -noupdate -expand -group soc -expand -group zpu /gmzpu_tb/soc/zpu/break_o
+add wave -noupdate -expand -group soc -expand -group zpu -radix hexadecimal /gmzpu_tb/soc/zpu/dbg_o
+add wave -noupdate -expand -group soc -expand -group zpu /gmzpu_tb/soc/zpu/mem_busy_i
+add wave -noupdate -expand -group soc -expand -group zpu -radix hexadecimal /gmzpu_tb/soc/zpu/data_i
+add wave -noupdate -expand -group soc -expand -group zpu -radix hexadecimal /gmzpu_tb/soc/zpu/data_o
+add wave -noupdate -expand -group soc -expand -group zpu -radix hexadecimal /gmzpu_tb/soc/zpu/addr_o
+add wave -noupdate -expand -group soc -expand -group zpu /gmzpu_tb/soc/zpu/write_en_o
+add wave -noupdate -expand -group soc -expand -group zpu /gmzpu_tb/soc/zpu/read_en_o
+add wave -noupdate -expand -group soc -expand -group zpu -radix hexadecimal /gmzpu_tb/soc/zpu/pc_r
+add wave -noupdate -expand -group soc -expand -group zpu -radix hexadecimal /gmzpu_tb/soc/zpu/sp_r
+add wave -noupdate -expand -group soc -expand -group zpu -radix hexadecimal /gmzpu_tb/soc/zpu/inc_sp
+add wave -noupdate -expand -group soc -expand -group zpu -radix hexadecimal /gmzpu_tb/soc/zpu/inc_inc_sp
+add wave -noupdate -expand -group soc -expand -group zpu -radix hexadecimal /gmzpu_tb/soc/zpu/a_r
+add wave -noupdate -expand -group soc -expand -group zpu -radix hexadecimal /gmzpu_tb/soc/zpu/b_r
+add wave -noupdate -expand -group soc -expand -group zpu -radix hexadecimal /gmzpu_tb/soc/zpu/bin_op_res1_r
+add wave -noupdate -expand -group soc -expand -group zpu -radix hexadecimal /gmzpu_tb/soc/zpu/bin_op_res2_r
+add wave -noupdate -expand -group soc -expand -group zpu -radix hexadecimal /gmzpu_tb/soc/zpu/mult_res1_r
+add wave -noupdate -expand -group soc -expand -group zpu -radix hexadecimal /gmzpu_tb/soc/zpu/mult_res2_r
+add wave -noupdate -expand -group soc -expand -group zpu -radix hexadecimal /gmzpu_tb/soc/zpu/mult_res3_r
+add wave -noupdate -expand -group soc -expand -group zpu -radix hexadecimal /gmzpu_tb/soc/zpu/mult_a_r
+add wave -noupdate -expand -group soc -expand -group zpu -radix hexadecimal /gmzpu_tb/soc/zpu/mult_b_r
+add wave -noupdate -expand -group soc -expand -group zpu /gmzpu_tb/soc/zpu/idim_r
+add wave -noupdate -expand -group soc -expand -group zpu /gmzpu_tb/soc/zpu/write_en_r
+add wave -noupdate -expand -group soc -expand -group zpu /gmzpu_tb/soc/zpu/read_en_r
+add wave -noupdate -expand -group soc -expand -group zpu -radix hexadecimal /gmzpu_tb/soc/zpu/addr_r
+add wave -noupdate -expand -group soc -expand -group zpu -radix hexadecimal /gmzpu_tb/soc/zpu/fetched_w_r
+add wave -noupdate -expand -group soc -expand -group zpu /gmzpu_tb/soc/zpu/in_irq_r
+add wave -noupdate -expand -group soc -expand -group zpu /gmzpu_tb/soc/zpu/state
+add wave -noupdate -expand -group soc -expand -group zpu /gmzpu_tb/soc/zpu/insn
+add wave -noupdate -expand -group soc -expand -group zpu /gmzpu_tb/soc/zpu/insns
+add wave -noupdate -expand -group soc -expand -group zpu -radix hexadecimal /gmzpu_tb/soc/zpu/opcode_r
 add wave -noupdate -group trace /gmzpu_tb/trace_mod/clk_i
 add wave -noupdate -group trace /gmzpu_tb/trace_mod/dbg_i
 add wave -noupdate -group trace /gmzpu_tb/trace_mod/stop_i
 add wave -noupdate -group trace /gmzpu_tb/trace_mod/busy_i
 add wave -noupdate -group trace /gmzpu_tb/trace_mod/counter
 TreeUpdate [SetDefaultTree]
-WaveRestoreCursors {{Cursor 1} {599390000 ps} 0}
+WaveRestoreCursors {{Cursor 1} {601479636 ps} 0}
 quietly wave cursor active 1
 configure wave -namecolwidth 368
 configure wave -valuecolwidth 100
@@ -837,4 +825,4 @@ configure wave -griddelta 40
 configure wave -timeline 0
 configure wave -timelineunits ms
 update
-WaveRestoreZoom {599290243 ps} {599489757 ps}
+WaveRestoreZoom {601390243 ps} {601589757 ps}
