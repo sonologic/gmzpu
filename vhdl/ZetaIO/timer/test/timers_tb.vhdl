@@ -54,7 +54,7 @@ end entity timers_TB;
 architecture Behave of timers_TB is
     constant CLK_FREQ   : positive:=50; -- 50 MHz clock
     constant CLK_S_PER  : time:=1 us/(2.0*real(CLK_FREQ)); -- Clock semi period
-    constant ADR_WIDTH  : natural:=4;
+    constant ADR_WIDTH  : natural:=6;
     constant DATA_WIDTH : natural:=32;
 
     component timers is
@@ -105,22 +105,22 @@ architecture Behave of timers_TB is
     constant test_data : sample_array :=
         (
         --   rst we  cyc stb adr_i   dat_i         dat_o        irq_o, ack_o
-            ('1','0','0','0',"0000", X"00000000",  X"00000000", '0',   '0'),
-            ('1','0','0','0',"0000", X"00000000",  X"00000000", '0',   '0'),
-            ('0','0','0','0',"0000", X"00000000",  X"00000000", '0',   '0'),
+            ('1','0','0','0',"000000", X"00000000",  X"00000000", '0',   'L'),
+            ('1','0','0','0',"000000", X"00000000",  X"00000000", '0',   'L'),
+            ('0','0','0','0',"000000", X"00000000",  X"00000000", '0',   'L'),
             -- write 
-            ('0','1','1','1',"0001", X"11111111",  X"00000000", '0',   '0'),
-            ('0','0','1','0',"0000", X"00000000",  X"00000000", '0',   '1'),
-            ('0','0','0','0',"0000", X"00000000",  X"00000000", '0',   '0'),
-            ('0','1','1','1',"0101", X"44444444",  X"00000000", '0',   '0'),
-            ('0','0','1','0',"0000", X"00000000",  X"00000000", '0',   '1'),
-            ('0','0','0','0',"0000", X"00000000",  X"00000000", '0',   '0'),
+            ('0','1','1','1',"000001", X"11111111",  X"00000000", '0',   '0'),
+            ('0','0','1','0',"000000", X"00000000",  X"00000000", '0',   '1'),
+            ('0','0','0','0',"000000", X"00000000",  X"00000000", '0',   'L'),
+            ('0','1','1','1',"000101", X"44444444",  X"00000000", '0',   '0'),
+            ('0','0','1','0',"000000", X"00000000",  X"00000000", '0',   '1'),
+            ('0','0','0','0',"000000", X"00000000",  X"00000000", '0',   'L'),
             -- read
-            ('0','0','1','1',"0101", X"00000000",  X"00000000", '0',   '0'),
-            ('0','0','1','0',"0101", X"00000000",  X"44444444", '0',   '1'),
-            ('0','0','0','0',"0000", X"00000000",  X"00000000", '0',   '0'),
+            ('0','0','1','1',"000101", X"00000000",  X"00000000", '0',   '0'),
+            ('0','0','1','0',"000101", X"00000000",  X"44444444", '0',   '1'),
+            ('0','0','0','0',"000000", X"00000000",  X"00000000", '0',   'L'),
             -- terminate
-            ('0','0','0','0',"0000", X"00000000",  X"00000000", '0',   '0')
+            ('0','0','0','0',"000000", X"00000000",  X"00000000", '0',   'L')
         );
         
 
@@ -156,6 +156,7 @@ begin
                  irq_o => irq_o);
 
     wb_dat_o <= (others => 'L');
+    wb_ack_o <= 'L';
 
     process
         variable cycle_count    : integer:=0;
@@ -176,7 +177,7 @@ begin
 
             assert (wb_dat_o = test_data(i).wb_dat_o) report "dat_o output mismatch" severity error;
             assert (irq_o = test_data(i).irq_o) report "irq_o output mismatch" severity error;
-            assert (wb_ack_o = test_data(i).wb_ack_o) report "ack_o output mismatch" severity error;
+            assert (wb_ack_o = test_data(i).wb_ack_o) report "wb_ack_o output mismatch" severity error;
             -- assert (icr_o = test_data(i).icr_o) report "icr_o output mismatch" severity failure;
 
         end loop;
