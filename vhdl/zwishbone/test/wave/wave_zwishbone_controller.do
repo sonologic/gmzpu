@@ -39,19 +39,20 @@ add wave -noupdate -expand -group dut -radix hexadecimal /zwishbone_controller_t
 add wave -noupdate -expand -group dut -radix hexadecimal /zwishbone_controller_tb/dut/wb_dat_o
 add wave -noupdate -expand -group dut -radix hexadecimal /zwishbone_controller_tb/dut/wb_tgd_i
 add wave -noupdate -expand -group dut -radix hexadecimal /zwishbone_controller_tb/dut/wb_tgd_o
-add wave -noupdate -expand -group dut /zwishbone_controller_tb/dut/wb_ack_i
-add wave -noupdate -expand -group dut -radix hexadecimal /zwishbone_controller_tb/dut/wb_adr_o
 add wave -noupdate -expand -group dut /zwishbone_controller_tb/dut/wb_cyc_o
+add wave -noupdate -expand -group dut -radix hexadecimal /zwishbone_controller_tb/dut/wb_stb_o
+add wave -noupdate -expand -group dut /zwishbone_controller_tb/dut/wb_ack_i
+add wave -noupdate -expand -group dut /zwishbone_controller_tb/dut/wb_we_o
+add wave -noupdate -expand -group dut -radix hexadecimal /zwishbone_controller_tb/dut/wb_adr_o
 add wave -noupdate -expand -group dut /zwishbone_controller_tb/dut/wb_stall_i
 add wave -noupdate -expand -group dut /zwishbone_controller_tb/dut/wb_err_i
 add wave -noupdate -expand -group dut /zwishbone_controller_tb/dut/wb_lock_o
 add wave -noupdate -expand -group dut /zwishbone_controller_tb/dut/wb_rty_i
 add wave -noupdate -expand -group dut -radix hexadecimal /zwishbone_controller_tb/dut/wb_sel_o
-add wave -noupdate -expand -group dut -radix hexadecimal /zwishbone_controller_tb/dut/wb_stb_o
 add wave -noupdate -expand -group dut -radix hexadecimal /zwishbone_controller_tb/dut/wb_tga_o
 add wave -noupdate -expand -group dut -radix hexadecimal /zwishbone_controller_tb/dut/wb_tgc_o
-add wave -noupdate -expand -group dut /zwishbone_controller_tb/dut/wb_we_o
 add wave -noupdate -expand -group dut /zwishbone_controller_tb/dut/state
+add wave -noupdate -expand -group dut /zwishbone_controller_tb/dut/next_state
 add wave -noupdate -expand -group dut /zwishbone_controller_tb/dut/reg_re_r
 add wave -noupdate -expand -group dut /zwishbone_controller_tb/dut/reg_we_r
 add wave -noupdate -expand -group dut -radix hexadecimal /zwishbone_controller_tb/dut/reg_dat_ir
@@ -62,7 +63,6 @@ add wave -noupdate -expand -group dut /zwishbone_controller_tb/dut/to_rst_r
 add wave -noupdate -expand -group dut /zwishbone_controller_tb/dut/err_r
 add wave -noupdate -expand -group dut /zwishbone_controller_tb/dut/rty_r
 add wave -noupdate -expand -group dut -radix hexadecimal /zwishbone_controller_tb/dut/config_r
-add wave -noupdate -expand -group dut -expand -group regs /zwishbone_controller_tb/dut/registers/to_r
 add wave -noupdate -expand -group dut -expand -group regs /zwishbone_controller_tb/dut/registers/reading_r
 add wave -noupdate -expand -group dut -expand -group regs /zwishbone_controller_tb/dut/registers/clk_i
 add wave -noupdate -expand -group dut -expand -group regs /zwishbone_controller_tb/dut/registers/rst_i
@@ -72,8 +72,10 @@ add wave -noupdate -expand -group dut -expand -group regs /zwishbone_controller_
 add wave -noupdate -expand -group dut -expand -group regs -radix hexadecimal /zwishbone_controller_tb/dut/registers/adr_i
 add wave -noupdate -expand -group dut -expand -group regs -radix hexadecimal /zwishbone_controller_tb/dut/registers/dat_i
 add wave -noupdate -expand -group dut -expand -group regs -radix hexadecimal /zwishbone_controller_tb/dut/registers/dat_o
+add wave -noupdate -expand -group dut -expand -group regs /zwishbone_controller_tb/dut/registers/to_r
 add wave -noupdate -expand -group dut -expand -group regs /zwishbone_controller_tb/dut/registers/to_inc_i
 add wave -noupdate -expand -group dut -expand -group regs /zwishbone_controller_tb/dut/registers/to_rst_i
+add wave -noupdate -expand -group dut -expand -group regs /zwishbone_controller_tb/dut/registers/to_rst_r
 add wave -noupdate -expand -group dut -expand -group regs /zwishbone_controller_tb/dut/registers/to_o
 add wave -noupdate -expand -group dut -expand -group regs -radix hexadecimal /zwishbone_controller_tb/dut/registers/cfg_o
 add wave -noupdate -expand -group dut -expand -group regs /zwishbone_controller_tb/dut/registers/err_i
@@ -83,7 +85,7 @@ add wave -noupdate -expand -group dut -expand -group regs -radix hexadecimal /zw
 add wave -noupdate -expand -group dut -expand -group regs -radix hexadecimal /zwishbone_controller_tb/dut/registers/reg_to_cmp
 add wave -noupdate -expand -group dut -expand -group regs -radix hexadecimal /zwishbone_controller_tb/dut/registers/reg_to_val
 TreeUpdate [SetDefaultTree]
-WaveRestoreCursors {{Cursor 1} {25911 ps} 0}
+WaveRestoreCursors {{Cursor 1} {202824 ps} 0}
 quietly wave cursor active 1
 configure wave -namecolwidth 375
 configure wave -valuecolwidth 100
@@ -99,4 +101,4 @@ configure wave -griddelta 40
 configure wave -timeline 0
 configure wave -timelineunits ms
 update
-WaveRestoreZoom {0 ps} {197700 ps}
+WaveRestoreZoom {92185 ps} {289885 ps}

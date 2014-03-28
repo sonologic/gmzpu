@@ -75,6 +75,7 @@ architecture rtl of zwishbone_c_regs is
     signal reg_to_val   : unsigned(DATA_WIDTH-1 downto 0); -- := (others => '0');
     -- reg_status signals
     signal to_r         : std_logic;
+    signal to_rst_r     : std_logic;
     -- reg_config bits
     constant    R_CFG_PIPELINE_BIT  : integer:=0;
     constant    R_CFG_BLOCK_BIT     : integer:=1;
@@ -94,9 +95,9 @@ begin
     
     irq_o <= err_i or rty_i or to_r;
 
-    process(clk_i)
+    process(clk_i,rst_i,to_rst_i,to_rst_r)
     begin
-        if rst_i='1' or to_rst_i='1' then
+        if rst_i='1' or to_rst_i='1' or to_rst_r='1' then
             reg_to_val <= x"00000000";
             to_r <= '0';
         elsif rising_edge(clk_i) then
@@ -115,7 +116,7 @@ begin
 
     to_o <= to_r;
  
-    process(clk_i)
+    process(clk_i,rst_i)
     begin
         if rst_i='1' then
             reg_config <= (others => '0');
@@ -123,6 +124,7 @@ begin
             reading_r <= '0';
             reg_to_cmp <= x"0000000f";
             reg_status <= (others => '0');
+            to_rst_r <= '0';
         elsif rising_edge(clk_i) then
             -- clock in status register
             reg_status(R_STATUS_ERR) <= err_i;
@@ -130,6 +132,7 @@ begin
             reg_status(R_STATUS_TO) <= to_r;
             reg_status(DATA_WIDTH-1 downto R_STATUS_UNUSED) <= (others => '0');
 
+                to_rst_r <= '0';
                 if re_i='1' then
                     reading_r <= '1';
                     case adr_i(3 downto 2) is
@@ -153,12 +156,15 @@ begin
                         when "00" =>
                             reg_config <= dat_i;
                         when "01" =>
-                            reg_status <= reg_status and (not dat_i);
+                            -- writing 0 to bit R_STATUS_TO in status resets timeout counter
+                            if dat_i(R_STATUS_TO)='0' then
+                                to_rst_r <= '1';
+                            end if;
                         when "10" =>
                             reg_to_cmp <= dat_i;
                         when others =>
-                            -- can't write TO_VAL
-                            null;
+                            -- writing to val resets timeout counter
+                            to_rst_r <= '1';
                     end case;
                 else
                     -- deassert reading_r on the rising clock after assertion
@@ -266,11 +272,14 @@ architecture rtl of zwishbone_controller is
         read_reg,
         read_reg_ready
     );
+
     signal state        : state_type;
+    signal next_state   : state_type;
   
     -- register component 
     signal reg_re_r     : std_logic; 
     signal reg_we_r     : std_logic; 
+    signal reg_adr_ir   : unsigned(ADR_WIDTH-BUSBIT_WIDTH-1 downto 0);
     signal reg_dat_ir   : unsigned(DATA_WIDTH-1 downto 0);
     signal reg_dat_or   : unsigned(DATA_WIDTH-1 downto 0);
     signal to_r         : std_logic;
@@ -287,58 +296,49 @@ begin
         generic map ( ADR_WIDTH => ADR_WIDTH-BUSBIT_WIDTH, DATA_WIDTH => DATA_WIDTH )
         port map ( clk_i => clk_i, rst_i => rst_i, irq_o => irq_o,
                    re_i => reg_re_r, we_i => reg_we_r,
-                   adr_i => adr_i(ADR_WIDTH-BUSBIT_WIDTH-1 downto 0),
+                   adr_i => reg_adr_ir,
                    dat_i => reg_dat_ir, dat_o => reg_dat_or,
                    to_inc_i => to_inc_r, to_rst_i => to_rst_r, to_o => to_r,
                    cfg_o => config_r, err_i => err_r, rty_i => rty_r);
 
-    err_r <= '1';
-    rty_r <= '1';
+    err_r <= '0';
+    rty_r <= '0';
 
     -- registered
     transition:
-    process(clk_i)
+    process(clk_i,rst_i)
     begin
         if rst_i='1' then
             state <= idle;
         elsif rising_edge(clk_i) then
-            state <= idle;
             case state is
-                when idle =>
-                    -- active when MSB is 1 (0 means register access)
-                    if adr_i(ADR_WIDTH-1)='1' then
-                        if re_i='1' then
-                            state <= read_start;
-                        elsif we_i='1' then
-                            state <= write_start;
-                        else
-                            state <= idle;
-                        end if;
-                    else
-                        -- register access
-                        if re_i='1' then
-                            state <= read_reg;
-                        elsif we_i='1' then
-                            state <= write_reg;
-                        end if;
-                    end if;
                 when write_start =>
-                    state <= write_cycle;
+                    if wb_ack_i='1' then
+                        state <= write_terminate;
+                    else
+                        state <= write_cycle;
+                    end if;
                 when write_cycle =>
                     if to_r='1' then
                         state <= idle;
                     elsif wb_ack_i='1' then
-                        state <= idle;
+                        state <= write_terminate;
                     else
                         state <= write_cycle;
                     end if;
+                when write_terminate =>
+                    state <= idle;
                 when read_start =>
-                    state <= read_cycle;
+                    if wb_ack_i='1' then
+                        state <= read_ready;
+                    else
+                        state <= read_cycle;
+                    end if;
                 when read_cycle =>
                     if to_r='1' then
                         state <= idle;
                     elsif wb_ack_i='1' then
-                        state <= idle;
+                        state <= read_ready;
                     else
                         state <= read_cycle;
                     end if;
@@ -348,10 +348,26 @@ begin
                     state <= idle;
                 when read_reg =>
                     state <= read_reg_ready;
-                when read_reg_ready =>
+                --when read_reg_ready =>
+                --    state <= idle;
+                when others => -- also read_reg_ready
+                    -- others includes state idle
                     state <= idle;
-                when others =>
-                    state <= idle;
+                    -- active when MSB is 1 (0 means register access)
+                    if adr_i(ADR_WIDTH-1)='1' then
+                        if re_i='1' then
+                            state <= read_start;
+                        elsif we_i='1' then
+                            state <= write_start;
+                        end if;
+                    else
+                        -- register access
+                        if re_i='1' then
+                            state <= read_reg;
+                        elsif we_i='1' then
+                            state <= write_reg;
+                        end if;
+                    end if;
             end case;
         end if;
     end process transition;
@@ -359,17 +375,19 @@ begin
     -- irq_o !
 
     -- unregistered (no registers, no latches!)
-    process(state)
+    process(state,adr_i,dat_i,reg_dat_or,to_r)
         variable bus_adr_v  : unsigned(ADR_WIDTH-BUSBIT_WIDTH-CS_WIDTH-1 downto 0);
+        variable reg_adr_v  : unsigned(ADR_WIDTH-BUSBIT_WIDTH-1 downto 0);
         variable cs_v       : unsigned(CS_WIDTH-1 downto 0);
     begin
         -- split address in bus address and chip select (=stb_o bit)
         bus_adr_v := adr_i(bus_adr_v'left downto 0);
+        reg_adr_v := adr_i(reg_adr_v'left downto 0);
         cs_v      := adr_i(ADR_WIDTH-BUSBIT_WIDTH-1 downto ADR_WIDTH-BUSBIT_WIDTH-CS_WIDTH);
 
         case state is
             when write_start =>
-                busy_o <= '0';
+                busy_o <= '1';
                 ready_o <= '0';
                 dat_o <= (others => 'Z');
                 --
@@ -381,18 +399,19 @@ begin
                 wb_lock_o <= '0';
                 wb_sel_o <= (others => '1');
                 wb_stb_o <= (others => '0');
-                wb_stb_o(2**to_integer(cs_v)) <= '1';
+                wb_stb_o((2**to_integer(cs_v))-1) <= '1';
                 wb_tga_o <= (others => '0');
                 wb_tgc_o <= (others => '0');
                 --
                 reg_re_r <= '0';
                 reg_we_r <= '0';
                 reg_dat_ir <= (others => '0');
+                reg_adr_ir <= (others => '0');
                 --
-                to_inc_r <= '1';
-                to_rst_r <= '0';
+                to_inc_r <= '0';
+                to_rst_r <= '1';
             when write_cycle =>
-                busy_o <= '0';
+                busy_o <= '1';
                 ready_o <= '0';
                 dat_o <= (others => 'Z');
                 --
@@ -410,9 +429,33 @@ begin
                 reg_re_r <= '0';
                 reg_we_r <= '0';
                 reg_dat_ir <= (others => '0');
+                reg_adr_ir <= (others => '0');
                 --
-                to_inc_r <= '1';
-                to_rst_r <= '0';
+                to_inc_r <= to_r;
+                to_rst_r <= not to_r;
+            when write_terminate =>
+                busy_o <= '1';
+                ready_o <= '0';
+                dat_o <= (others => 'Z');
+                --
+                wb_we_o <= '0';
+                wb_cyc_o <= '1';
+                wb_lock_o <= '0';
+                wb_adr_o <= (others => 'Z');
+                wb_dat_o <= (others => 'Z');
+                wb_stb_o <= (others => '0');
+                wb_tgd_o <= (others => 'Z');
+                wb_sel_o <= (others => 'Z');
+                wb_tga_o <= (others => 'Z');
+                wb_tgc_o <= (others => 'Z');
+                --
+                reg_re_r <= '0';
+                reg_we_r <= '0';
+                reg_dat_ir <= (others => '0');
+                reg_adr_ir <= (others => '0');
+                --
+                to_inc_r <= to_r;
+                to_rst_r <= not to_r;
             when read_start =>
                 busy_o <= '1';
                 ready_o <= '0';
@@ -424,7 +467,7 @@ begin
                 wb_adr_o <= bus_adr_v;
                 wb_dat_o <= (others => 'Z');
                 wb_stb_o <= (others => '0');
-                wb_stb_o(2**to_integer(cs_v)) <= '1';
+                wb_stb_o((2**to_integer(cs_v))-1) <= '1';
                 wb_tgd_o <= (others => '0');
                 wb_sel_o <= (others => '1');
                 wb_tga_o <= (others => '0');
@@ -433,9 +476,10 @@ begin
                 reg_re_r <= '0';
                 reg_we_r <= '0';
                 reg_dat_ir <= (others => '0');
+                reg_adr_ir <= (others => '0');
                 --
-                to_inc_r <= '1';
-                to_rst_r <= '0';
+                to_inc_r <= '0';
+                to_rst_r <= '1';
             when read_cycle =>
                 busy_o <= '1';
                 ready_o <= '0';
@@ -455,6 +499,7 @@ begin
                 reg_re_r <= '0';
                 reg_we_r <= '0';
                 reg_dat_ir <= (others => '0');
+                reg_adr_ir <= (others => '0');
                 --
                 to_inc_r <= '1';
                 to_rst_r <= '0';
@@ -464,7 +509,7 @@ begin
                 dat_o <= wb_dat_i;
                 --
                 wb_we_o <= '0';
-                wb_cyc_o <= '0';
+                wb_cyc_o <= '1';
                 wb_lock_o <= '0';
                 wb_adr_o <= (others => 'Z');
                 wb_dat_o <= (others => 'Z');
@@ -477,9 +522,10 @@ begin
                 reg_re_r <= '0';
                 reg_we_r <= '0';
                 reg_dat_ir <= (others => '0');
+                reg_adr_ir <= (others => '0');
                 --
-                to_inc_r <= '0';
-                to_rst_r <= '1';
+                to_inc_r <= to_r;
+                to_rst_r <= not to_r;
             when write_reg =>
                 busy_o <= '0';
                 ready_o <= '0';
@@ -499,9 +545,10 @@ begin
                 reg_re_r <= '0';
                 reg_we_r <= '1';
                 reg_dat_ir <= dat_i;
+                reg_adr_ir <= reg_adr_v;
                 --
-                to_inc_r <= '0';
-                to_rst_r <= '1';
+                to_inc_r <= to_r;
+                to_rst_r <= not to_r;
             when read_reg =>
                 busy_o <= '1';
                 ready_o <= '0';
@@ -521,9 +568,10 @@ begin
                 reg_re_r <= '1';
                 reg_we_r <= '0';
                 reg_dat_ir <= (others => '0');
+                reg_adr_ir <= (others => '0');
                 --
-                to_inc_r <= '0';
-                to_rst_r <= '1';
+                to_inc_r <= to_r;
+                to_rst_r <= not to_r;
             when read_reg_ready =>
                 busy_o <= '0';
                 ready_o <= '1';
@@ -543,16 +591,17 @@ begin
                 reg_re_r <= '0';
                 reg_we_r <= '0';
                 reg_dat_ir <= (others => '0');
+                reg_adr_ir <= reg_adr_v;
                 --
-                to_inc_r <= '0';
-                to_rst_r <= '1';
+                to_inc_r <= to_r;
+                to_rst_r <= not to_r;
             when others =>
                 -- others includes state idle
                 busy_o <= '0';
                 ready_o <= '0';
                 dat_o <= (others => 'Z');
                 --
-                wb_we_o <= 'Z';
+                wb_we_o <= '0';
                 wb_dat_o <= (others => 'Z');
                 wb_tgd_o <= (others => 'Z');
                 wb_adr_o <= (others => 'Z');
@@ -566,9 +615,10 @@ begin
                 reg_re_r <= '0';
                 reg_we_r <= '0';
                 reg_dat_ir <= (others => '0');
+                reg_adr_ir <= (others => '0');
                 --
-                to_inc_r <= '0';
-                to_rst_r <= '1';
+                to_inc_r <= to_r;
+                to_rst_r <= not to_r;
         end case;
     end process;
 end architecture rtl;
