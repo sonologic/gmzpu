@@ -66,10 +66,14 @@ cd ${DIR}
 
 if [ ${FAIL} -eq 0 ]; then
     echo -en "${GREEN}"
+    ec=0
 else
     echo -en "${RED}"
+    ec=1
 fi
 
 TOTAL=$(( ${OK} + ${FAIL} ))
 
 echo -e "${OK}/${TOTAL} tests passed, ${FAIL} failed${NO}"
+
+exit ${ec}
