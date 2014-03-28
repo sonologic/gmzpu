@@ -68,15 +68,15 @@ begin
     end process;
 
     write_regs:
-    process(clk_i)
+    process(clk_i,rst_i)
     begin
-        if rising_edge(clk_i) then
-            if rst_i='1' then
-                THR <= (others => '1');
-                CFG <= (others => '0');
-                clk_to_inc_rst_r <= '0';
-                clk_to_inc_ack_r <= '0';
-            elsif en_i='1' then 
+        if rst_i='1' then
+            THR <= (others => '1');
+            CFG <= (others => '0');
+            clk_to_inc_rst_r <= '0';
+            clk_to_inc_ack_r <= '0';
+        elsif rising_edge(clk_i) then
+            if en_i='1' then 
                 -- mem i/o
                 if we_i='1' then
                     case addr_i(1 downto 0) is
@@ -232,53 +232,97 @@ architecture rtl of timers is
     signal we_d     : std_logic;
     signal dat_d    : unsigned(DATA_WIDTH-1 downto 0);
     signal addr_d   : unsigned(ADR_WIDTH-1 downto 0);
+    signal my_cyc_r : std_logic;
 begin
     timer_gen: for i in N_TIMERS-1 downto 0 generate
         timerX : timer
             generic map(ADR_WIDTH => 2, DATA_WIDTH => DATA_WIDTH)
             port map(clk_i => clk_i, rst_i => rst_i, inc_i => clk_i,
-                     addr_i => addr_d(1 downto 0), thresh_o => irq_r(i),
+                     addr_i => addr_d(3 downto 2), thresh_o => irq_r(i),
                      dat_o => wb_dat_o, dat_i => dat_d,
                      we_i => we_d, en_i => ten_r(i));
     end generate;
 
     wb_tgd_o <= (others => 'Z');
     wb_tgd_o <= (others => 'Z');
-    wb_stall_o <= '0';
-    wb_err_o <= '0';
-    wb_rty_o <= '0';
+    wb_stall_o <= '0' when my_cyc_r='1' else 'Z';
+    wb_err_o <= '0' when my_cyc_r='1' else 'Z';
+    wb_rty_o <= '0' when my_cyc_r='1' else 'Z';
  
     cs_r <= addr_r(ADR_WIDTH-1 downto 2);
 
     --wb_ack_o <= cyc_r and not en_r;
-    wb_ack_o <= '0'     when ten_r=(ten_r'range => '0') else
-                wb_cyc_i;
+    --wb_ack_o <= '0'     when ten_r=(ten_r'range => '0') else
+    --            wb_cyc_i;
 
-    process(clk_i)
+    process(clk_i,rst_i)
     begin
-        if rising_edge(clk_i) then
-            -- clock in input signals
-            addr_r <= wb_adr_i;
-            en_r <= wb_stb_i and wb_cyc_i;
-            we_r <= wb_we_i;
-            dat_r <= wb_dat_i;
-
-            -- delay signals to allow one cycle for chip select
-            addr_d <= addr_r;
-            we_d <= we_r;
-            dat_d <= dat_r;
-
-            -- decode cs_i to ten_r
-            for i in ten_r'range loop
-                if i=cs_r then
-                    ten_r(i) <= en_r and not rst_i;
-                else
-                    ten_r(i) <= '0';
+        if rst_i='1' then
+            addr_r <= (others => '0');
+            en_r <= '0';
+            we_r <= '0';
+            dat_r <= (others => '0');
+            addr_d <= (others => '0');
+            we_d <= '0';
+            dat_d <= (others => '0');
+            ten_r <= (others => '0');
+            my_cyc_r <= '0';
+        elsif rising_edge(clk_i) then
+            if my_cyc_r='1' and wb_cyc_i='0' then
+                my_cyc_r <= '0';
+            end if;
+            if wb_stb_i='1' or en_r='1' then
+                -- clock in input signals
+                if wb_stb_i='1' then
+                    addr_r <= wb_adr_i;
                 end if;
-            end loop;
-            
+                if wb_stb_i='1' and wb_cyc_i='1' then
+                    en_r <= '1';
+                    my_cyc_r <= '1';
+                else
+                    en_r <= '0';
+                end if;
+                we_r <= wb_we_i;
+                dat_r <= wb_dat_i;
+
+                -- delay signals to allow one cycle for chip select
+                addr_d <= addr_r;
+                we_d <= we_r;
+                dat_d <= dat_r;
+
+                -- decode cs_i to ten_r
+                for i in ten_r'range loop
+                    if i=cs_r then
+                        ten_r(i) <= en_r and not rst_i;
+                    else
+                        ten_r(i) <= '0';
+                    end if;
+                end loop;
+            else
+                ten_r <= (others => '0');
+            end if;
         end if;
     end process;
+
+    wb_ack_o <= 'Z' when rst_i='1' else
+                '0' when my_cyc_r='1' and wb_stb_i='1' else
+                '1' when my_cyc_r='1' else
+                'Z';
+       
+    --process(clk_i,rst_i)
+    --begin
+    --    if rst_i='1' then
+    --        wb_ack_o <= 'Z';
+    --    elsif rising_edge(clk_i) then
+    --        if my_cyc_r='1' then
+    --            wb_ack_o <= '1';
+    --        elsif wb_stb_i='1' and wb_cyc_i='1' then
+    --            wb_ack_o <= '0';
+    --        else
+    --            wb_ack_o <= 'Z';
+    --        end if;
+    --    end if;
+    --end process;
 
     irq_o <= '0' when irq_r=(irq_r'range => '0') or rst_i='1' else '1';
     
