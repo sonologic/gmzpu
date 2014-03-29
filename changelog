@@ -1,0 +1,7 @@
+0.0.1
+=====
+
+- gmZPU SoC with ram, phiIO, zwc0
+- timer
+- programmable interrupt controler
+
