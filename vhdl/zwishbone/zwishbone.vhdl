@@ -77,14 +77,14 @@ architecture rtl of zwishbone_c_regs is
     signal to_r         : std_logic;
     signal to_rst_r     : std_logic;
     -- reg_config bits
-    constant    R_CFG_PIPELINE_BIT  : integer:=0;
-    constant    R_CFG_BLOCK_BIT     : integer:=1;
-    constant    R_CFG_RMW_BIT       : integer:=2;
+    constant    R_CFG_PIPELINE_BIT  : natural:=0;
+    constant    R_CFG_BLOCK_BIT     : natural:=1;
+    constant    R_CFG_RMW_BIT       : natural:=2;
     -- reg_status bits
-    constant    R_STATUS_ERR        : integer:=0;
-    constant    R_STATUS_RTY        : integer:=1;
-    constant    R_STATUS_TO         : integer:=2;
-    constant    R_STATUS_UNUSED     : integer:=3;
+    constant    R_STATUS_ERR        : natural:=0;
+    constant    R_STATUS_RTY        : natural:=1;
+    constant    R_STATUS_TO         : natural:=2;
+    constant    R_STATUS_UNUSED     : natural:=3;
     -- memory control
     signal reading_r    : std_logic;
     --signal ready_r      : std_logic;
@@ -120,6 +120,7 @@ begin
     begin
         if rst_i='1' then
             reg_config <= (others => '0');
+            reg_config(R_CFG_PIPELINE_BIT) <= '1';
             dat_o <= (others => '0');
             reading_r <= '0';
             reg_to_cmp <= x"0000000f";
@@ -154,7 +155,8 @@ begin
                     dat_o <= (others => 'Z');
                     case adr_i(3 downto 2) is
                         when "00" =>
-                            reg_config <= dat_i;
+                            reg_config <= (others => '0');
+                            reg_config(R_CFG_PIPELINE_BIT) <= '1';
                         when "01" =>
                             -- writing 0 to bit R_STATUS_TO in status resets timeout counter
                             if dat_i(R_STATUS_TO)='0' then
