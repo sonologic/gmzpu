@@ -130,7 +130,6 @@ architecture Structural of gmZPU is
     signal phi_io_addr      : unsigned(2 downto 0);
 
     -- I/O (zwishbone)
-    signal zw_ena           : std_logic;
     signal zw_busy          : std_logic;
     signal zw_ready         : std_logic;
     signal zw_addr          : unsigned(ADDR_W-3 downto 0);
@@ -206,14 +205,13 @@ begin
             DATA_WIDTH => WORD_SIZE, ADR_WIDTH => ADDR_W-2, CS_WIDTH => 4
         )
         port map(
-            clk_i => clk_i, rst_i => rst_i, ena_i => zw_ena, busy_o => zw_busy, ready_o => zw_ready, irq_o => irq_r,
+            clk_i => clk_i, rst_i => rst_i, re_i => zw_re, busy_o => zw_busy, ready_o => zw_ready, irq_o => irq_r,
             adr_i => zw_addr, we_i => zw_we, dat_i => zw_dat_i, dat_o => zw_dat_o,
             int_i => interrupt_i
         );
     -- ADDR_W = 18, IO_BIT = 17, ZW_BIT = 16
-    zw_we  <= mem_we and mem_addr(IO_BIT) and mem_addr(ZW_BIT);
-    zw_re  <= mem_re and mem_addr(IO_BIT) and mem_addr(ZW_BIT);
-    zw_ena <= zw_we or zw_re;
+    zw_we   <= mem_we and mem_addr(IO_BIT) and mem_addr(ZW_BIT);
+    zw_re   <= mem_re and mem_addr(IO_BIT) and mem_addr(ZW_BIT);
     zw_addr <= mem_addr(ADDR_W-3 downto 0);
 
     zw_dat_i <= mem_write;

@@ -14,10 +14,10 @@ package soc is
             clk_i       : in std_logic;
             rst_i       : in std_logic;
             -- zpu interface (non wishbone signal)
-            ena_i       : in std_logic; -- enable wb controller
             busy_o      : out std_logic; -- controller busy
             ready_o     : out std_logic; -- read request ready
             adr_i       : in unsigned(ADR_WIDTH-1 downto 0);
+            re_i        : in std_logic;
             we_i        : in std_logic;
             dat_i      : in unsigned(DATA_WIDTH-1 downto 0);
             dat_o      : out unsigned(DATA_WIDTH-1 downto 0);

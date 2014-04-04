@@ -20,10 +20,10 @@ entity zwc is
         clk_i       : in std_logic;
         rst_i       : in std_logic;
         -- zpu interface (non wishbone signal)
-        ena_i       : in std_logic; -- enable wb controller
         busy_o      : out std_logic; -- controller busy
         ready_o     : out std_logic; -- read request ready
         adr_i       : in unsigned(ADR_WIDTH-1 downto 0);
+        re_i        : in std_logic;
         we_i        : in std_logic;
         dat_i      : in unsigned(DATA_WIDTH-1 downto 0);
         dat_o      : out unsigned(DATA_WIDTH-1 downto 0);
@@ -80,10 +80,10 @@ begin
         )
         port map(
             -- syscon
-            clk_i => clk_i, rst_i => rst_i, ena_i => ena_i, busy_o => busy_o, ready_o => ready_o, 
+            clk_i => clk_i, rst_i => rst_i, busy_o => busy_o, ready_o => ready_o, 
             -- interrupt
             irq_o => int_r(PIC_INT_ZWC),
-            adr_i => adr_i, we_i => we_i, dat_i => dat_i, dat_o => dat_o,
+            adr_i => adr_i, re_i => re_i, we_i => we_i, dat_i => dat_i, dat_o => dat_o,
             -- chip select
             wb_stb_o => wb_stb_o,
             -- wishbone bus (master)
