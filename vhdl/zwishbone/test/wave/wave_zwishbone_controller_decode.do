@@ -1,0 +1,107 @@
+onerror {resume}
+quietly WaveActivateNextPane {} 0
+add wave -noupdate -expand -group testbench /zwishbone_controller_decode_tb/clk
+add wave -noupdate -expand -group testbench /zwishbone_controller_decode_tb/rst_i
+add wave -noupdate -expand -group testbench /zwishbone_controller_decode_tb/adr_i
+add wave -noupdate -expand -group testbench /zwishbone_controller_decode_tb/re_i
+add wave -noupdate -expand -group testbench /zwishbone_controller_decode_tb/we_i
+add wave -noupdate -expand -group testbench /zwishbone_controller_decode_tb/zw_adr_i
+add wave -noupdate -expand -group testbench /zwishbone_controller_decode_tb/zw_re_i
+add wave -noupdate -expand -group testbench /zwishbone_controller_decode_tb/zw_we_i
+add wave -noupdate -expand -group testbench -radix hexadecimal /zwishbone_controller_decode_tb/dat_i
+add wave -noupdate -expand -group testbench -radix hexadecimal /zwishbone_controller_decode_tb/wb_dat_i
+add wave -noupdate -expand -group testbench /zwishbone_controller_decode_tb/wb_ack_i
+add wave -noupdate -expand -group testbench /zwishbone_controller_decode_tb/wb_stall_i
+add wave -noupdate -expand -group testbench /zwishbone_controller_decode_tb/wb_err_i
+add wave -noupdate -expand -group testbench /zwishbone_controller_decode_tb/wb_rty_i
+add wave -noupdate -expand -group testbench -radix hexadecimal /zwishbone_controller_decode_tb/wb_tgd_i
+add wave -noupdate -expand -group testbench /zwishbone_controller_decode_tb/wb_cyc_o
+add wave -noupdate -expand -group testbench /zwishbone_controller_decode_tb/wb_stb_o
+add wave -noupdate -expand -group testbench /zwishbone_controller_decode_tb/wb_we_o
+add wave -noupdate -expand -group testbench /zwishbone_controller_decode_tb/wb_lock_o
+add wave -noupdate -expand -group testbench /zwishbone_controller_decode_tb/busy_o
+add wave -noupdate -expand -group testbench /zwishbone_controller_decode_tb/ready_o
+add wave -noupdate -expand -group testbench -radix hexadecimal /zwishbone_controller_decode_tb/dat_o
+add wave -noupdate -expand -group testbench /zwishbone_controller_decode_tb/irq_o
+add wave -noupdate -expand -group testbench -radix hexadecimal /zwishbone_controller_decode_tb/wb_dat_o
+add wave -noupdate -expand -group testbench -radix hexadecimal /zwishbone_controller_decode_tb/wb_tgc_o
+add wave -noupdate -expand -group testbench /zwishbone_controller_decode_tb/wb_adr_o
+add wave -noupdate -expand -group testbench -radix hexadecimal /zwishbone_controller_decode_tb/wb_tga_o
+add wave -noupdate -expand -group testbench -radix hexadecimal /zwishbone_controller_decode_tb/wb_sel_o
+add wave -noupdate -expand -group dut /zwishbone_controller_decode_tb/dut/clk_i
+add wave -noupdate -expand -group dut /zwishbone_controller_decode_tb/dut/rst_i
+add wave -noupdate -expand -group dut /zwishbone_controller_decode_tb/dut/busy_o
+add wave -noupdate -expand -group dut /zwishbone_controller_decode_tb/dut/ready_o
+add wave -noupdate -expand -group dut -radix hexadecimal /zwishbone_controller_decode_tb/dut/adr_i
+add wave -noupdate -expand -group dut /zwishbone_controller_decode_tb/dut/we_i
+add wave -noupdate -expand -group dut /zwishbone_controller_decode_tb/dut/re_i
+add wave -noupdate -expand -group dut -radix hexadecimal /zwishbone_controller_decode_tb/dut/dat_i
+add wave -noupdate -expand -group dut -radix hexadecimal /zwishbone_controller_decode_tb/dut/dat_o
+add wave -noupdate -expand -group dut /zwishbone_controller_decode_tb/dut/irq_o
+add wave -noupdate -expand -group dut -radix hexadecimal /zwishbone_controller_decode_tb/dut/wb_dat_i
+add wave -noupdate -expand -group dut -radix hexadecimal /zwishbone_controller_decode_tb/dut/wb_dat_o
+add wave -noupdate -expand -group dut -radix hexadecimal /zwishbone_controller_decode_tb/dut/wb_tgd_i
+add wave -noupdate -expand -group dut -radix hexadecimal /zwishbone_controller_decode_tb/dut/wb_tgd_o
+add wave -noupdate -expand -group dut /zwishbone_controller_decode_tb/dut/wb_cyc_o
+add wave -noupdate -expand -group dut -radix hexadecimal /zwishbone_controller_decode_tb/dut/wb_stb_o
+add wave -noupdate -expand -group dut /zwishbone_controller_decode_tb/dut/wb_ack_i
+add wave -noupdate -expand -group dut /zwishbone_controller_decode_tb/dut/wb_we_o
+add wave -noupdate -expand -group dut -radix hexadecimal /zwishbone_controller_decode_tb/dut/wb_adr_o
+add wave -noupdate -expand -group dut /zwishbone_controller_decode_tb/dut/wb_stall_i
+add wave -noupdate -expand -group dut /zwishbone_controller_decode_tb/dut/wb_err_i
+add wave -noupdate -expand -group dut /zwishbone_controller_decode_tb/dut/wb_lock_o
+add wave -noupdate -expand -group dut /zwishbone_controller_decode_tb/dut/wb_rty_i
+add wave -noupdate -expand -group dut -radix hexadecimal /zwishbone_controller_decode_tb/dut/wb_sel_o
+add wave -noupdate -expand -group dut -radix hexadecimal /zwishbone_controller_decode_tb/dut/wb_tga_o
+add wave -noupdate -expand -group dut -radix hexadecimal /zwishbone_controller_decode_tb/dut/wb_tgc_o
+add wave -noupdate -expand -group dut /zwishbone_controller_decode_tb/dut/state
+add wave -noupdate -expand -group dut /zwishbone_controller_decode_tb/dut/next_state
+add wave -noupdate -expand -group dut /zwishbone_controller_decode_tb/dut/reg_re_r
+add wave -noupdate -expand -group dut /zwishbone_controller_decode_tb/dut/reg_we_r
+add wave -noupdate -expand -group dut -radix hexadecimal /zwishbone_controller_decode_tb/dut/reg_dat_ir
+add wave -noupdate -expand -group dut -radix hexadecimal /zwishbone_controller_decode_tb/dut/reg_dat_or
+add wave -noupdate -expand -group dut /zwishbone_controller_decode_tb/dut/to_r
+add wave -noupdate -expand -group dut /zwishbone_controller_decode_tb/dut/to_inc_r
+add wave -noupdate -expand -group dut /zwishbone_controller_decode_tb/dut/to_rst_r
+add wave -noupdate -expand -group dut /zwishbone_controller_decode_tb/dut/err_r
+add wave -noupdate -expand -group dut /zwishbone_controller_decode_tb/dut/rty_r
+add wave -noupdate -expand -group dut -radix hexadecimal /zwishbone_controller_decode_tb/dut/config_r
+add wave -noupdate -expand -group dut -expand -group regs /zwishbone_controller_decode_tb/dut/registers/reading_r
+add wave -noupdate -expand -group dut -expand -group regs /zwishbone_controller_decode_tb/dut/registers/clk_i
+add wave -noupdate -expand -group dut -expand -group regs /zwishbone_controller_decode_tb/dut/registers/rst_i
+add wave -noupdate -expand -group dut -expand -group regs /zwishbone_controller_decode_tb/dut/registers/irq_o
+add wave -noupdate -expand -group dut -expand -group regs /zwishbone_controller_decode_tb/dut/registers/re_i
+add wave -noupdate -expand -group dut -expand -group regs /zwishbone_controller_decode_tb/dut/registers/we_i
+add wave -noupdate -expand -group dut -expand -group regs -radix hexadecimal /zwishbone_controller_decode_tb/dut/registers/adr_i
+add wave -noupdate -expand -group dut -expand -group regs -radix hexadecimal /zwishbone_controller_decode_tb/dut/registers/dat_i
+add wave -noupdate -expand -group dut -expand -group regs -radix hexadecimal /zwishbone_controller_decode_tb/dut/registers/dat_o
+add wave -noupdate -expand -group dut -expand -group regs /zwishbone_controller_decode_tb/dut/registers/to_r
+add wave -noupdate -expand -group dut -expand -group regs /zwishbone_controller_decode_tb/dut/registers/to_inc_i
+add wave -noupdate -expand -group dut -expand -group regs /zwishbone_controller_decode_tb/dut/registers/to_rst_i
+add wave -noupdate -expand -group dut -expand -group regs /zwishbone_controller_decode_tb/dut/registers/to_rst_r
+add wave -noupdate -expand -group dut -expand -group regs /zwishbone_controller_decode_tb/dut/registers/to_o
+add wave -noupdate -expand -group dut -expand -group regs -radix hexadecimal /zwishbone_controller_decode_tb/dut/registers/cfg_o
+add wave -noupdate -expand -group dut -expand -group regs /zwishbone_controller_decode_tb/dut/registers/err_i
+add wave -noupdate -expand -group dut -expand -group regs /zwishbone_controller_decode_tb/dut/registers/rty_i
+add wave -noupdate -expand -group dut -expand -group regs -radix hexadecimal /zwishbone_controller_decode_tb/dut/registers/reg_config
+add wave -noupdate -expand -group dut -expand -group regs -radix hexadecimal /zwishbone_controller_decode_tb/dut/registers/reg_status
+add wave -noupdate -expand -group dut -expand -group regs -radix hexadecimal /zwishbone_controller_decode_tb/dut/registers/reg_to_cmp
+add wave -noupdate -expand -group dut -expand -group regs -radix hexadecimal /zwishbone_controller_decode_tb/dut/registers/reg_to_val
+TreeUpdate [SetDefaultTree]
+WaveRestoreCursors {{Cursor 1} {0 ps} 0}
+quietly wave cursor active 1
+configure wave -namecolwidth 375
+configure wave -valuecolwidth 151
+configure wave -justifyvalue left
+configure wave -signalnamewidth 0
+configure wave -snapdistance 10
+configure wave -datasetprefix 0
+configure wave -rowmargin 4
+configure wave -childrowmargin 2
+configure wave -gridoffset 0
+configure wave -gridperiod 1
+configure wave -griddelta 40
+configure wave -timeline 0
+configure wave -timelineunits ms
+update
+WaveRestoreZoom {0 ps} {184485 ps}
